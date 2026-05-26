@@ -631,7 +631,7 @@
         <button type="submit" class="login-submit">접근</button>
         <button type="button" class="login-cancel" onclick="cancelPwGate()">취소</button>
       </form>
-      <div class="login-pw-hint">데모 비밀번호: <code>2026</code> (실제 서비스에서는 개별 비밀번호로 대체)</div>
+      <div class="login-pw-hint">비밀번호는 본인에게만 부여됩니다. 분실 시 관리자(본부장)에게 문의해주세요.</div>
     </div>
   </div>
 </div>
@@ -1053,10 +1053,13 @@ const OWNERS = {
   '메디웰'      : '미지정',
 };
 
-/* 팀 로스터: 본부장 + G팀(팀장/과장/대리/사원) */
+/* 팀 로스터: 본부장 + G팀(팀장/과장/대리/사원)
+   - password: 팀장/본부장만 사용 (member는 비밀번호 불필요)
+   - 운영 환경에서는 각 사용자가 직접 변경하도록 별도 페이지/API 필요
+*/
 const TEAM_ROSTER = [
-  { name:'남진현', role:'head',   title:'본부장' },
-  { name:'최유정', role:'lead',   title:'팀장' },
+  { name:'남진현', role:'head',   title:'본부장', password:'njh2026' },
+  { name:'최유정', role:'lead',   title:'팀장',   password:'cyj2026' },
   { name:'안혜인', role:'member', title:'과장' },
   { name:'최진영', role:'member', title:'대리' },
   { name:'김윤지', role:'member', title:'사원' },
@@ -2072,7 +2075,7 @@ function buildLoginScreen(){
   if(pwWrap) pwWrap.style.display = 'none';
   PENDING_LOGIN = null;
 }
-const ADMIN_PW = '2026';  // 데모 비밀번호 (팀장/본부장 공통)
+// 개별 비밀번호 — 각 사용자의 password 필드 사용 (TEAM_ROSTER 참조)
 let PENDING_LOGIN = null;
 
 function doLoginByName(){
@@ -2111,8 +2114,9 @@ function doLoginByPassword(){
   const pwInp = document.getElementById('login-pw-input');
   const err = document.getElementById('login-error');
   const pw = (pwInp.value||'').trim();
-  if(pw !== ADMIN_PW){
-    err.textContent = '비밀번호가 일치하지 않습니다. (데모 비밀번호: 2026)';
+  // 사용자별 개별 비밀번호와 비교 (TEAM_ROSTER에 등록된 password)
+  if(!PENDING_LOGIN.password || pw !== PENDING_LOGIN.password){
+    err.textContent = '비밀번호가 일치하지 않습니다. 비밀번호를 잊으셨다면 관리자에게 문의해주세요.';
     err.style.display = 'block';
     pwInp.value = '';
     setTimeout(()=>pwInp.focus(),20);
@@ -2433,4 +2437,4 @@ showLogin();
 </div>
 </body>
 </html>
-                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                    
+                                                                                                                                                                 
