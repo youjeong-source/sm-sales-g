@@ -2,7 +2,7 @@
 <html lang="ko">
 <head>
 <meta charset="utf-8" />
-<title>GOLDENAX Sales · G팀 매출관리 시스템</title>
+<title>GOLDENAX SM본부 매출 관리</title>
 <meta name="viewport" content="width=1440" />
 <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.1/chart.umd.min.js"></script>
 <script src="https://cdn.jsdelivr.net/npm/xlsx@0.18.5/dist/xlsx.full.min.js"></script>
@@ -359,10 +359,10 @@
   /* HQ 매출 관리 (브랜드별 표) */
   .hq-brand-tbl-wrap{overflow-x:auto}
   .hq-brand-tbl{width:100%;border-collapse:collapse;font-size:12px}
-  .hq-brand-tbl thead th{background:#FAFAFA;color:var(--ink3);font-weight:700;font-size:10.5px;text-transform:uppercase;letter-spacing:.3px;padding:10px 10px;text-align:left;border-bottom:2px solid var(--line)}
-  .hq-brand-tbl thead th.r{text-align:right}
-  .hq-brand-tbl tbody td{padding:10px 10px;border-bottom:1px solid var(--line2);font-variant-numeric:tabular-nums}
-  .hq-brand-tbl tbody td.r{text-align:right}
+  .hq-brand-tbl thead th{background:#FAFAFA;color:var(--ink3);font-weight:700;font-size:10.5px;text-transform:uppercase;letter-spacing:.3px;padding:10px 10px;text-align:center;border-bottom:2px solid var(--line)}
+  .hq-brand-tbl thead th.r{text-align:center}
+  .hq-brand-tbl tbody td{padding:10px 10px;border-bottom:1px solid var(--line2);font-variant-numeric:tabular-nums;text-align:center}
+  .hq-brand-tbl tbody td.r{text-align:center}
   .hq-brand-tbl tbody tr:hover{background:var(--bg)}
   .hq-brand-tbl .team-pill{display:inline-flex;align-items:center;gap:5px;font-size:10.5px;font-weight:800;padding:3px 8px;border-radius:5px;letter-spacing:.3px}
   .hq-brand-tbl .team-pill.g{background:var(--team-g-bg);color:var(--team-g)}
@@ -2093,6 +2093,7 @@ function editHQInsight(idx, encodedHeader){
   openFormModal(`본부 인사이트 - ${header}`, html, ()=>{
     const val = document.getElementById('fm-hi-body').value;
     STATE.hqInsightOverrides[`hi_${idx}`] = val;
+    persistTeamsData();
     renderHQDashboard();
   });
 }
@@ -2448,13 +2449,13 @@ function editAuxNew(){
     const v = parseInt(document.getElementById('fm-newgoal').value,10);
     if(isNaN(v) || v<0){alert('0 이상의 숫자를 입력해주세요.');return false;}
     STATE.goals.brand = v;
-    // 팀별 goals에도 반영 (영구 저장)
     if(STATE.team !== 'HQ' && ALL_TEAMS_DATA.teams[STATE.team]){
       ALL_TEAMS_DATA.teams[STATE.team].goals.brand = v;
-      recomputeHQGoals();  // 본부 합산 실시간 반영
+      recomputeHQGoals();
     } else if(STATE.team === 'HQ'){
       ALL_TEAMS_DATA.hq_goals.brand = v;
     }
+    persistTeamsData();  // localStorage 영구 저장
     renderAuxKPIs();
     renderKPI();
   });
@@ -2480,6 +2481,7 @@ function editAuxRenew(){
     const checks = document.querySelectorAll('#fm-body input[type="checkbox"]');
     STATE.renewedSet = new Set();
     checks.forEach(c=>{ if(c.checked) STATE.renewedSet.add(c.dataset.brand); });
+    persistTeamsData();
     renderAuxKPIs();
   });
 }
@@ -2494,6 +2496,7 @@ function editQualGrowth(){
   `;
   openFormModal('질적 성장 목표 입력', html, ()=>{
     setCurrentQualGrowth(document.getElementById('fm-qual').value);
+    persistTeamsData();
     renderAuxKPIs();
   });
 }
@@ -2790,8 +2793,9 @@ function confirmExtendContract(b){
     if(!ne){alert('새 계약 종료일을 입력하세요.');return false;}
     meta.contractEnd = ne;
     STATE.renewedSet.add(b);
+    persistTeamsData();
     refreshAll();
-    alert(`[${b}] 계약이 ${ne}까지 연장 처리되었습니다.`);
+    showToast(`[${b}] 계약이 ${ne}까지 연장 처리되었습니다.`, 'success');
   });
 }
 document.addEventListener('keydown', e=>{
@@ -3093,6 +3097,12 @@ function renderOps(){
           else DATA.notes.push({brand:b,month,category:c,note:inp.value});
         }
       }
+      // ALL_TEAMS_DATA에도 동기화 + 영구 저장
+      if(STATE.team !== 'HQ' && ALL_TEAMS_DATA.teams[STATE.team]){
+        ALL_TEAMS_DATA.teams[STATE.team].records = DATA.records.slice();
+        ALL_TEAMS_DATA.teams[STATE.team].notes = DATA.notes.slice();
+      }
+      persistTeamsData();
       // partial refresh
       renderKPI(); renderCharts(); renderAlerts();
       // update top sums w/o re-rendering all cards
@@ -3111,7 +3121,7 @@ function toggleEditBrand(b){
 function toggleBrandEnded(b, ended){
   const meta = getMeta(b);
   meta.ended = !!ended;
-  // 종료 브랜드는 자동 하단 배치
+  persistTeamsData();
   renderOps();
   renderProgList(); renderBrandTbl();
 }
@@ -3214,6 +3224,15 @@ function openBrandAdd(){
     if(!ADV_ORDER.includes(adv)) ADV_ORDER.push(adv);
     BRAND_META[name] = {newBrand:getFMChk('fm-new'), contractStart:getFM('fm-cs'), contractEnd:getFM('fm-ce'), ended:false};
     TAX_INVOICE[name] = {};
+    // ALL_TEAMS_DATA 동기화
+    if(STATE.team !== 'HQ' && ALL_TEAMS_DATA.teams[STATE.team]){
+      const t = ALL_TEAMS_DATA.teams[STATE.team];
+      t.brands = DATA.brands.slice();
+      t.advertiserMap = Object.assign({}, DATA.advertiserMap);
+      t.owners = Object.assign({}, DATA.owners);
+      t.advertiserOrder = DATA.advertiserOrder.slice();
+    }
+    persistTeamsData();
     refreshAll();
   });
 }
@@ -3256,6 +3275,15 @@ function renameBrand(oldName){
     m.contractEnd = getFM('fm-ce');
     m.newBrand = getFMChk('fm-new');
     m.ended = getFMChk('fm-end');
+    if(STATE.team !== 'HQ' && ALL_TEAMS_DATA.teams[STATE.team]){
+      const t = ALL_TEAMS_DATA.teams[STATE.team];
+      t.brands = DATA.brands.slice();
+      t.records = DATA.records.slice();
+      t.notes = DATA.notes.slice();
+      t.advertiserMap = Object.assign({}, DATA.advertiserMap);
+      t.owners = Object.assign({}, DATA.owners);
+    }
+    persistTeamsData();
     refreshAll();
   });
 }
@@ -3297,6 +3325,15 @@ async function deleteBrand(name){
   DATA.records = DATA.records.filter(r=>r.brand!==name);
   DATA.notes   = DATA.notes.filter(n=>n.brand!==name);
   delete ADV_MAP[name]; delete OWNERS[name]; delete BRAND_META[name]; delete TAX_INVOICE[name];
+  if(STATE.team !== 'HQ' && ALL_TEAMS_DATA.teams[STATE.team]){
+    const t = ALL_TEAMS_DATA.teams[STATE.team];
+    t.brands = DATA.brands.slice();
+    t.records = DATA.records.slice();
+    t.notes = DATA.notes.slice();
+    t.advertiserMap = Object.assign({}, DATA.advertiserMap);
+    t.owners = Object.assign({}, DATA.owners);
+  }
+  persistTeamsData();
   rebuildREC();
   refreshAll();
 }
@@ -3410,13 +3447,14 @@ function processOpsExcel(workbook, fileName){
     return;
   }
 
-  // 현재 팀의 ALL_TEAMS_DATA에도 반영 (영구 저장)
+  // 현재 팀의 ALL_TEAMS_DATA에도 반영 + localStorage 영구 저장
   if(STATE.team !== 'HQ' && ALL_TEAMS_DATA.teams[STATE.team]){
     ALL_TEAMS_DATA.teams[STATE.team].brands = DATA.brands.slice();
     ALL_TEAMS_DATA.teams[STATE.team].records = DATA.records.slice();
     ALL_TEAMS_DATA.teams[STATE.team].advertiserMap = Object.assign({}, DATA.advertiserMap);
     ALL_TEAMS_DATA.teams[STATE.team].owners = Object.assign({}, DATA.owners);
   }
+  persistTeamsData();
   rebuildREC();
   refreshAll();
   alert(`✅ 엑셀 업로드 완료\n\n• 시트: ${sheetName}\n• 신규 브랜드: ${added}개\n• 매출 record 갱신: ${updated}건\n\n월간 운영 / 브랜드별 매출표가 즉시 반영되었습니다.`);
@@ -3437,8 +3475,8 @@ function isTaxIssued(brand, month){
 function toggleTaxIssued(brand, month, val){
   TAX_INVOICE[brand] = TAX_INVOICE[brand] || {};
   TAX_INVOICE[brand][month] = !!val;
-  // 발행 해제 시 승인 상태도 초기화
   if(!val && APPROVAL_STATUS[brand]) delete APPROVAL_STATUS[brand][month];
+  persistTeamsData();
   renderOps();
   renderApprove();
 }
@@ -3624,6 +3662,96 @@ function restoreSession(){
 function clearSession(){
   try { localStorage.removeItem(SESSION_KEY); } catch(e){}
 }
+
+/* ===== 팀 데이터 실시간 저장/복원 (localStorage) ===== */
+const DATA_KEY = 'sm_sales_teams_data_v1';
+
+function persistTeamsData(){
+  // 핵심 변경 가능 데이터만 저장 (모든 ALL_TEAMS_DATA 저장은 크기 부담)
+  try {
+    const snapshot = {
+      teams: {},
+      hq_goals: ALL_TEAMS_DATA.hq_goals,
+      hqInsightOverrides: STATE.hqInsightOverrides || {},
+      qualGrowth: STATE.qualGrowth || {},
+      taxInvoice: TAX_INVOICE || {},
+      brandMeta: BRAND_META || {},
+      approvalStatus: APPROVAL_STATUS || {},
+      renewed: Array.from(STATE.renewedSet || []),
+      updatedAt: Date.now()
+    };
+    Object.keys(ALL_TEAMS_DATA.teams).forEach(tid=>{
+      const t = ALL_TEAMS_DATA.teams[tid];
+      snapshot.teams[tid] = {
+        brands: t.brands,
+        records: t.records,
+        notes: t.notes,
+        advertiserMap: t.advertiserMap,
+        owners: t.owners,
+        advertiserOrder: t.advertiserOrder,
+        goals: t.goals,
+        roster: t.roster
+      };
+    });
+    localStorage.setItem(DATA_KEY, JSON.stringify(snapshot));
+  } catch(e){ console.warn('데이터 저장 실패', e); }
+}
+
+function restoreTeamsData(){
+  try {
+    const raw = localStorage.getItem(DATA_KEY);
+    if(!raw) return false;
+    const snapshot = JSON.parse(raw);
+    if(!snapshot.teams) return false;
+    // 30일 이상 오래된 데이터는 무시
+    if(snapshot.updatedAt && (Date.now() - snapshot.updatedAt) > 30*24*60*60*1000){
+      return false;
+    }
+    // ALL_TEAMS_DATA에 병합
+    Object.keys(snapshot.teams).forEach(tid=>{
+      if(ALL_TEAMS_DATA.teams[tid]){
+        const stored = snapshot.teams[tid];
+        const cur = ALL_TEAMS_DATA.teams[tid];
+        if(stored.brands) cur.brands = stored.brands;
+        if(stored.records) cur.records = stored.records;
+        if(stored.notes) cur.notes = stored.notes;
+        if(stored.advertiserMap) cur.advertiserMap = stored.advertiserMap;
+        if(stored.owners) cur.owners = stored.owners;
+        if(stored.advertiserOrder) cur.advertiserOrder = stored.advertiserOrder;
+        if(stored.goals) cur.goals = stored.goals;
+        if(stored.roster) cur.roster = stored.roster;
+      }
+    });
+    if(snapshot.hq_goals) ALL_TEAMS_DATA.hq_goals = snapshot.hq_goals;
+    if(snapshot.hqInsightOverrides) STATE.hqInsightOverrides = snapshot.hqInsightOverrides;
+    if(snapshot.qualGrowth) Object.assign(STATE.qualGrowth, snapshot.qualGrowth);
+    if(snapshot.taxInvoice) Object.assign(TAX_INVOICE, snapshot.taxInvoice);
+    if(snapshot.brandMeta) Object.assign(BRAND_META, snapshot.brandMeta);
+    if(snapshot.approvalStatus) Object.assign(APPROVAL_STATUS, snapshot.approvalStatus);
+    if(snapshot.renewed && Array.isArray(snapshot.renewed)){
+      STATE.renewedSet = new Set(snapshot.renewed);
+    }
+    return true;
+  } catch(e){
+    console.warn('데이터 복원 실패', e);
+    return false;
+  }
+}
+
+// 다른 탭에서 데이터 변경 감지 → 자동 갱신
+window.addEventListener('storage', function(e){
+  if(e.key === DATA_KEY && e.newValue){
+    if(restoreTeamsData()){
+      // 현재 보고 있는 팀 데이터 다시 적용
+      if(STATE.team){
+        applyTeamData(STATE.team);
+        STATE.goals = applyTeamGoals(STATE.team);
+      }
+      refreshAll();
+      showToast('다른 탭/창에서 데이터가 변경되어 자동 동기화되었습니다.', 'info');
+    }
+  }
+});
 async function logout(){
   const ok = await confirmUI('로그아웃 하시겠습니까?\n현재 세션이 종료되고 로그인 화면으로 이동합니다.', '로그아웃');
   if(!ok) return;
@@ -3666,8 +3794,9 @@ function saveGoals(){
     ALL_TEAMS_DATA.teams[STATE.team].goals = Object.assign({}, STATE.goals);
     recomputeHQGoals();  // 본부 목표 실시간 재계산
   }
+  persistTeamsData();  // localStorage 영구 저장
   renderKPI(); renderCharts(); renderBrandTbl(); renderProgList();
-  alert('연간 목표가 저장되었습니다. (SM본부 합계 자동 반영)');
+  showToast('연간 목표가 저장되었습니다. SM본부 합계도 자동 반영되었습니다.', 'success');
 }
 
 /* ================ Team Tab ================ */
@@ -3796,9 +3925,10 @@ function renderApprove(){
 }
 const APPROVAL_STATUS = {};
 function approveItem(brand, month, ok){
-  if(STATE.role!=='head'){alert('본부장 권한이 필요합니다.');return;}
+  if(STATE.role!=='head'){showToast('본부장 권한이 필요합니다.','warn');return;}
   APPROVAL_STATUS[brand] = APPROVAL_STATUS[brand] || {};
   APPROVAL_STATUS[brand][month] = ok===true ? 'approved' : ok===false ? 'rejected' : 'pending';
+  persistTeamsData();
   renderApprove();
 }
 
@@ -4037,6 +4167,8 @@ document.addEventListener('click', e=>{
 
 /* ================ Init - 세션 복원 또는 로그인 게이트 ================ */
 (function init(){
+  // 저장된 팀 데이터 복원 (다른 탭의 변경사항 포함)
+  restoreTeamsData();
   recomputeHQGoals();
   // 5시간 세션 복원 시도
   const restored = restoreSession();
