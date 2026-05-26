@@ -1368,7 +1368,7 @@
         <button class="btn req-tl" onclick="openBrandAdd()">＋ 브랜드 추가</button>
       </div>
       <table class="role-table contract-tbl" id="contract-tbl"></table>
-      <div style="margin-top:8px;font-size:11px;color:var(--ink3)">※ 계약 종료일이 30일 이내인 브랜드는 자동으로 변동 알림에 표시됩니다.</div>
+      <div style="margin-top:8px;font-size:11px;color:var(--ink3)">※ 매출 변동 알림은 <b>작성일 기준 최근 7일 내 변경된 데이터</b>를 비교합니다 (500만원 이상 변동 시 표시). 계약 종료일이 30일 이내인 브랜드도 자동 표시됩니다.</div>
     </div>
   </section>
 
@@ -2835,32 +2835,43 @@ function buildAllAlerts(){
   const last = months[months.length-1];
   const prev = months[months.length-2];
   const out = [];
-  // 1) 매출 변동 - 당월 vs 이전 누적 월평균 비교 (500만원 이상 가감)
-  // 매출 변동 - 주차별 비교 (월 ÷ 4 = 주 평균, 평일 5일씩 4주 시뮬레이션)
-  brandsInScope().forEach(b=>{
-    if(getMeta(b).ended) return;
-    // 마지막 월 = 이번 주차 (최근 4주차의 평균)
-    const lastMonthRev = brandMonth(b, last).rev;
-    const thisWeekAvg = lastMonthRev / 4;  // 이번 달 주 평균
-    // 이전 월들의 주 평균
-    let priorTotalRev = 0, priorWeekCount = 0;
-    for(let i=0; i<months.length-1; i++){
-      const bm = brandMonth(b, months[i]);
-      if(bm.rev>0){ priorTotalRev += bm.rev; priorWeekCount += 4; }  // 각 월 = 4주
+  // 1) 매출 변동 - 작성일 기준 최근 7일 내 변경 이력 기반 (CHANGE_LOG)
+  const recent = getRecent7DayChanges();
+  // 브랜드+월 기준으로 그룹핑
+  const grouped = {};  // {brand+'|'+month: {revDelta, expDelta, latestTs, baseRev, baseExp, currentRev, currentExp}}
+  recent.forEach(e=>{
+    const key = e.brand + '|' + e.month;
+    if(!grouped[key]){
+      grouped[key] = {brand:e.brand, month:e.month, revDelta:0, expDelta:0, latestTs:0, firstPrevRev:null, firstPrevExp:null};
     }
-    const priorWeekAvg = priorWeekCount>0 ? priorTotalRev/priorWeekCount : 0;
-    if(priorWeekAvg===0 && thisWeekAvg===0) return;
-    const diff = thisWeekAvg - priorWeekAvg;
-    // 주차 기준이므로 임계값도 작게 (월 500만원 = 주 125만원, 안전하게 150만원 기준)
-    if(Math.abs(diff) >= 1_500_000){
-      const pct = priorWeekAvg ? (diff/priorWeekAvg*100) : (thisWeekAvg?100:0);
-      out.push({kind:'revenue', dir:diff>0?'up':'down',
-        severity: Math.abs(diff)>=7_500_000 ? 'high' : 'mid',
-        brand:b, month:last, adv:ADV_MAP[b]||'-', owner:OWNERS[b]||'-',
-        title:`${b} 매출 ${diff>0?'급증':'급감'} (주차 평균 대비 ${diff>0?'+':''}${fmtShort(diff*4)}원/월 환산)`,
-        body:`이전 ${priorWeekCount}주 평균 ${fmtShort(priorWeekAvg)}원/주 → 이번 ${last} 평균 ${fmtShort(thisWeekAvg)}원/주 (${diff>0?'+':''}${pct.toFixed(1)}%) · 평일 5일 단위 변동 감지`,
-        time:last});
+    const g = grouped[key];
+    if(e.field === 'revenue'){
+      if(g.firstPrevRev === null) g.firstPrevRev = e.prev;
+      g.revDelta = e.next - g.firstPrevRev;
     }
+    if(e.field === 'expense'){
+      if(g.firstPrevExp === null) g.firstPrevExp = e.prev;
+      g.expDelta = e.next - g.firstPrevExp;
+    }
+    if(e.ts > g.latestTs) g.latestTs = e.ts;
+  });
+
+  Object.values(grouped).forEach(g=>{
+    if(getMeta(g.brand) && getMeta(g.brand).ended) return;
+    if(!brandsInScope().includes(g.brand)) return;
+    const diff = g.revDelta;
+    // 임계값: 500만원 이상 변동
+    if(Math.abs(diff) < 5_000_000) return;
+    const baseRev = g.firstPrevRev ?? 0;
+    const curRev = baseRev + diff;
+    const pct = baseRev ? (diff/baseRev*100) : (curRev?100:0);
+    out.push({kind:'revenue', dir:diff>0?'up':'down',
+      severity: Math.abs(diff) >= 20_000_000 ? 'high' : 'mid',
+      brand:g.brand, month:g.month, adv:ADV_MAP[g.brand]||'-', owner:OWNERS[g.brand]||'-',
+      title:`${g.brand} 매출 ${diff>0?'급증':'급감'} (${diff>0?'+':''}${fmtShort(diff)}원)`,
+      body:`7일 전 ${fmtShort(baseRev)}원 → 현재 <b>${fmtShort(curRev)}원</b> (${diff>0?'+':''}${pct.toFixed(1)}%) · ${g.month} 기준 · ${fmtRelTime(g.latestTs)} 업데이트`,
+      time:fmtRelTime(g.latestTs),
+      ts:g.latestTs});
   });
   brandsInScope().forEach(b=>{
     const meta = getMeta(b);
@@ -3087,8 +3098,15 @@ function renderOps(){
         DATA.records.push(rec);
         REC[k]=rec;
       }
+      const _prevRev = rec.revenue, _prevExp = rec.expense;
       if(f==='revenue') rec.revenue = parseInt((inp.value||'0').replace(/[^0-9-]/g,''),10)||0;
       if(f==='expense') rec.expense = parseInt((inp.value||'0').replace(/[^0-9-]/g,''),10)||0;
+      if(f==='revenue' && rec.revenue !== _prevRev){
+        logChange(STATE.team || 'HQ', b, month, 'revenue', _prevRev, rec.revenue);
+      }
+      if(f==='expense' && rec.expense !== _prevExp){
+        logChange(STATE.team || 'HQ', b, month, 'expense', _prevExp, rec.expense);
+      }
       if(f==='note'){
         NOTES_MAP[k] = inp.value;
         if(inp.value){
@@ -3665,6 +3683,55 @@ function clearSession(){
 
 /* ===== 팀 데이터 실시간 저장/복원 (localStorage) ===== */
 const DATA_KEY = 'sm_sales_teams_data_v1';
+const CHANGE_LOG_KEY = 'sm_change_log_v1';
+const CHANGE_LOG_MAX = 1000;
+
+// 변경 이력 (메모리 + localStorage)
+let CHANGE_LOG = [];
+try {
+  const raw = localStorage.getItem(CHANGE_LOG_KEY);
+  if(raw) CHANGE_LOG = JSON.parse(raw) || [];
+} catch(e){ CHANGE_LOG = []; }
+
+function logChange(team, brand, month, field, prev, next){
+  if(prev === next) return;
+  CHANGE_LOG.push({
+    ts: Date.now(),
+    team, brand, month, field,
+    prev: Number(prev)||0,
+    next: Number(next)||0
+  });
+  // 최대 개수 유지
+  if(CHANGE_LOG.length > CHANGE_LOG_MAX){
+    CHANGE_LOG = CHANGE_LOG.slice(-CHANGE_LOG_MAX);
+  }
+  // 30일 이상 오래된 이력 제거
+  const cutoff = Date.now() - 30*24*60*60*1000;
+  CHANGE_LOG = CHANGE_LOG.filter(e=>e.ts >= cutoff);
+  try { localStorage.setItem(CHANGE_LOG_KEY, JSON.stringify(CHANGE_LOG)); } catch(e){}
+}
+
+// 7일 전 이후 변경 이력만 추출 (현재 팀 또는 'HQ'면 전체)
+function getRecent7DayChanges(){
+  const cutoff = Date.now() - 7*24*60*60*1000;
+  const teamFilter = STATE.team;
+  return CHANGE_LOG.filter(e=>{
+    if(e.ts < cutoff) return false;
+    if(teamFilter && teamFilter !== 'HQ' && e.team !== teamFilter) return false;
+    return true;
+  });
+}
+
+function fmtRelTime(ts){
+  const diff = Date.now() - ts;
+  const m = Math.floor(diff/60000);
+  if(m < 1) return '방금 전';
+  if(m < 60) return m + '분 전';
+  const h = Math.floor(m/60);
+  if(h < 24) return h + '시간 전';
+  const d = Math.floor(h/24);
+  return d + '일 전';
+}
 
 function persistTeamsData(){
   // 핵심 변경 가능 데이터만 저장 (모든 ALL_TEAMS_DATA 저장은 크기 부담)

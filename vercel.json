@@ -13,6 +13,7 @@
     { "source": "/E", "destination": "/" },
     { "source": "/I", "destination": "/" },
     { "source": "/R", "destination": "/" },
-    { "source": "/HQ", "destination": "/" }
+    { "source": "/HQ", "destination": "/" },
+    { "source": "/demo", "destination": "/demo.html" }
   ]
 }

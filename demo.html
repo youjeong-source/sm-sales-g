@@ -1,0 +1,292 @@
+<!doctype html>
+<html lang="ko">
+<head>
+<meta charset="utf-8" />
+<title>GOLDENAX · 사이드바 UI 데모</title>
+<style>
+  :root{
+    --bg:#F4F5F8;
+    --ink:#0F172A; --ink2:#1F2937; --ink3:#64748B; --ink4:#94A3B8;
+    --line:#E5E7EB; --line2:#EEF0F4;
+    --card:#FFFFFF;
+    --primary:#4F46E5;       /* 선택 항목 텍스트 */
+    --primary-bg:#E8E9FE;    /* 선택 항목 배경 */
+    --red:#E60021;           /* GOLDENAX 시그니처 */
+    --shadow:0 4px 14px rgba(15,23,42,.06);
+    --shadow-lg:0 10px 30px rgba(15,23,42,.08);
+  }
+  *{box-sizing:border-box}
+  body{margin:0;font-family:'Pretendard', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;background:var(--bg);color:var(--ink);font-size:13px;line-height:1.55}
+
+  /* ============ 상단 헤더 ============ */
+  .top-header{
+    height:64px;background:#fff;border-bottom:1px solid var(--line);
+    display:flex;align-items:center;justify-content:space-between;padding:0 28px;
+    position:sticky;top:0;z-index:10;
+  }
+  .brand{display:flex;align-items:center;gap:10px;font-weight:800;letter-spacing:.3px}
+  .brand-logo{width:30px;height:30px;border-radius:8px;background:linear-gradient(135deg, #E60021 0%, #B30019 100%);display:flex;align-items:center;justify-content:center;color:#fff;font-size:14px;font-weight:900}
+  .brand-text{font-size:15px;color:var(--ink)}
+  .brand-sub{font-size:11px;color:var(--ink3);font-weight:500;margin-left:6px}
+  .header-right{display:flex;align-items:center;gap:14px}
+  .user-chip{display:flex;align-items:center;gap:8px;padding:6px 12px;border-radius:999px;background:#F1F5F9;font-size:12px;color:var(--ink2)}
+  .user-avatar{width:24px;height:24px;border-radius:50%;background:linear-gradient(135deg,#A78BFA,#7C3AED);color:#fff;display:flex;align-items:center;justify-content:center;font-size:11px;font-weight:700}
+
+  /* ============ 레이아웃 (헤더와 사이드바 분리) ============ */
+  .layout{
+    display:grid;grid-template-columns:260px 1fr;gap:24px;
+    padding:20px 24px 32px 20px;
+    min-height:calc(100vh - 64px);
+  }
+
+  /* ============ 사이드바 (분리 + 라운드 + 카드형) ============ */
+  .sidebar{
+    background:var(--card);
+    border-radius:18px;
+    box-shadow:var(--shadow);
+    padding:18px 14px 22px 14px;
+    height:fit-content;
+    position:sticky;top:84px;
+    border:1px solid var(--line2);
+  }
+  .menu-section{margin-top:8px}
+  .menu-section:first-child{margin-top:0}
+  .menu-label{
+    font-size:10.5px;color:var(--ink4);font-weight:700;
+    letter-spacing:1.2px;padding:0 14px;margin-bottom:8px;
+    text-transform:uppercase;
+  }
+  .menu-list{list-style:none;padding:0;margin:0;display:flex;flex-direction:column;gap:3px}
+  .menu-item{
+    display:flex;align-items:center;gap:11px;
+    padding:10px 14px;
+    border-radius:11px;
+    color:var(--ink2);font-size:13px;font-weight:500;
+    cursor:pointer;transition:background .12s, color .12s;
+    user-select:none;
+  }
+  .menu-item:hover{background:#F8FAFC;color:var(--ink)}
+  .menu-item.active{
+    background:var(--primary-bg);
+    color:var(--primary);
+    font-weight:700;
+    border:1.5px solid #DDDEFC;
+    padding:8.5px 12.5px;  /* 보더만큼 보정 */
+  }
+  .menu-item .icon{
+    font-size:16px;width:22px;display:inline-flex;align-items:center;justify-content:center;
+    line-height:1;
+  }
+  .menu-item .badge-mini{
+    margin-left:auto;font-size:10px;background:#FEE2E2;color:#B91C1C;padding:1px 7px;border-radius:999px;font-weight:700;
+  }
+  .menu-item.active .badge-mini{background:#fff;color:var(--primary)}
+  .menu-divider{height:1px;background:var(--line2);margin:14px 6px 12px 6px;border:0}
+
+  /* ============ 메인 컨텐츠 ============ */
+  .main{padding:4px 4px 0 0}
+  .page-title{font-size:22px;font-weight:800;letter-spacing:-.3px;color:var(--ink);margin:6px 0 4px 0}
+  .page-sub{font-size:12.5px;color:var(--ink3);margin-bottom:18px}
+  .card{
+    background:var(--card);border-radius:14px;padding:22px 24px;
+    box-shadow:var(--shadow);border:1px solid var(--line2);margin-bottom:16px;
+  }
+  .card h3{margin:0 0 8px 0;font-size:15px;color:var(--ink)}
+  .card p{margin:0;color:var(--ink2);font-size:13px}
+  .card-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:14px;margin-bottom:18px}
+  .kpi-card{
+    background:#fff;border-radius:14px;padding:16px 18px;border:1px solid var(--line2);box-shadow:var(--shadow);
+  }
+  .kpi-card .kpi-label{font-size:11px;color:var(--ink3);font-weight:600;letter-spacing:.5px;text-transform:uppercase}
+  .kpi-card .kpi-value{font-size:22px;font-weight:800;color:var(--ink);margin-top:6px;font-variant-numeric:tabular-nums}
+  .kpi-card .kpi-delta{font-size:11.5px;color:#16A34A;margin-top:4px;font-weight:600}
+  .kpi-card .kpi-delta.down{color:#DC2626}
+
+  /* 데모용 안내 박스 */
+  .demo-note{
+    background:linear-gradient(135deg, #FFF8E1 0%, #FFF3CD 100%);
+    border:1px solid #FDE68A;border-radius:14px;padding:14px 18px;margin-bottom:16px;
+    display:flex;align-items:center;gap:12px;font-size:12.5px;color:#7C5800;
+  }
+  .demo-note b{color:#5A3D00}
+
+  /* 토글 (라운드 vs 기존) */
+  .style-toggle{
+    position:fixed;bottom:18px;right:18px;
+    background:#fff;border:1px solid var(--line);border-radius:999px;padding:6px;
+    display:flex;gap:4px;box-shadow:var(--shadow-lg);z-index:50;
+  }
+  .style-toggle button{
+    border:0;background:transparent;padding:8px 14px;border-radius:999px;
+    font-size:12px;font-weight:600;color:var(--ink3);cursor:pointer;
+  }
+  .style-toggle button.active{background:var(--ink);color:#fff}
+
+  /* 기존 스타일 비교용 (사이드바 헤더와 붙어있음) */
+  body.legacy .layout{gap:0;padding:0}
+  body.legacy .sidebar{
+    border-radius:0;box-shadow:none;border:0;border-right:1px solid var(--line);
+    padding:16px 12px;
+    background:#fff;
+    height:calc(100vh - 64px);position:sticky;top:64px;
+  }
+  body.legacy .menu-item.active{background:#FEE2E2;color:var(--red);border-color:#FECACA}
+  body.legacy .main{padding:24px 28px}
+</style>
+</head>
+<body>
+
+<header class="top-header">
+  <div class="brand">
+    <div class="brand-logo">G</div>
+    <div>
+      <div class="brand-text">GOLDENAX <span class="brand-sub">SM본부 매출 관리</span></div>
+    </div>
+  </div>
+  <div class="header-right">
+    <span style="font-size:12px;color:var(--ink3)">2026.05.26</span>
+    <div class="user-chip">
+      <div class="user-avatar">최</div>
+      <span>최유정 그룹장</span>
+    </div>
+  </div>
+</header>
+
+<div class="layout">
+
+  <!-- ============ 사이드바 (라운드 카드형, 헤더와 분리) ============ -->
+  <aside class="sidebar">
+
+    <div class="menu-section">
+      <div class="menu-label">MY MENU</div>
+      <ul class="menu-list">
+        <li class="menu-item active">
+          <span class="icon">📊</span>
+          <span>대시보드</span>
+        </li>
+        <li class="menu-item">
+          <span class="icon">🏷️</span>
+          <span>브랜드별 매출표</span>
+        </li>
+        <li class="menu-item">
+          <span class="icon">🗓️</span>
+          <span>월간 운영</span>
+        </li>
+        <li class="menu-item">
+          <span class="icon">🔔</span>
+          <span>변동 알림</span>
+          <span class="badge-mini">3</span>
+        </li>
+        <li class="menu-item">
+          <span class="icon">✅</span>
+          <span>본부장 승인</span>
+        </li>
+      </ul>
+    </div>
+
+    <hr class="menu-divider" />
+
+    <div class="menu-section">
+      <div class="menu-label">TEAM</div>
+      <ul class="menu-list">
+        <li class="menu-item">
+          <span class="icon">👥</span>
+          <span>인원 관리</span>
+        </li>
+        <li class="menu-item">
+          <span class="icon">🎯</span>
+          <span>연간 목표</span>
+        </li>
+        <li class="menu-item">
+          <span class="icon">📈</span>
+          <span>SM본부 전체</span>
+        </li>
+      </ul>
+    </div>
+
+    <hr class="menu-divider" />
+
+    <div class="menu-section">
+      <div class="menu-label">DOCUMENTATION</div>
+      <ul class="menu-list">
+        <li class="menu-item">
+          <span class="icon">📘</span>
+          <span>워크플로우</span>
+        </li>
+        <li class="menu-item">
+          <span class="icon">🗂️</span>
+          <span>데이터 모델</span>
+        </li>
+        <li class="menu-item">
+          <span class="icon">🚀</span>
+          <span>개발 로드맵</span>
+        </li>
+      </ul>
+    </div>
+
+  </aside>
+
+  <!-- ============ 메인 컨텐츠 ============ -->
+  <main class="main">
+    <div class="page-title">대시보드</div>
+    <div class="page-sub">2026년 5월 · G팀 매출 현황 한 눈에 보기</div>
+
+    <div class="demo-note">
+      <span style="font-size:20px">💡</span>
+      <div>
+        <b>사이드바 UI 데모 페이지</b> — 좌측 사이드바를 상단 헤더와 분리한 라운드 카드형 디자인입니다.
+        실제 적용 전 컨셉 확인용 페이지이며, 본 디자인 확정 시 전체 팀 페이지에 일괄 적용됩니다.
+        우측 하단 토글로 기존 스타일과 비교해보세요.
+      </div>
+    </div>
+
+    <div class="card-grid">
+      <div class="kpi-card">
+        <div class="kpi-label">YTD 매출</div>
+        <div class="kpi-value">28.4억</div>
+        <div class="kpi-delta">↑ 12.3% vs 전년</div>
+      </div>
+      <div class="kpi-card">
+        <div class="kpi-label">YTD 순매출</div>
+        <div class="kpi-value">6.8억</div>
+        <div class="kpi-delta">↑ 8.1% vs 전년</div>
+      </div>
+      <div class="kpi-card">
+        <div class="kpi-label">진행 브랜드</div>
+        <div class="kpi-value">14건</div>
+        <div class="kpi-delta down">↓ 2건 vs 전월</div>
+      </div>
+    </div>
+
+    <div class="card">
+      <h3>레이아웃 변경 포인트</h3>
+      <p style="margin-top:8px">
+        ① 사이드바가 상단 헤더와 시각적으로 분리됨 (좌측/상단 24px 여백)<br/>
+        ② 흰 카드 + 둥근 모서리 (border-radius 18px) + 부드러운 그림자<br/>
+        ③ 메뉴 항목 자체도 라운드 박스(11px)로, 선택 시 연한 라벤더 배경 + 보라 텍스트 + 보더<br/>
+        ④ 섹션 라벨(MY MENU / TEAM / DOCUMENTATION)은 작은 회색 대문자, 섹션 간 얇은 구분선<br/>
+        ⑤ 이모지 아이콘 (실제 적용 시 SVG 아이콘으로 대체)<br/>
+        ⑥ 배지(예: 변동 알림 ‘3’)는 우측 정렬, 핑크 칩 형태
+      </p>
+    </div>
+
+    <div class="card">
+      <h3>적용 옵션</h3>
+      <p style="margin-top:8px">
+        본 데모가 OK 사인되면 다음 옵션 중 선택해서 전체 적용 가능합니다:<br/>
+        · <b>옵션 A</b>: 현재 빨강 시그니처는 유지하고 사이드바만 라운드 카드형으로 (헤더는 빨강 유지)<br/>
+        · <b>옵션 B</b>: 사이드바 + 메인 헤더까지 모두 화이트 톤으로 재정비 (좀 더 미니멀)<br/>
+        · <b>옵션 C</b>: 팀별 컬러를 사이드바 선택 항목 보더에만 반영 (G=빨강 / D=파랑 등)
+      </p>
+    </div>
+  </main>
+
+</div>
+
+<div class="style-toggle">
+  <button class="active" onclick="document.body.classList.remove('legacy'); this.classList.add('active'); this.nextElementSibling.classList.remove('active');">새 디자인</button>
+  <button onclick="document.body.classList.add('legacy'); this.classList.add('active'); this.previousElementSibling.classList.remove('active');">기존 스타일</button>
+</div>
+
+</body>
+</html>
