@@ -1,8 +1,18 @@
 {
   "rewrites": [
-    {
-      "source": "/((?!_next|api|favicon\\.ico|.*\\.(?:js|css|json|png|jpg|jpeg|svg|gif|webp|ico|woff|woff2|ttf|otf|map)).*)",
-      "destination": "/index.html"
-    }
+    { "source": "/g", "destination": "/" },
+    { "source": "/d", "destination": "/" },
+    { "source": "/u", "destination": "/" },
+    { "source": "/e", "destination": "/" },
+    { "source": "/i", "destination": "/" },
+    { "source": "/r", "destination": "/" },
+    { "source": "/hq", "destination": "/" },
+    { "source": "/G", "destination": "/" },
+    { "source": "/D", "destination": "/" },
+    { "source": "/U", "destination": "/" },
+    { "source": "/E", "destination": "/" },
+    { "source": "/I", "destination": "/" },
+    { "source": "/R", "destination": "/" },
+    { "source": "/HQ", "destination": "/" }
   ]
 }
