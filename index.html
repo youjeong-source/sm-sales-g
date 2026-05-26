@@ -2494,6 +2494,24 @@ function toggleCardExpand(brand){
   if(card) card.classList.toggle('expanded');
 }
 
+/* ===== URL 기반 초기 팀 파싱 ===== */
+function getUrlTeam(){
+  // 1순위: path (/g, /d, /u, /hq)
+  let path = (window.location.pathname || '').toLowerCase().replace(/^\/+|\/+$/g, '');
+  // GitHub Pages 등 prefix 대응
+  path = path.split('/').pop();
+  if(['g','d','u','hq'].includes(path)) return path.toUpperCase();
+  // 2순위: ?team=X
+  const sp = new URLSearchParams(window.location.search);
+  const q = (sp.get('team')||'').toUpperCase();
+  if(['G','D','U','HQ'].includes(q)) return q;
+  // 3순위: #G 형식 해시
+  const h = (window.location.hash||'').replace('#','').toUpperCase();
+  if(['G','D','U','HQ'].includes(h)) return h;
+  return null;
+}
+const URL_REQUESTED_TEAM = getUrlTeam();  // null 또는 'G'/'D'/'U'/'HQ'
+
 /* ===== 로그인 게이트 (이름 입력 + 빠른 칩) ===== */
 function buildLoginScreen(){
   const inp = document.getElementById('login-name-input');
@@ -2579,9 +2597,26 @@ function loginAs(role, user){
   document.getElementById('who-name').textContent = display;
   document.getElementById('who-init').textContent = (user||'?').charAt(0);
   document.getElementById('login-gate').classList.remove('open');
-  // 사용자 소속 팀으로 자동 전환
+  // 사용자 소속 팀으로 자동 전환 + URL 요청 팀 우선 반영
   const myTeam = (p && p.team) ? p.team : 'G';
-  STATE.team = (role==='head') ? 'HQ' : myTeam;
+  let initialTeam;
+  if(URL_REQUESTED_TEAM){
+    // URL이 요청한 팀이 권한 있는지 확인
+    if(role==='head'){
+      initialTeam = URL_REQUESTED_TEAM;  // 본부장은 모두 가능
+    } else if(role==='lead' && (URL_REQUESTED_TEAM === myTeam || URL_REQUESTED_TEAM === 'HQ')){
+      initialTeam = URL_REQUESTED_TEAM;  // 팀장은 자기팀+HQ
+    } else if(URL_REQUESTED_TEAM === myTeam){
+      initialTeam = URL_REQUESTED_TEAM;  // 본인 팀이면 OK
+    } else {
+      // 권한 없는 팀 URL → 본인 팀으로 폴백 + 안내
+      initialTeam = (role==='head') ? 'HQ' : myTeam;
+      setTimeout(()=>alert(`'${URL_REQUESTED_TEAM === 'HQ' ? 'SM본부' : URL_REQUESTED_TEAM+'팀'}' 접근 권한이 없어 본인 소속(${myTeam==='HQ'?'SM본부':myTeam+'팀'})으로 이동합니다.`), 100);
+    }
+  } else {
+    initialTeam = (role==='head') ? 'HQ' : myTeam;
+  }
+  STATE.team = initialTeam;
   STATE.goals = applyTeamGoals(STATE.team);
   applyTeamData(STATE.team);
   // body 테마

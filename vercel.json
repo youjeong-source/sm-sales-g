@@ -1,0 +1,14 @@
+{
+  "rewrites": [
+    { "source": "/g", "destination": "/index.html" },
+    { "source": "/d", "destination": "/index.html" },
+    { "source": "/u", "destination": "/index.html" },
+    { "source": "/hq", "destination": "/index.html" },
+    { "source": "/G", "destination": "/index.html" },
+    { "source": "/D", "destination": "/index.html" },
+    { "source": "/U", "destination": "/index.html" },
+    { "source": "/HQ", "destination": "/index.html" }
+  ],
+  "cleanUrls": true,
+  "trailingSlash": false
+}
