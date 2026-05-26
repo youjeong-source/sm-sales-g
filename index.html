@@ -194,9 +194,9 @@
   .ts-trigger .ts-dot.u{background:var(--team-u)}
   .ts-trigger svg{color:var(--ink3)}
   .ts-menu{
-    position:absolute;top:calc(100% + 6px);right:0;
+    position:absolute;top:calc(100% + 6px);left:0;
     background:#fff;border:1px solid var(--line);border-radius:10px;padding:6px;
-    box-shadow:0 8px 24px rgba(0,0,0,.10);min-width:220px;z-index:1000
+    box-shadow:0 8px 24px rgba(0,0,0,.10);min-width:200px;z-index:1000
   }
   .ts-menu[hidden]{display:none}
   .ts-menu .ts-section-h{font-size:10px;color:var(--muted);font-weight:700;letter-spacing:.6px;padding:6px 10px;text-transform:uppercase}
@@ -250,6 +250,9 @@
   }
   aside.side .nav button:hover{background:var(--pt-ll);color:var(--pt)}
   aside.side .nav button.active{background:var(--pt-l);color:var(--pt);font-weight:700}
+  /* 팀별 사이드바 active 컬러 정돈 */
+  body[data-team-id="D"] aside.side .nav button.active{background:var(--team-d-bg);color:var(--team-d)}
+  body[data-team-id="U"] aside.side .nav button.active{background:var(--team-u-bg);color:var(--team-u)}
   aside.side .nav button .ico{width:18px;display:inline-flex;justify-content:center;align-items:center;color:var(--ink3)}
   aside.side .nav button.active .ico,aside.side .nav button:hover .ico{color:var(--pt)}
 
@@ -420,20 +423,20 @@
   .welcome-bar h2 #welcome-team{color:var(--ink);font-size:inherit;font-weight:inherit;background:none;padding:0;border-radius:0;margin:0}
   .welcome-bar h2 #welcome-emoji{font-size:24px;margin-left:4px}
   .welcome-bar p{margin:0;font-size:14.5px;color:var(--ink3);font-weight:500;line-height:1.6;white-space:pre-line}
-  /* HQ 모드 - 웰컴 텍스트 (31px) + 응원/명언 랜덤 */
-  body.hq-mode .welcome-bar{margin-bottom:18px;padding:10px 0 6px}
-  body.hq-mode .welcome-bar h2{font-size:31px;letter-spacing:-.8px;line-height:1.2;color:var(--ink)}
+  /* HQ 모드 - 웰컴 텍스트 (팀과 동일 28px) + 응원/명언 랜덤 */
+  body.hq-mode .welcome-bar{margin-bottom:16px;padding:8px 0 4px}
+  body.hq-mode .welcome-bar h2{font-size:28px;letter-spacing:-.7px;line-height:1.2;color:var(--ink);font-weight:800}
   body.hq-mode .welcome-bar h2 .hq-cheer{
-    background:linear-gradient(135deg,#E60021,#FF4D6A);
-    -webkit-background-clip:text;-webkit-text-fill-color:transparent;
-    background-clip:text;color:#E60021;font-weight:900;letter-spacing:-.9px
+    color:var(--ink);font-weight:800;letter-spacing:-.5px;
+    background:none;-webkit-text-fill-color:initial;-webkit-background-clip:initial;background-clip:initial
   }
-  body.hq-mode .welcome-bar h2 #welcome-emoji{font-size:28px}
-  body.hq-mode .welcome-bar p{font-size:15px;color:var(--ink3);line-height:1.6;font-weight:400;max-width:900px}
+  body.hq-mode .welcome-bar h2 #welcome-emoji{font-size:24px}
+  body.hq-mode .welcome-bar p{font-size:14.5px;color:var(--ink3);line-height:1.6;font-weight:400;max-width:900px;white-space:pre-line}
 
   /* ============ KPI 보조 지표 ============ */
   .kpi-aux{display:grid;grid-template-columns:1fr 1fr 1.4fr;gap:14px;margin-bottom:18px}
   .aux-card{background:#fff;border:1px solid var(--line);border-radius:12px;padding:16px 18px;display:flex;flex-direction:column;gap:8px;min-height:120px}
+  .aux-card .head{display:flex;align-items:center;justify-content:space-between;gap:8px}
   .aux-card .lab{font-size:11px;color:var(--ink3);font-weight:600}
   .aux-card .val{font-size:26px;font-weight:800;color:var(--ink);letter-spacing:-.6px;line-height:1}
   .aux-card .val small{font-size:12px;font-weight:600;color:var(--ink3);margin-left:3px}
@@ -770,14 +773,15 @@
 
   /* ============ Variance Alerts (legacy 사이드 패널) ============ */
   .alerts{display:flex;flex-direction:column;gap:8px;max-height:400px;overflow:auto;padding-right:4px}
-  .alert{border:1px solid var(--line);border-left:3px solid var(--pt);border-radius:8px;padding:10px 14px;background:#fff}
-  .alert.note{border-left-color:var(--ink3)}
+  .alert{border:1px solid var(--line2);border-radius:8px;padding:10px 14px;background:#FAFAFA}
+  .alert.note{background:#F7F7F8}
   .alert .top-r{display:flex;justify-content:space-between;align-items:center;gap:8px}
   .alert .b{font-weight:700;font-size:12px;color:var(--ink)}
   .alert .m{font-size:11px;color:var(--ink3);margin-left:4px}
-  .alert .delta{font-size:11px;font-weight:700;padding:2px 7px;border-radius:5px;background:var(--pt-l);color:var(--pt)}
-  .alert.down .delta{background:var(--bg2);color:var(--ink2)}
-  .alert.note .delta{background:var(--bg2);color:var(--ink2)}
+  .alert .delta{font-size:11px;font-weight:700;padding:2px 7px;border-radius:5px;background:#fff;color:var(--ink2);border:1px solid var(--line)}
+  .alert.up .delta{background:var(--pt-l);color:var(--pt)}
+  .alert.down .delta{background:#DBEAFE;color:#1D4ED8}
+  .alert.note .delta{background:#fff;color:var(--ink2)}
   .alert .body{font-size:11.5px;color:var(--ink2);margin-top:6px;line-height:1.5}
 
   /* ============ Side Drawer (브랜드 상세) ============ */
@@ -1049,13 +1053,13 @@
 
     <div class="kpi-aux hq-hide">
       <div class="aux-card">
-        <div class="lab">목표 신규 브랜드 계약</div>
+        <div class="head"><div class="lab">목표 신규 브랜드 계약</div><button class="aux-edit req-tl" onclick="editAuxNew()">✎ 팀장 편집</button></div>
         <div class="val"><span id="aux-new-count">-</span><small>건</small></div>
         <div class="aux-bar"><i id="aux-new-bar" style="width:0%"></i></div>
         <div class="sub">목표 <b><span id="aux-new-target">5</span>건</b> · 달성률 <b><span id="aux-new-pct">0</span>%</b></div>
       </div>
       <div class="aux-card">
-        <div class="lab">재계약률</div>
+        <div class="head"><div class="lab">재계약률</div><button class="aux-edit req-tl" onclick="editAuxRenew()">✎ 팀장 편집</button></div>
         <div class="val"><span id="aux-renew-pct">-</span><small>%</small></div>
         <div class="aux-bar"><i id="aux-renew-bar" style="width:0%"></i></div>
         <div class="sub" id="aux-renew-sub">- / -건 갱신</div>
@@ -2301,6 +2305,54 @@ function renderAuxKPIs(){
   const qel = document.getElementById('aux-qual');
   if(qel) qel.textContent = getCurrentQualGrowth() || '아직 입력되지 않았습니다. 팀장이 입력해주세요.';
 }
+function editAuxNew(){
+  if(STATE.role==='member'){alert('신규 브랜드 목표는 팀장 권한입니다.');return;}
+  const cur = STATE.goals.brand || 5;
+  const teamId = STATE.team;
+  const html = `
+    <div class="fm-row"><label>신규 브랜드 계약 목표 (건)</label>
+      <input type="number" id="fm-newgoal" value="${cur}" min="0" />
+      <span class="help">${teamId==='HQ'?'본부 전체':teamId+'팀'} 신규 브랜드 계약 목표 건수입니다.</span></div>
+  `;
+  openFormModal('신규 브랜드 계약 목표', html, ()=>{
+    const v = parseInt(document.getElementById('fm-newgoal').value,10);
+    if(isNaN(v) || v<0){alert('0 이상의 숫자를 입력해주세요.');return false;}
+    STATE.goals.brand = v;
+    // 팀별 goals에도 반영 (영구 저장)
+    if(STATE.team !== 'HQ' && ALL_TEAMS_DATA.teams[STATE.team]){
+      ALL_TEAMS_DATA.teams[STATE.team].goals.brand = v;
+    } else if(STATE.team === 'HQ'){
+      ALL_TEAMS_DATA.hq_goals.brand = v;
+    }
+    renderAuxKPIs();
+    renderKPI();
+  });
+}
+
+function editAuxRenew(){
+  if(STATE.role==='member'){alert('재계약률 목표는 팀장 권한입니다.');return;}
+  const endedBrands = DATA.brands.filter(b=>getMeta(b).ended);
+  const curRenewed = endedBrands.filter(b=>STATE.renewedSet.has(b));
+  const html = `
+    <div class="fm-row"><label>계약 종료된 브랜드 - 갱신 처리</label>
+      <span class="help">아래 목록에서 재계약(갱신) 완료된 브랜드를 체크하세요. 재계약률이 자동 계산됩니다.</span>
+      <div style="max-height:280px;overflow:auto;border:1px solid var(--line);border-radius:7px;padding:8px;margin-top:6px;background:#fff">
+        ${endedBrands.length===0 ? '<div style="color:var(--ink3);font-size:12px;padding:14px;text-align:center">현재 계약 종료된 브랜드가 없습니다.</div>' :
+          endedBrands.map(b=>`<label style="display:flex;align-items:center;gap:8px;padding:7px 8px;border-radius:5px;cursor:pointer;font-size:12.5px" class="renew-row" onmouseover="this.style.background='var(--bg)'" onmouseout="this.style.background=''">
+            <input type="checkbox" data-brand="${b.replace(/"/g,'&quot;')}" ${STATE.renewedSet.has(b)?'checked':''} />
+            <b>${b}</b> <span style="color:var(--ink3);font-size:11px;margin-left:auto">${ADV_MAP[b]||'-'}</span>
+          </label>`).join('')}
+      </div>
+    </div>
+  `;
+  openFormModal('재계약률 - 갱신 브랜드 선택', html, ()=>{
+    const checks = document.querySelectorAll('#fm-body input[type="checkbox"]');
+    STATE.renewedSet = new Set();
+    checks.forEach(c=>{ if(c.checked) STATE.renewedSet.add(c.dataset.brand); });
+    renderAuxKPIs();
+  });
+}
+
 function editQualGrowth(){
   if(STATE.role==='member'){alert('질적 성장 목표는 팀장 권한입니다.');return;}
   const safe = (getCurrentQualGrowth()||'').replace(/</g,'&lt;');
@@ -3213,6 +3265,7 @@ function loginAs(role, user){
   applyTeamData(STATE.team);
   // body 테마
   document.body.setAttribute('data-team', STATE.team);
+  applyTeamThemeColor(STATE.team);
   // 드롭다운 갱신
   buildTeamSwitcher();
   applyHQMenuVisibility();
@@ -3521,6 +3574,14 @@ function applyHQMenuVisibility(){
   document.body.classList.toggle('hq-mode', isHQ);
 }
 
+/* ================ 팀별 테마 컬러 적용 ================ */
+function applyTeamThemeColor(teamId){
+  // 모든 팀 + HQ는 메인 빨강 (#E60021) 유지가 기본
+  // 사용자 요구는 "팀별 컬러 정돈" - 팀별 식별만 일관되게
+  // body data-team 속성으로 팀별 differentiated style 적용 가능
+  document.body.setAttribute('data-team-id', teamId);
+}
+
 /* ================ Team Switcher ================ */
 function switchTeam(teamId){
   // 권한: head는 모두, lead는 자기팀+HQ, member는 자기팀만 (로그인 해제 상태에서는 head로 자동 진입)
@@ -3534,6 +3595,8 @@ function switchTeam(teamId){
     alert('팀장은 본인 팀과 SM본부만 접근 가능합니다.');
     return;
   }
+  // 팀별 컬러 정돈: --pt 변수를 팀 컬러로 동적 변경
+  applyTeamThemeColor(teamId);
   STATE.team = teamId;
   STATE.goals = applyTeamGoals(teamId);
   applyTeamData(teamId);
@@ -3577,10 +3640,10 @@ function buildTeamSwitcher(){
   }
   const menu = document.getElementById('ts-menu');
   if(!menu) return;
-  let html = '<div class="ts-section-h">시트 선택</div>';
+  let html = '';
   options.forEach(o=>{
     const dotCls = o.id === 'HQ' ? 'hq' : o.id.toLowerCase();
-    const sub = o.id === 'HQ' ? '본부 통합' : (o.id === STATE.team && me && me.team === o.id ? '내 팀' : '');
+    const sub = (o.id === STATE.team && me && me.team === o.id) ? '내 팀' : '';
     html += `<button class="ts-item${o.id===STATE.team?' active':''}" data-team="${o.id}"><span class="ts-dot ${dotCls}"></span>${o.name}${sub?`<span class="ts-sub">${sub}</span>`:''}</button>`;
   });
   menu.innerHTML = html;
@@ -3631,6 +3694,7 @@ document.addEventListener('click', e=>{
   STATE.goals = applyTeamGoals(initialTeam);
   applyTeamData(initialTeam);
   document.body.setAttribute('data-team', initialTeam);
+  applyTeamThemeColor(initialTeam);
   buildTeamSwitcher();
   applyHQMenuVisibility();
   updateTeamSubLabel();
