@@ -1490,10 +1490,28 @@ function applyTeamData(teamId){
   }
 }
 applyTeamData('G');  // 초기값
+function recomputeHQGoals(){
+  // 6팀 매출 목표 합산으로 본부 목표 자동 계산
+  let rev=0, net=0, brand=0;
+  const margins = [];
+  Object.values(ALL_TEAMS_DATA.teams).forEach(t=>{
+    if(t.goals){
+      rev += t.goals.rev || 0;
+      net += t.goals.net || 0;
+      brand += t.goals.brand || 0;
+      if(t.goals.margin) margins.push(t.goals.margin);
+    }
+  });
+  const margin = margins.length ? Math.round(margins.reduce((a,b)=>a+b,0)/margins.length) : 23;
+  ALL_TEAMS_DATA.hq_goals = {rev, net, margin, brand};
+  return ALL_TEAMS_DATA.hq_goals;
+}
 function applyTeamGoals(teamId){
-  if(teamId === 'HQ') return ALL_TEAMS_DATA.hq_goals;
+  if(teamId === 'HQ') return recomputeHQGoals();
   return ALL_TEAMS_DATA.teams[teamId].goals;
 }
+// 페이지 로드 시 즉시 한 번 계산
+recomputeHQGoals();
 const CATS = ['운영비','SNS 광고','매체 광고','바이럴(인플루언서&커뮤니티)','추가 제작비','기타'];
 // 동적으로 현재 팀의 매핑 참조 (applyTeamData가 DATA를 교체할 때마다 즉시 반영)
 function getAdvOrder(){ return DATA.advertiserOrder; }
@@ -2332,6 +2350,7 @@ function editAuxNew(){
     // 팀별 goals에도 반영 (영구 저장)
     if(STATE.team !== 'HQ' && ALL_TEAMS_DATA.teams[STATE.team]){
       ALL_TEAMS_DATA.teams[STATE.team].goals.brand = v;
+      recomputeHQGoals();  // 본부 합산 실시간 반영
     } else if(STATE.team === 'HQ'){
       ALL_TEAMS_DATA.hq_goals.brand = v;
     }
@@ -3016,6 +3035,7 @@ function getFMChk(id){return document.getElementById(id).checked;}
 /* ===== 브랜드 CRUD (모달 폼 사용) ===== */
 function openBrandAdd(){
   if(STATE.role==='member'){alert('브랜드 추가는 팀장 권한입니다.');return;}
+  // 본부 합산 갱신은 refreshAll 시 자동
   const memberOpts = TEAM_ROSTER.filter(p=>p.role!=='head').map(p=>`<option value="${p.name}">${p.name} (${p.title})</option>`).join('');
   const html = `
     <div class="fm-row"><label>브랜드명 <span style="color:var(--pt)">*</span></label><input type="text" id="fm-brand" placeholder="예: 새브랜드" /></div>
@@ -3318,8 +3338,13 @@ function saveGoals(){
   STATE.goals.net = parseFloat(document.getElementById('gs-net').value||'0')||STATE.goals.net;
   STATE.goals.margin = parseFloat(document.getElementById('gs-margin').value||'0')||STATE.goals.margin;
   STATE.goals.brand = parseFloat(document.getElementById('gs-brand').value||'0')||STATE.goals.brand;
+  // 팀별 ALL_TEAMS_DATA.teams[X].goals 도 동기화 → HQ 합산 자동 갱신
+  if(STATE.team !== 'HQ' && ALL_TEAMS_DATA.teams[STATE.team]){
+    ALL_TEAMS_DATA.teams[STATE.team].goals = Object.assign({}, STATE.goals);
+    recomputeHQGoals();  // 본부 목표 실시간 재계산
+  }
   renderKPI(); renderCharts(); renderBrandTbl(); renderProgList();
-  alert('연간 목표가 저장되었습니다.');
+  alert('연간 목표가 저장되었습니다. (SM본부 합계 자동 반영)');
 }
 
 /* ================ Team Tab ================ */
@@ -3637,19 +3662,19 @@ function buildTeamSwitcher(){
   const options = [];
   if(STATE.role === 'head'){
     options.push({id:'HQ', name:'SM본부'});
-    options.push({id:'G', name:'G팀'});
-    options.push({id:'D', name:'D팀'});
-    options.push({id:'U', name:'U팀'});
-    options.push({id:'E', name:'E팀'});
-    options.push({id:'I', name:'I팀'});
-    options.push({id:'R', name:'R팀'});
+    // 실제 데이터에 존재하는 팀만 동적 추가
+    Object.keys(ALL_TEAMS_DATA.teams).forEach(tid=>{
+      options.push({id:tid, name: ALL_TEAMS_DATA.teams[tid].name || (tid+'팀')});
+    });
   } else if(STATE.role === 'lead'){
     // 팀장: 자기 팀 + SM본부
-    options.push({id:myTeam, name: ALL_TEAMS_DATA.teams[myTeam].name});
+    const t = ALL_TEAMS_DATA.teams[myTeam];
+    if(t) options.push({id:myTeam, name: t.name});
     options.push({id:'HQ', name:'SM본부'});
   } else {
     // 팀원: 자기 팀만
-    options.push({id:myTeam, name: ALL_TEAMS_DATA.teams[myTeam].name});
+    const t = ALL_TEAMS_DATA.teams[myTeam];
+    if(t) options.push({id:myTeam, name: t.name});
   }
   const menu = document.getElementById('ts-menu');
   if(!menu) return;
@@ -3691,6 +3716,8 @@ document.addEventListener('click', e=>{
 // 로그인 기능 임시 해제 - 자동으로 본부장 권한 진입
 // URL 요청 팀이 있으면 해당 팀으로, 없으면 본부장(HQ)으로
 (function autoLogin(){
+  // 페이지 진입 시 본부 합산 한 번 더 보장
+  recomputeHQGoals();
   const urlTeam = URL_REQUESTED_TEAM;
   // 본부장 권한으로 진입 (모든 팀 접근 가능)
   STATE.role = 'head';
