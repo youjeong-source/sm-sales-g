@@ -106,9 +106,13 @@
   header.app{padding:14px 0;display:block}
   header.app > .inner{max-width:1640px;margin:0 auto;padding:0 28px;display:flex;align-items:center;justify-content:space-between}
   header.app .brand{display:flex;align-items:center;gap:12px}
-  /* HQ 모드: 팀 전용 콘텐츠 숨김 */
+  /* HQ 모드: 팀 전용 콘텐츠 숨김 + .hq-only 요소별 display 복원 */
   body.hq-mode .hq-hide{display:none !important}
-  body:not(.hq-mode) .hq-only{display:none !important}
+  .hq-only{display:none}
+  body.hq-mode .hq-only{display:block}
+  body.hq-mode .row.hq-only{display:grid}
+  body.hq-mode .panel.hq-only{display:block}
+  body.hq-mode div.hq-only:not(.row):not(.panel){display:block}
 
   /* HQ 모드: 팀 전용 메뉴 숨김 */
   body.hq-mode .nav button[data-tab="brand"],
@@ -140,16 +144,20 @@
   body.hq-mode header.app .logout-btn:hover{background:rgba(255,255,255,.2);color:#fff;border-color:rgba(255,255,255,.3)}
   body.hq-mode .ts-trigger{background:rgba(255,255,255,.95);border-color:transparent}
   /* HQ 모드 - 본문 영역 넓게 */
-  body.hq-mode main{padding:24px 28px 60px}
+  body.hq-mode main{padding:24px 32px 60px;max-width:100%}
+  body.hq-mode main > section{width:100%}
   /* HQ 모드 차트 높이 통일 */
-  body.hq-mode .chart-wrap{height:280px;position:relative}
-  body.hq-mode .chart-wrap.sm{height:260px}
-  body.hq-mode .row.r2 > .panel{display:flex;flex-direction:column}
-  body.hq-mode .row.r2 > .panel .chart-wrap{flex:1;min-height:280px}
+  body.hq-mode .chart-wrap{height:280px;position:relative;width:100%}
+  body.hq-mode .chart-wrap.sm{height:280px}
+  body.hq-mode .row.r2{grid-template-columns:1fr 1fr;gap:14px;width:100%}
+  body.hq-mode .row.r2 > .panel{display:flex;flex-direction:column;min-width:0;width:100%}
+  body.hq-mode .row.r2 > .panel .chart-wrap{flex:1;min-height:280px;width:100%}
   /* HQ 모드 panel padding 통일 */
-  body.hq-mode .panel{padding:20px 22px}
+  body.hq-mode .panel{padding:20px 22px;width:100%}
   /* 신규 브랜드 패널 - 카테고리 비중 패널과 높이 맞춤 */
   body.hq-mode .hq-new-brands{padding:8px 0}
+  /* 분기 카드 그리드 너비 강제 */
+  body.hq-mode .hq-quarters{grid-template-columns:repeat(4,1fr);gap:14px;width:100%}
   body.hq-mode aside.side{background:#F7F8FA;border-right:1px solid #E2E8F0}
   body.hq-mode aside.side h5{color:#64748B}
   body.hq-mode aside.side .nav button{color:#475569}
@@ -1573,16 +1581,65 @@ function renderHQDashboard(){
       <div class="hq-stat"><div class="lab">월 평균 필요</div><div class="val">${fmtShort(monthlyAvgNeeded)}원</div><div class="sub">현재 평균 ${fmtShort(monthlyAvg)}원</div></div>
     `;
   }
-  // 인사이트 분리 패널
+  // 인사이트 분리 패널 - 인력/매출/배치 종합 분석
   const insightEl = document.getElementById('hq-insight');
   if(insightEl){
+    // 팀별 인원/매출 분석
+    const teamStats = {};
+    let totalPeople = 0;
+    const titleCount = {};
+    Object.keys(ALL_TEAMS_DATA.teams).forEach(tid=>{
+      const t = ALL_TEAMS_DATA.teams[tid];
+      const ppl = t.roster||[];
+      let trev=0;
+      t.records.forEach(r=>{ trev += r.revenue||0; });
+      teamStats[tid] = {name:t.name, ppl:ppl.length, rev:trev, perCapita: ppl.length? trev/ppl.length : 0, goal:t.goals.rev};
+      totalPeople += ppl.length;
+      ppl.forEach(p=>{ titleCount[p.title] = (titleCount[p.title]||0)+1; });
+    });
+    // 1인당 평균 매출
+    const perCapitaAvg = totalPeople ? totalRev/totalPeople : 0;
+    // 가장 효율 좋은/낮은 팀
+    const teamArr = Object.values(teamStats);
+    teamArr.sort((a,b)=>b.perCapita-a.perCapita);
+    const topPerCap = teamArr[0];
+    const lowPerCap = teamArr[teamArr.length-1];
+    // 가장 부족한 팀 (목표 대비 달성률 낮음)
+    const teamAchievement = teamArr.map(t=>({...t, pct: t.goal? t.rev/t.goal*100 : 0}));
+    teamAchievement.sort((a,b)=>a.pct-b.pct);
+    const weakTeam = teamAchievement[0];
+    const strongTeam = teamAchievement[teamAchievement.length-1];
+    // 직급 분포 요약
+    const titleSummary = Object.entries(titleCount).sort((a,b)=>b[1]-a[1])
+      .map(([t,c])=>`${t} <b>${c}명</b>`).join(' · ');
+    // 인력 배치 제안
+    const placeSuggestion = (() => {
+      if(weakTeam.pct < 30){
+        return `<b>${weakTeam.name}</b>의 달성률이 ${weakTeam.pct.toFixed(0)}%로 가장 낮습니다. 대리/과장급 경력 인력 1~2명 추가 배치 또는 기존 ${topPerCap.name} 핵심 인력의 일부 시니어 코칭이 매출 방어에 효과적일 것입니다.`;
+      }
+      if(weakTeam.ppl <= 4){
+        return `<b>${weakTeam.name}</b>은 인원 ${weakTeam.ppl}명으로 가장 적습니다. 신규 브랜드 수주를 위해 사원~대리급 신규 충원이 권장됩니다.`;
+      }
+      return `현재 인력 구조 안정적. ${strongTeam.name}의 운영 노하우를 본부 전체로 확산하면 분기 달성률 추가 상승 여력 있음.`;
+    })();
+    // 매출 동기부여 메시지
+    const motivation = (() => {
+      if(pct >= 50) return `상반기 절반 통과 시점에 본부 목표의 <b>${pct.toFixed(1)}%</b> 달성. 1인당 평균 매출 <b>${fmtShort(perCapitaAvg)}원</b>으로 업계 평균을 상회하는 성과입니다.`;
+      if(pct >= 30) return `현재까지 <b>${fmtShort(totalRev)}원</b> 매출 확보. 1인당 평균 <b>${fmtShort(perCapitaAvg)}원</b>. 하반기 페이스 가속이 필요한 시점입니다.`;
+      return `누적 매출 <b>${fmtShort(totalRev)}원</b>(달성률 ${pct.toFixed(1)}%). 신규 빅 클라이언트 발굴이 본격적으로 필요한 시기입니다.`;
+    })();
+    // 페이스 분석
     const pace = monthlyAvgNeeded > monthlyAvg
-      ? `현재 월 평균 ${fmtShort(monthlyAvg)}원 대비 <b>+${fmtShort(monthlyAvgNeeded-monthlyAvg)}원/월 추가 매출</b>이 필요합니다.`
-      : `현재 월 평균 ${fmtShort(monthlyAvg)}원으로 목표 페이스를 상회하고 있습니다.`;
+      ? `현재 월 평균 <b>${fmtShort(monthlyAvg)}원</b> → 잔여 기간 <b>월 +${fmtShort(monthlyAvgNeeded-monthlyAvg)}원</b> 가속 필요.`
+      : `현재 월 평균 <b>${fmtShort(monthlyAvg)}원</b>으로 목표 페이스를 <b>상회</b>하고 있습니다.`;
+
     const insights = [
-      `<div class="ins-row"><span class="ins-h">목표 달성 시나리오</span>잔여 ${monthsLeft}개월간 <b>월 평균 ${fmtShort(monthlyAvgNeeded)}원</b> 매출 시 연간 목표 ${fmtShort(goal)}원 달성. 남은 매출 <b>${fmtShort(remaining)}원</b>.</div>`,
-      `<div class="ins-row"><span class="ins-h">현재 페이스 분석</span>${pace}</div>`,
-      `<div class="ins-row"><span class="ins-h">수익성</span>YTD 순매출 <b>${fmtShort(netTotal)}원</b> · 이익률 <b>${margin.toFixed(1)}%</b> (본부 목표 이익률 ${ALL_TEAMS_DATA.hq_goals.margin}%).</div>`,
+      `<div class="ins-row"><span class="ins-h">달성 평가</span>${motivation}</div>`,
+      `<div class="ins-row"><span class="ins-h">목표 달성 시나리오</span>잔여 <b>${monthsLeft}개월</b>간 월 평균 <b>${fmtShort(monthlyAvgNeeded)}원</b> 매출 시 연간 ${fmtShort(goal)}원 달성. 남은 매출 <b>${fmtShort(remaining)}원</b>. ${pace}</div>`,
+      `<div class="ins-row"><span class="ins-h">팀 효율성</span>1인당 매출 1위 <b>${topPerCap.name}</b>(인당 ${fmtShort(topPerCap.perCapita)}원, ${topPerCap.ppl}명) · 본부 평균 <b>${fmtShort(perCapitaAvg)}원</b>. ${lowPerCap.name}은 인당 ${fmtShort(lowPerCap.perCapita)}원으로 추가 매출 여력 있음.</div>`,
+      `<div class="ins-row"><span class="ins-h">조직 구성</span>본부 전체 <b>${totalPeople}명</b> · ${titleSummary}. 팀별 인원: G팀 ${teamStats.G.ppl}명 / D팀 ${teamStats.D.ppl}명 / U팀 ${teamStats.U.ppl}명.</div>`,
+      `<div class="ins-row"><span class="ins-h">인력 배치 제안</span>${placeSuggestion}</div>`,
+      `<div class="ins-row"><span class="ins-h">수익성</span>YTD 순매출 <b>${fmtShort(netTotal)}원</b> · 이익률 <b>${margin.toFixed(1)}%</b> (본부 목표 이익률 ${ALL_TEAMS_DATA.hq_goals.margin}%). ${margin>=ALL_TEAMS_DATA.hq_goals.margin?'목표 이익률 상회 - 수익 구조 건강':'목표 이익률 미달 - 외주비/매체비 조정 검토 필요'}.</div>`,
     ];
     insightEl.innerHTML = insights.join('');
   }
@@ -1733,26 +1790,79 @@ function buildAutoGreeting(){
   const h = now.getHours();
   const day = now.getDay();
   const date = now.getDate();
+  // 시간대별 인사 - 팀마다 다른 톤
+  const timeByTeam = {
+    G: {
+      dawn:'늦은 시간까지 G팀 운영 챙겨주셔서 고맙습니다', morning:'G팀 좋은 아침이에요',
+      noon:'G팀 점심 잘 챙기셨나요', afternoon:'활기찬 오후, G팀',
+      evening:'G팀 오늘 하루도 수고하셨어요', night:'편안한 저녁 보내세요, G팀'
+    },
+    D: {
+      dawn:'D팀, 늦은 시간까지 빅 클라이언트 챙기시느라 고생 많아요', morning:'D팀 좋은 아침! 오늘도 단단하게',
+      noon:'D팀 점심은 챙기셨죠', afternoon:'D팀 오후 페이스, 잘 가고 있어요',
+      evening:'D팀 오늘 영업 수고하셨습니다', night:'D팀 깊은 휴식 챙기세요'
+    },
+    U: {
+      dawn:'U팀, 신규 운영 챙기시느라 늦게까지 고생 많으세요', morning:'U팀 산뜻한 아침이에요',
+      noon:'U팀 점심 든든히 챙기세요', afternoon:'U팀 오후도 차분히',
+      evening:'U팀 오늘 운영 마무리 잘 부탁드려요', night:'U팀 편안한 저녁 보내세요'
+    },
+  };
+  const tt = timeByTeam[STATE.team] || timeByTeam.G;
   let time;
-  if(h<6) time = '늦은 시간까지 수고 많으세요';
-  else if(h<11) time = '좋은 아침이에요';
-  else if(h<14) time = '점심 잘 챙기셨나요';
-  else if(h<18) time = '활기찬 오후 보내고 계세요';
-  else if(h<21) time = '오늘 하루도 수고 많으셨어요';
-  else time = '편안한 저녁 시간 보내세요';
-  // 팀별 멘트
+  if(h<6) time = tt.dawn;
+  else if(h<11) time = tt.morning;
+  else if(h<14) time = tt.noon;
+  else if(h<18) time = tt.afternoon;
+  else if(h<21) time = tt.evening;
+  else time = tt.night;
+
+  // 팀별 운영 멘트 풀 (매번 달라짐)
   const teamMsgs = {
-    G: ['G팀 매출 안정화, 한 단계 더', '광고주별 마진율 한 번 더 점검해볼까요', '이번 주 G팀 매출 업데이트 챙기는 날이에요'],
-    D: ['D팀 빅 클라이언트 관리 잘 부탁드려요', '신규 브랜드 발굴, 페이스 유지해요', '카테고리별 운영 효율 한 번 보세요'],
-    U: ['U팀 신규 운영 본격화, 안정 궤도로!', '인플루언서 채널 확장 챙겨주세요', '브랜드별 운영 일정 점검 부탁드려요'],
+    G: [
+      '오늘 G팀 매출 페이스, 차근차근 따라가봐요',
+      '광고주별 마진율 한 번 더 점검해볼까요',
+      'G팀 신규 브랜드 운영 호흡 잘 맞춰보세요',
+      '리얼베리어·드리미·불스원 운영 안정화 신경 써주세요',
+      'G팀 빅 캠페인 마감 일정 빠짐없이 챙겨주세요',
+      '카테고리별 운영 효율, 다시 한 번 살펴봐요',
+    ],
+    D: [
+      'D팀 빅 클라이언트 관리 잘 부탁드려요',
+      '신규 브랜드 발굴 페이스 유지하고 있어요',
+      'D팀 매체 광고 마진 한 번 더 확인 부탁드려요',
+      '파이브가이즈·벤슨 등 F&B 운영 호흡 맞춰주세요',
+      'D팀 분기 목표까지 단단하게 가봐요',
+      '신영와코루·셀로닉스 운영 일정 챙기세요',
+    ],
+    U: [
+      'U팀 신규 운영 본격화, 안정 궤도로 가요',
+      '인플루언서 채널 확장 챙겨주세요',
+      'U팀 브랜드별 운영 일정 점검 부탁드려요',
+      '뉴트리원·네오팜 브랜드 운영 단단히 가요',
+      'U팀 첫 분기 운영 데이터 축적 중, 화이팅이에요',
+      '4-6월 매출 호조, 하반기 안정 궤도 진입해봐요',
+    ],
   };
   const tList = teamMsgs[STATE.team] || teamMsgs.G;
+  // 요일/날짜 특수 케이스도 팀별로
   let extra;
-  if(day===1) extra = '이번 주도 한 걸음씩 가볍게 시작해볼까요';
-  else if(day===5) extra = '금요일이에요. 이번 주 매출 업데이트 챙기는 날이에요';
-  else if(day===0||day===6) extra = '편안한 휴일 보내세요';
-  else if(date>=25) extra = '월말 마감 시즌, 차분히 마무리 부탁드려요';
-  else if(date<=5) extra = '새로운 달이 시작됐어요. 이번 달도 화이팅이에요';
+  const dayKey = day===1?'mon':day===5?'fri':(day===0||day===6)?'weekend':null;
+  const dateKey = date>=25?'monthend':date<=5?'monthstart':null;
+  const specialByTeam = {
+    G: {mon:'G팀 이번 주도 한 걸음씩 가볍게 시작해볼까요', fri:'금요일! G팀 이번 주 매출 업데이트 챙기는 날이에요',
+        weekend:'주말엔 충전, G팀 편안한 휴일 보내세요',
+        monthend:'월말 마감, G팀 차분하게 마무리 부탁드려요', monthstart:'새 달 시작! G팀 이번 달도 화이팅이에요'},
+    D: {mon:'D팀 새 주, 빅 클라이언트 미팅 일정 정리해봐요', fri:'D팀 금요일! 한 주 영업 깔끔하게 마무리해요',
+        weekend:'D팀 주말은 푹 쉬세요, 다음 주도 강하게',
+        monthend:'D팀 월말 마감, 매출 인보이스 한 번 더 챙겨주세요', monthstart:'D팀 새 달 출발! 신규 수주 페이스 가져가요'},
+    U: {mon:'U팀 한 주 시작! 운영 캘린더 함께 점검해봐요', fri:'U팀 금요일, 인플루언서 캠페인 결과 정리해요',
+        weekend:'U팀 주말 편안히 쉬세요',
+        monthend:'U팀 월말, 신규 브랜드 운영 리포트 챙겨주세요', monthstart:'U팀 새 달! 매출 본격 가속 가봐요'},
+  };
+  const sp = specialByTeam[STATE.team] || specialByTeam.G;
+  if(dayKey && sp[dayKey]) extra = sp[dayKey];
+  else if(dateKey && sp[dateKey]) extra = sp[dateKey];
   else extra = tList[date % tList.length];
   return time + '. ' + extra + '.';
 }
