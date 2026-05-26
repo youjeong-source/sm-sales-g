@@ -22,6 +22,9 @@
     --bg2:#F5F5F5;
     --white:#FFFFFF;
     --bar-fill: linear-gradient(90deg,#E60021 0%,#FF4D6A 100%);
+    --team-g:#E60021; --team-g-bg:#FFE5E9;
+    --team-d:#1D4ED8; --team-d-bg:#DBEAFE;
+    --team-u:#D97706; --team-u-bg:#FFF7E6;
   }
   *{box-sizing:border-box}
   html,body{margin:0;padding:0;background:var(--bg);color:var(--ink);
@@ -134,9 +137,9 @@
 
   /* SM본부 전용 컬러 테마 (네이비/골드) */
   body.hq-mode{
-    background:linear-gradient(180deg,#FCFAFA 0%,#FFFFFF 60%);
+    background:linear-gradient(180deg,#FFFAFB 0%,#FFFFFF 100%);
   }
-  body.hq-mode header.app{background:linear-gradient(135deg,#C71D2E 0%,#A11827 100%);border-bottom:1px solid #A11827}
+  body.hq-mode header.app{background:linear-gradient(135deg,#E60021 0%,#B8001A 100%);border-bottom:1px solid #B8001A}
   body.hq-mode header.app h1,
   body.hq-mode header.app h1 b{color:#fff !important}
   body.hq-mode header.app .brand-sep,
@@ -186,9 +189,9 @@
   .ts-trigger:hover{border-color:#0F0F10}
   .ts-trigger .ts-dot{width:9px;height:9px;border-radius:50%;display:inline-block;background:#E60021}
   .ts-trigger .ts-dot.hq{background:linear-gradient(135deg,#1E293B,#475569)}
-  .ts-trigger .ts-dot.g{background:#E60021}
-  .ts-trigger .ts-dot.d{background:#1D4ED8}
-  .ts-trigger .ts-dot.u{background:#D97706}
+  .ts-trigger .ts-dot.g{background:var(--team-g)}
+  .ts-trigger .ts-dot.d{background:var(--team-d)}
+  .ts-trigger .ts-dot.u{background:var(--team-u)}
   .ts-trigger svg{color:var(--ink3)}
   .ts-menu{
     position:absolute;top:calc(100% + 6px);right:0;
@@ -254,14 +257,14 @@
 
   /* ============ SM본부 KPI Hero v3 (세그먼트 진행률, 배경 그라데이션) ============ */
   .hq-hero-v3{
-    background:linear-gradient(135deg,#FAF7F8 0%,#FFFFFF 50%,#FBF6F7 100%);
-    border:1px solid #EDE2E4;border-radius:16px;
+    background:linear-gradient(135deg,#FFF5F7 0%,#FFFFFF 50%,#FFFAFB 100%);
+    border:1px solid #FFD9DF;border-radius:16px;
     padding:26px 30px;margin-bottom:14px;
     box-shadow:0 2px 12px rgba(199,29,46,.04)
   }
   .hh-top{display:flex;justify-content:space-between;align-items:center;margin-bottom:22px}
   .hh-label{font-size:12px;color:var(--ink3);font-weight:600;letter-spacing:.3px}
-  .hh-label .hh-fy{background:#C71D2E;color:#fff;padding:2px 8px;border-radius:4px;font-weight:800;margin-right:6px;letter-spacing:0}
+  .hh-label .hh-fy{background:#E60021;color:#fff;padding:2px 8px;border-radius:4px;font-weight:800;margin-right:6px;letter-spacing:0}
   .hh-date{font-size:11px;color:var(--ink3);background:#fff;padding:6px 12px;border-radius:6px;border:1px solid var(--line);font-weight:500}
 
   .hh-main-row{display:flex;align-items:flex-end;justify-content:space-between;gap:24px;margin-bottom:20px;flex-wrap:wrap}
@@ -272,9 +275,9 @@
   .hh-slash{font-size:26px;color:var(--ink3);font-weight:400}
   .hh-goal{font-size:24px;color:var(--ink3);font-weight:700}
   .hh-pct-display{text-align:right}
-  .hh-pct-big{font-size:48px;font-weight:900;letter-spacing:-2px;color:#C71D2E;line-height:1}
+  .hh-pct-big{font-size:48px;font-weight:900;letter-spacing:-2px;color:#E60021;line-height:1}
   .hh-pct-big b{font-weight:900}
-  .hh-pct-big span{font-size:24px;color:#C71D2E;margin-left:2px;font-weight:800}
+  .hh-pct-big span{font-size:24px;color:#E60021;margin-left:2px;font-weight:800}
   .hh-pct-lab{font-size:11px;color:var(--ink3);font-weight:600;letter-spacing:.3px;text-transform:uppercase;margin-top:4px}
 
   /* 12개월 세그먼트 진행바 (컴팩트) */
@@ -282,16 +285,16 @@
   .hh-segments-lab{display:flex;justify-content:space-between;align-items:center;font-size:10.5px;color:var(--ink3);font-weight:600;margin-bottom:6px;letter-spacing:.2px}
   .hh-segments-lab span:first-child{text-transform:uppercase;font-weight:700}
   .hh-segments-info{color:var(--ink);font-weight:600}
-  .hh-segments-info b{color:#C71D2E;font-weight:800}
+  .hh-segments-info b{color:#E60021;font-weight:800}
   .hh-segments{display:grid;grid-template-columns:repeat(12,1fr);gap:3px;height:22px}
   .hh-seg{
     border-radius:3px;background:var(--bg2);position:relative;
     transition:all .15s ease;cursor:pointer
   }
-  .hh-seg.filled{background:linear-gradient(180deg,#C71D2E,#E04055)}
-  .hh-seg.partial{background:linear-gradient(180deg,#FBC4CC,#F5919D)}
+  .hh-seg.filled{background:linear-gradient(180deg,#E60021,#FF4D6A)}
+  .hh-seg.partial{background:linear-gradient(180deg,#FFB3C0,#FF6B7E)}
   .hh-seg.future{background:repeating-linear-gradient(45deg,#F4F4F5,#F4F4F5 3px,#FAFAFA 3px,#FAFAFA 6px)}
-  .hh-seg.now{box-shadow:inset 0 0 0 1.5px #C71D2E}  /* now: 내부 얇은 라인만, 외부 빨강 강조 보더 제거 */
+  /* .hh-seg.now - 당월 강조 라인 완전 제거 */
   .hh-seg:hover{transform:scaleY(1.15);z-index:5}
   /* 커스텀 호버 툴팁 */
   .hh-seg-tooltip{
@@ -314,38 +317,38 @@
   .hh-segments-ticks span:nth-child(4){margin-left:8.5%}
 
   /* 4 stats */
-  .hh-stats{display:grid;grid-template-columns:repeat(4,1fr);gap:14px;padding-top:18px;border-top:1px solid #EDE2E4}
+  .hh-stats{display:grid;grid-template-columns:repeat(4,1fr);gap:14px;padding-top:18px;border-top:1px solid #FFD9DF}
   .hh-stat{display:flex;flex-direction:column;gap:3px;padding:4px 2px}
   .hh-stat .lab{font-size:10.5px;color:var(--ink3);font-weight:600;letter-spacing:.3px;text-transform:uppercase}
   .hh-stat .val{font-size:18px;font-weight:800;color:var(--ink);letter-spacing:-.3px}
-  .hh-stat .val .accent{color:#C71D2E}
+  .hh-stat .val .accent{color:#E60021}
   .hh-stat .sub{font-size:10.5px;color:var(--ink3);font-weight:500}
 
-  /* HQ 매출 관리 - 상단 요약 3카드 */
+  /* HQ 매출 관리 - 상단 요약 3카드 (팀 페이지 .top3 스타일과 통일) */
   .hq-sales-summary{display:grid;grid-template-columns:repeat(3,1fr);gap:14px;margin-bottom:14px}
   .hss-card{
     background:#fff;border:1px solid var(--line);border-radius:12px;padding:18px 20px;
-    display:flex;flex-direction:column;gap:8px;position:relative;overflow:hidden
+    display:flex;flex-direction:column;gap:8px;position:relative;overflow:hidden;transition:all .15s
   }
-  .hss-card::before{
-    content:'';position:absolute;left:0;top:0;bottom:0;width:4px
+  .hss-card:hover{border-color:var(--ink2);box-shadow:0 4px 12px rgba(0,0,0,.05)}
+  /* 1위 카드 - 팀 페이지 .top3 .card.r1과 동일하게 빨강 그라데이션 배경 */
+  .hss-card.top{background:linear-gradient(135deg,#FFF5F7 0%,#FFFFFF 80%);border-color:var(--pt-l)}
+  .hss-card .hss-rk{
+    position:absolute;top:0;right:0;color:#fff;font-weight:800;font-size:11px;padding:5px 12px;
+    border-bottom-left-radius:10px;letter-spacing:.5px
   }
-  .hss-card.top::before{background:linear-gradient(180deg,#C71D2E,#E04055)}
-  .hss-card.bottom::before{background:linear-gradient(180deg,#475569,#64748B)}
-  .hss-card.warn::before{background:linear-gradient(180deg,#D97706,#F59E0B)}
-  .hss-card .hss-tag{font-size:10.5px;font-weight:700;letter-spacing:.4px;text-transform:uppercase;display:inline-flex;align-items:center;gap:5px;width:fit-content;padding:3px 9px;border-radius:5px}
-  .hss-card.top .hss-tag{background:#FBEBED;color:#C71D2E}
-  .hss-card.bottom .hss-tag{background:#F1F5F9;color:#475569}
-  .hss-card.warn .hss-tag{background:#FEF3C7;color:#D97706}
+  .hss-card.top .hss-rk{background:#E60021}
+  .hss-card.bottom .hss-rk{background:#71717A}
+  .hss-card.warn .hss-rk{background:#D97706}
+  .hss-card .hss-meta-top{font-size:11px;color:var(--ink3);font-weight:600}
   .hss-card .hss-brand{font-size:18px;font-weight:800;color:var(--ink);letter-spacing:-.4px;line-height:1.2}
-  .hss-card .hss-meta{font-size:11.5px;color:var(--ink3);font-weight:500}
-  .hss-card .hss-meta b{color:var(--ink);font-weight:700}
-  .hss-card .hss-num{font-size:22px;font-weight:800;letter-spacing:-.5px;line-height:1;margin-top:auto;padding-top:8px;border-top:1px solid var(--line2)}
-  .hss-card.top .hss-num{color:#C71D2E}
+  .hss-card .hss-num{font-size:22px;font-weight:800;color:#E60021;letter-spacing:-.5px;line-height:1;margin-top:4px}
   .hss-card.bottom .hss-num{color:var(--ink2)}
   .hss-card.warn .hss-num{color:#D97706}
-  .hss-card .hss-num small{font-size:11px;color:var(--ink3);font-weight:600;margin-left:5px}
-  .hss-card .hss-msg{font-size:11px;color:var(--ink3);line-height:1.4}
+  .hss-card .hss-num small{font-size:11px;color:var(--ink3);font-weight:600;margin-left:3px}
+  .hss-card .hss-stat-row{display:flex;gap:14px;border-top:1px solid var(--line2);padding-top:10px;margin-top:6px}
+  .hss-card .hss-stat-row > div{flex:1;font-size:11px;color:var(--ink3)}
+  .hss-card .hss-stat-row > div b{display:block;color:var(--ink);font-size:12.5px;font-weight:700;margin-top:2px}
 
   /* HQ 매출 관리 (브랜드별 표) */
   .hq-brand-tbl-wrap{overflow-x:auto}
@@ -356,9 +359,9 @@
   .hq-brand-tbl tbody td.r{text-align:right}
   .hq-brand-tbl tbody tr:hover{background:var(--bg)}
   .hq-brand-tbl .team-pill{display:inline-flex;align-items:center;gap:5px;font-size:10.5px;font-weight:800;padding:3px 8px;border-radius:5px;letter-spacing:.3px}
-  .hq-brand-tbl .team-pill.g{background:#FBEBED;color:#C71D2E}
-  .hq-brand-tbl .team-pill.d{background:#DBEAFE;color:#1D4ED8}
-  .hq-brand-tbl .team-pill.u{background:#FFF7E6;color:#D97706}
+  .hq-brand-tbl .team-pill.g{background:var(--team-g-bg);color:var(--team-g)}
+  .hq-brand-tbl .team-pill.d{background:var(--team-d-bg);color:var(--team-d)}
+  .hq-brand-tbl .team-pill.u{background:var(--team-u-bg);color:var(--team-u)}
   .hq-brand-tbl .b-name{font-weight:700;color:var(--ink)}
   .hq-brand-tbl .adv-name{color:var(--ink3);font-size:11px}
   .hq-brand-tbl .net-val{color:#1D4ED8;font-weight:700}
@@ -370,13 +373,13 @@
   body.hq-mode .panel.hq-insight-panel{background:#fff;border-color:var(--line);margin-bottom:14px;margin-top:6px}
   .hq-insight-cards{display:grid;grid-template-columns:repeat(3,1fr);gap:12px}
   .hi-card{background:var(--bg);border:1px solid var(--line);border-radius:11px;padding:14px 16px;display:flex;flex-direction:column;gap:8px;transition:all .15s;position:relative}
-  .hi-card:hover{border-color:#C71D2E;background:#fff;box-shadow:0 4px 12px rgba(199,29,46,.05)}
+  .hi-card:hover{border-color:#E60021;background:#fff;box-shadow:0 4px 12px rgba(199,29,46,.05)}
   .hi-card.editable:hover .hi-edit-btn{opacity:1}
   .hi-card .hi-row1{display:flex;align-items:center;gap:8px}
-  .hi-card .hi-ico{font-size:18px;width:30px;height:30px;border-radius:8px;background:#FBEBED;color:#C71D2E;display:flex;align-items:center;justify-content:center;flex:none}
+  .hi-card .hi-ico{font-size:18px;width:30px;height:30px;border-radius:8px;background:#FFE5E9;color:#E60021;display:flex;align-items:center;justify-content:center;flex:none}
   .hi-card .hi-h{font-size:12.5px;font-weight:800;color:var(--ink);letter-spacing:-.2px;flex:1}
   .hi-card .hi-body{font-size:12px;color:var(--ink2);line-height:1.6;font-weight:500;white-space:pre-wrap}
-  .hi-card .hi-body b{color:#C71D2E;font-weight:800}
+  .hi-card .hi-body b{color:#E60021;font-weight:800}
   .hi-card .hi-edited{font-size:10px;font-weight:700;color:#1D4ED8;background:#DBEAFE;padding:2px 6px;border-radius:4px}
   .hi-card .hi-edit-btn{background:none;border:1px solid var(--line);color:var(--ink3);width:24px;height:24px;border-radius:5px;cursor:pointer;font-size:11px;opacity:0;transition:opacity .15s}
   .hi-card .hi-edit-btn:hover{border-color:#E60021;color:#E60021}
@@ -394,19 +397,22 @@
   .hq-q-card .q-pct{font-size:11px;color:#1E293B;font-weight:800;margin-top:5px}
   .hq-q-card.future .q-pct{color:var(--muted)}
   .hq-q-card .q-net{font-size:11px;color:var(--ink2);margin-top:6px;border-top:1px solid var(--line2);padding-top:5px}
-  .hq-q-card .q-net b{color:#C71D2E;font-weight:800}
+  .hq-q-card .q-net b{color:#E60021;font-weight:800}
 
   /* 신규 브랜드 팀별 카드 */
   .hq-new-brands{display:flex;flex-direction:column;gap:12px;justify-content:center}
   .hq-new-row{display:flex;align-items:center;gap:12px;padding:11px 13px;border:1px solid var(--line);border-radius:9px;background:#fff}
   .hq-new-row .team-dot{width:8px;height:8px;border-radius:50%;flex:none}
-  .hq-new-row .team-dot.g{background:#E60021}
-  .hq-new-row .team-dot.d{background:#1D4ED8}
-  .hq-new-row .team-dot.u{background:#D97706}
+  .hq-new-row .team-dot.g{background:var(--team-g)}
+  .hq-new-row .team-dot.d{background:var(--team-d)}
+  .hq-new-row .team-dot.u{background:var(--team-u)}
   .hq-new-row .nm{flex:1;font-size:13px;font-weight:700}
   .hq-new-row .bar{width:160px;height:7px;background:var(--bg2);border-radius:999px;overflow:hidden}
-  .hq-new-row .bar > i{display:block;height:100%;background:#1E293B;border-radius:999px}
-  .hq-new-row .num{font-size:13px;font-weight:800;color:#1E293B;min-width:70px;text-align:right}
+  .hq-new-row[data-team="G"] .bar > i{background:var(--team-g)}
+  .hq-new-row[data-team="D"] .bar > i{background:var(--team-d)}
+  .hq-new-row[data-team="U"] .bar > i{background:var(--team-u)}
+  .hq-new-row .bar > i{display:block;height:100%;border-radius:999px;background:var(--ink)}
+  .hq-new-row .num{font-size:13px;font-weight:800;color:var(--ink);min-width:70px;text-align:right}
 
   /* ============ 웰컴 멘트 ============ */
   .welcome-bar{margin-bottom:16px;padding:8px 0 4px}
@@ -414,16 +420,16 @@
   .welcome-bar h2 #welcome-team{color:var(--ink);font-size:inherit;font-weight:inherit;background:none;padding:0;border-radius:0;margin:0}
   .welcome-bar h2 #welcome-emoji{font-size:24px;margin-left:4px}
   .welcome-bar p{margin:0;font-size:14.5px;color:var(--ink3);font-weight:500;line-height:1.6;white-space:pre-line}
-  /* HQ 모드 - 웰컴 텍스트 크게 + 오길비 명언 강조 */
+  /* HQ 모드 - 웰컴 텍스트 (31px) + 응원/명언 랜덤 */
   body.hq-mode .welcome-bar{margin-bottom:18px;padding:10px 0 6px}
-  body.hq-mode .welcome-bar h2{font-size:34px;letter-spacing:-.9px;line-height:1.15;color:var(--ink)}
+  body.hq-mode .welcome-bar h2{font-size:31px;letter-spacing:-.8px;line-height:1.2;color:var(--ink)}
   body.hq-mode .welcome-bar h2 .hq-cheer{
-    background:linear-gradient(135deg,#C71D2E,#E04055);
+    background:linear-gradient(135deg,#E60021,#FF4D6A);
     -webkit-background-clip:text;-webkit-text-fill-color:transparent;
-    background-clip:text;color:#C71D2E;font-weight:900;letter-spacing:-1px
+    background-clip:text;color:#E60021;font-weight:900;letter-spacing:-.9px
   }
-  body.hq-mode .welcome-bar h2 #welcome-emoji{font-size:30px}
-  body.hq-mode .welcome-bar p{font-size:16px;color:var(--ink2);line-height:1.65;font-weight:500;max-width:900px}
+  body.hq-mode .welcome-bar h2 #welcome-emoji{font-size:28px}
+  body.hq-mode .welcome-bar p{font-size:15px;color:var(--ink3);line-height:1.6;font-weight:400;max-width:900px}
 
   /* ============ KPI 보조 지표 ============ */
   .kpi-aux{display:grid;grid-template-columns:1fr 1fr 1.4fr;gap:14px;margin-bottom:18px}
@@ -568,7 +574,7 @@
   .ba.alrm{border-color:var(--pt-l);background:var(--pt-ll)}
   .ba .tag{font-size:10px;font-weight:700;padding:4px 8px;border-radius:5px;background:var(--pt);color:#fff;flex:none}
   .ba.warn .tag{background:#F59E0B}
-  .ba.up .tag{background:#C71D2E;color:#fff}
+  .ba.up .tag{background:#E60021;color:#fff}
   .ba.down .tag{background:#1D4ED8;color:#fff}
   .ba .info{flex:1;min-width:0}
   .ba .info b{font-size:13px;color:var(--ink);font-weight:700;display:block}
@@ -735,13 +741,13 @@
   .alert-feed{display:flex;flex-direction:column;gap:8px}
   .af-item{display:flex;gap:14px;padding:14px 16px;border:1px solid var(--line);border-radius:10px;background:#fff;align-items:flex-start;transition:border-color .12s}
   .af-item:hover{border-color:var(--ink2)}
-  .af-item.severity-high{border-left:3px solid #C71D2E}
+  .af-item.severity-high{border-left:3px solid #E60021}
   .af-item.severity-mid{border-left:3px solid #D97706}
   .af-item.severity-low{border-left:3px solid #71717A}
   /* 매출 급감 항목은 좌측 보더 파랑 우선 적용 */
   .af-item[data-kind="revenue-down"]{border-left-color:#1D4ED8 !important}
   .af-icon{width:34px;height:34px;border-radius:8px;display:flex;align-items:center;justify-content:center;flex:none;background:var(--bg2);color:var(--ink2)}
-  .af-icon.up{background:#FBEBED;color:#C71D2E}        /* 매출 급증 - 빨강 톤다운 */
+  .af-icon.up{background:#FFE5E9;color:#E60021}        /* 매출 급증 - 빨강 톤다운 */
   .af-icon.down{background:#DBEAFE;color:#1D4ED8}      /* 매출 급감 - 파랑 */
   .af-icon.contract{background:#FFF7E6;color:#D97706}
   .af-icon.tax{background:#EFF6FF;color:#1D4ED8}
@@ -749,7 +755,7 @@
   .af-content{flex:1;min-width:0}
   .af-top{display:flex;align-items:center;gap:8px;margin-bottom:3px;flex-wrap:wrap}
   .af-cat{font-size:10px;font-weight:800;padding:2px 7px;border-radius:4px;letter-spacing:.3px;text-transform:uppercase}
-  .af-cat.revenue-up{background:#FBEBED;color:#C71D2E;border:1px solid #F3CDD2}
+  .af-cat.revenue-up{background:#FFE5E9;color:#E60021;border:1px solid #FFB3C0}
   .af-cat.revenue-down{background:#DBEAFE;color:#1D4ED8;border:1px solid #BFDBFE}
   .af-cat.contract{background:#FFF7E6;color:#D97706}
   .af-cat.tax{background:#EFF6FF;color:#1D4ED8}
@@ -1737,7 +1743,7 @@ function renderHQDashboard(){
       if(mRev >= monthlyGoal*0.7){ cls += ' filled'; dataMonths++; }
       else if(mRev > 0){ cls += ' partial'; dataMonths++; }
       else if(i > curMonthIdx) cls += ' future';
-      if(i === curMonthIdx) cls += ' now';
+      // 당월 강조 제거 (사용자 요청)
       const ratio = monthlyGoal>0 ? Math.min(100, mRev/monthlyGoal*100).toFixed(0) : 0;
       const tipHTML = `<div class="hh-seg-tooltip"><div class="ttm">${m}</div><div class="ttr">${fmtShort(mRev)}원</div><div class="ttp">월 목표 대비 ${ratio}%</div></div>`;
       segHtml += `<div class="${cls}">${tipHTML}</div>`;
@@ -1945,7 +1951,7 @@ function renderHQDashboard(){
     // 단순화: brand 수를 신규 카운트로 가정 (실제로는 BRAND_META 사용해야 함)
     const cnt = t.brands.length;
     const pct = Math.min(100, cnt/goal*100);
-    return `<div class="hq-new-row">
+    return `<div class="hq-new-row" data-team="${tid}">
       <span class="team-dot ${tid.toLowerCase()}"></span>
       <div class="nm">${t.name}</div>
       <div class="bar"><i style="width:${pct}%"></i></div>
@@ -1967,7 +1973,7 @@ function renderHQDashboard(){
   if(chHQCat) try{chHQCat.destroy();}catch(e){}
   const catCanvas = document.getElementById('ch-hq-cat');
   if(catCanvas){
-    const catColors = ['#C71D2E','#E04055','#1E40AF','#3B82F6','#B45309','#D97706'];
+    const catColors = ['#E60021','#FF4D6A','#1E40AF','#3B82F6','#B45309','#D97706'];
     chHQCat = new Chart(catCanvas, {
       type:'doughnut',
       data:{labels:CATS, datasets:[{data:CATS.map(c=>catData[c]), backgroundColor:catColors, borderWidth:3, borderColor:'#fff'}]},
@@ -2029,27 +2035,30 @@ function renderHQSalesSummary(){
   });
   // 상위 매출 1위
   const top = rows.slice().filter(r=>r.rev>0).sort((a,b)=>b.rev-a.rev)[0];
+  if(top) top.numLabel = fmtShort(top.rev) + '<small>원</small>';
   // 하위 매출 1개 (매출>0 중 가장 작음)
   const bottom = rows.slice().filter(r=>r.rev>0).sort((a,b)=>a.rev-b.rev)[0];
-  // 점검 필요 - 이익률 가장 낮음 (적자/저수익) 또는 마이너스 이익률
+  if(bottom) bottom.numLabel = fmtShort(bottom.rev) + '<small>원</small>';
+  // 점검 필요 - 이익률 가장 낮음
   const warnList = rows.slice().filter(r=>r.rev>0).sort((a,b)=>a.margin-b.margin);
   const warn = warnList[0];
+  if(warn) warn.numLabel = warn.margin.toFixed(1) + '<small>%</small>';
 
-  function card(type, tagLabel, data, msg, numLabel){
-    if(!data) return `<div class="hss-card ${type}"><div class="hss-tag">${tagLabel}</div><div class="hss-brand">데이터 부족</div></div>`;
+  function card(type, rkLabel, data, statRow){
+    if(!data) return `<div class="hss-card ${type}"><div class="hss-rk">${rkLabel}</div><div class="hss-brand">데이터 부족</div></div>`;
     return `<div class="hss-card ${type}">
-      <div class="hss-tag">${tagLabel}</div>
+      <div class="hss-rk">${rkLabel}</div>
+      <div class="hss-meta-top">${data.teamName} · ${data.adv} · 담당 ${data.owner}</div>
       <div class="hss-brand">${data.brand}</div>
-      <div class="hss-meta"><b>${data.teamName}</b> · ${data.adv} · 담당 ${data.owner}</div>
-      <div class="hss-msg">${msg}</div>
-      <div class="hss-num">${numLabel}</div>
+      <div class="hss-num">${data.numLabel}</div>
+      <div class="hss-stat-row">${statRow}</div>
     </div>`;
   }
 
   const html =
-    card('top','🥇 상위 매출 1위', top, top ? `YTD 매출 ${fmtShort(top.rev)}원 · 순매출 ${fmtShort(top.net)}원 · 이익률 ${top.margin.toFixed(1)}%` : '', top ? fmtShort(top.rev)+'<small>원</small>' : '-') +
-    card('bottom','📉 하위 매출 1건', bottom, bottom ? `YTD 매출이 가장 작은 브랜드 · 운영 점검 권장` : '', bottom ? fmtShort(bottom.rev)+'<small>원</small>' : '-') +
-    card('warn','⚠️ 점검 필요', warn, warn ? (warn.margin<0 ? `이익률 ${warn.margin.toFixed(1)}% (적자) · 즉시 점검 필요` : `이익률 ${warn.margin.toFixed(1)}%로 가장 낮음 · 원가/마진 검토`) : '', warn ? warn.margin.toFixed(1)+'<small>%</small>' : '-');
+    card('top','상위 1위', top, top ? `<div>YTD 매출<b>${fmtShort(top.rev)}원</b></div><div>순매출<b>${fmtShort(top.net)}원</b></div><div>이익률<b>${top.margin.toFixed(1)}%</b></div>` : '') +
+    card('bottom','하위 1건', bottom, bottom ? `<div>YTD 매출<b>${fmtShort(bottom.rev)}원</b></div><div>순매출<b>${fmtShort(bottom.net)}원</b></div><div>이익률<b>${bottom.margin.toFixed(1)}%</b></div>` : '') +
+    card('warn','점검 필요', warn, warn ? `<div>YTD 매출<b>${fmtShort(warn.rev)}원</b></div><div>순매출<b>${fmtShort(warn.net)}원</b></div><div>이익률<b style="color:${warn.margin<0?'#E60021':warn.margin<10?'#D97706':'var(--ink)'}">${warn.margin.toFixed(1)}%</b></div>` : '');
 
   wrap.innerHTML = html;
 }
@@ -2097,7 +2106,7 @@ function renderHQBrandTable(){
       </tr>`;
     });
     const totalMargin = totalRev ? (totalNet/totalRev*100) : 0;
-    html += `<tr style="background:#FBEBED;border-top:2px solid #C71D2E"><td colspan="4"><b style="color:#C71D2E">합계 (${filtered.length}개 브랜드)</b></td><td class="r"><b>${fmtShort(totalRev)}원</b></td><td class="r net-val"><b>${fmtShort(totalNet)}원</b></td><td class="r"><b>${totalMargin.toFixed(1)}%</b></td></tr>`;
+    html += `<tr style="background:#FFE5E9;border-top:2px solid #E60021"><td colspan="4"><b style="color:#E60021">합계 (${filtered.length}개 브랜드)</b></td><td class="r"><b>${fmtShort(totalRev)}원</b></td><td class="r net-val"><b>${fmtShort(totalNet)}원</b></td><td class="r"><b>${totalMargin.toFixed(1)}%</b></td></tr>`;
   }
   html += '</tbody>';
   tbl.innerHTML = html;
@@ -2224,7 +2233,7 @@ function buildAutoGreeting(){
   return time + '. ' + extra + '.';
 }
 function buildHQGreeting(){
-  // SM본부 응원 + 오길비 명언
+  // SM본부 - 응원 OR 오길비 명언 랜덤 (둘 중 하나만)
   const goal = ALL_TEAMS_DATA.hq_goals.rev;
   let totRev=0;
   Object.keys(ALL_TEAMS_DATA.teams).forEach(tid=>{
@@ -2232,15 +2241,18 @@ function buildHQGreeting(){
   });
   const pct = goal ? (totRev/goal*100) : 0;
   const remain = Math.max(0, goal - totRev);
-  // 응원 (성과 기반)
-  let cheer;
-  if(pct >= 100) cheer = `연간 목표 달성! 누적 ${fmtShort(totRev)}원의 빛나는 성과, 하반기 더 큰 도약 만들어봐요.`;
-  else if(pct >= 75) cheer = `목표의 ${pct.toFixed(0)}% 달성. 잔여 ${fmtShort(remain)}원, 막판 스퍼트로 정상까지!`;
-  else if(pct >= 50) cheer = `상반기 절반 통과. 누적 ${fmtShort(totRev)}원, 하반기 우상향 곡선의 시작점이에요.`;
-  else if(pct >= 25) cheer = `1분기 마무리 시점. 잔여 ${fmtShort(remain)}원, 팀별 빅딜 발굴로 가속도 만들어가요.`;
-  else cheer = `목표 ${fmtShort(goal)}원, 현재 ${pct.toFixed(1)}%. 신규 클라이언트 발굴이 본부 전체의 핵심 미션입니다.`;
-  // 오길비 명언 (날짜 기반 로테이션)
-  const OGILVY_QUOTES = [
+  // 응원 풀 (성과 기반)
+  const cheers = [];
+  if(pct >= 100) cheers.push(`연간 목표 달성! 누적 ${fmtShort(totRev)}원의 빛나는 성과, 하반기 더 큰 도약 만들어봐요.`);
+  else if(pct >= 75) cheers.push(`목표의 ${pct.toFixed(0)}% 달성. 잔여 ${fmtShort(remain)}원, 막판 스퍼트로 정상까지!`);
+  else if(pct >= 50) cheers.push(`상반기 절반 통과. 누적 ${fmtShort(totRev)}원, 하반기 우상향 곡선의 시작점이에요.`);
+  else if(pct >= 25) cheers.push(`1분기 마무리 시점. 잔여 ${fmtShort(remain)}원, 팀별 빅딜 발굴로 가속도 만들어가요.`);
+  else cheers.push(`목표 ${fmtShort(goal)}원, 현재 ${pct.toFixed(1)}%. 신규 클라이언트 발굴이 본부 전체의 핵심 미션입니다.`);
+  cheers.push(`SM본부, 오늘의 한 걸음이 본부 전체의 한 단계가 됩니다.`);
+  cheers.push(`팀별 강점을 살린 시너지가 본부 목표의 가장 빠른 길입니다.`);
+  cheers.push(`빅 클라이언트 한 건의 임팩트가 분기 그래프를 바꿉니다. 본부 화이팅!`);
+  // 오길비 명언 풀
+  const ogilvy = [
     '"고객은 바보가 아닙니다. 그녀는 당신의 아내입니다." — David Ogilvy',
     '"팔지 못한다면 그것은 창의적인 광고가 아닙니다." — David Ogilvy',
     '"광고에서 가장 중요한 단어는 \'테스트\'입니다." — David Ogilvy',
@@ -2254,10 +2266,13 @@ function buildHQGreeting(){
     '"단어 하나 차이가 광고 효과를 19배 키울 수 있다." — David Ogilvy',
     '"실용성과 영혼이 함께할 때 비로소 진짜 광고가 된다." — David Ogilvy',
   ];
-  const today = new Date();
-  const dayOfYear = Math.floor((today - new Date(today.getFullYear(),0,0)) / 86400000);
-  const quote = OGILVY_QUOTES[dayOfYear % OGILVY_QUOTES.length];
-  return cheer + '\n' + quote;
+  // 랜덤: 페이지 로드 시점에 응원/명언 50:50 선택
+  const showQuote = Math.random() < 0.5;
+  if(showQuote){
+    return ogilvy[Math.floor(Math.random() * ogilvy.length)];
+  } else {
+    return cheers[Math.floor(Math.random() * cheers.length)];
+  }
 }
 function getCurrentQualGrowth(){
   return (STATE.qualGrowth && STATE.qualGrowth[STATE.team]) || '';
