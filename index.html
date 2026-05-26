@@ -213,6 +213,9 @@
   header.app h1{font-size:16px;margin:0;font-weight:600;color:var(--ink);letter-spacing:-.3px;display:flex;align-items:center;gap:10px;flex-wrap:wrap}
   header.app h1 b{color:var(--pt);font-weight:800;font-size:17px;letter-spacing:-.5px}
   header.app .brand-sep{color:var(--muted);font-weight:400}
+  /* HQ 모드 - brand-sep 흰 라인 제거 (보이지 않게) */
+  body.hq-mode header.app .brand-sep{display:none}
+  body.hq-mode header.app h1{gap:14px}
   header.app .team-chip{background:#0F0F10;color:#fff;font-size:11px;font-weight:700;padding:3px 9px;border-radius:5px;letter-spacing:.3px;margin-left:2px}
   header.app .meta{display:flex;align-items:center;gap:14px}
   header.app .pill{background:var(--bg2);padding:6px 12px;border-radius:999px;font-size:11px;color:var(--ink2);font-weight:600}
@@ -250,9 +253,6 @@
   }
   aside.side .nav button:hover{background:var(--pt-ll);color:var(--pt)}
   aside.side .nav button.active{background:var(--pt-l);color:var(--pt);font-weight:700}
-  /* 팀별 사이드바 active 컬러 정돈 */
-  body[data-team-id="D"] aside.side .nav button.active{background:var(--team-d-bg);color:var(--team-d)}
-  body[data-team-id="U"] aside.side .nav button.active{background:var(--team-u-bg);color:var(--team-u)}
   aside.side .nav button .ico{width:18px;display:inline-flex;justify-content:center;align-items:center;color:var(--ink3)}
   aside.side .nav button.active .ico,aside.side .nav button:hover .ico{color:var(--pt)}
 
@@ -1146,7 +1146,7 @@
     <div class="panel hq-only hq-insight-panel">
       <div class="head-row">
         <h3>본부 인사이트 <span class="tag">분석 + 편집</span></h3>
-        <div style="font-size:11px;color:var(--ink3)" id="hq-insight-edit-hint">본부장 / 그룹장은 카드 클릭 시 직접 수정 가능</div>
+        <div style="font-size:11px;color:var(--ink3);display:none" id="hq-insight-edit-hint"></div>
       </div>
       <div class="hq-insight-cards" id="hq-insight"></div>
     </div>
@@ -1187,9 +1187,7 @@
       <div class="hq-brand-tbl-wrap">
         <table class="hq-brand-tbl" id="hq-brand-tbl"></table>
       </div>
-      <div style="margin-top:14px;padding:12px 14px;background:#FFF5F7;border:1px solid var(--pt-l);border-radius:8px;font-size:11.5px;color:var(--ink2);line-height:1.6">
-        <b style="color:#E60021">매출 관리 안내</b> · 본부장/그룹장 권한으로 G·D·U 3팀 전체 브랜드 매출을 통합 조회합니다. 검색·정렬을 활용해 빠른 분석이 가능합니다.
-      </div>
+<!-- 매출 관리 안내 박스 제거됨 -->
     </div>
   </section>
 
@@ -3574,12 +3572,10 @@ function applyHQMenuVisibility(){
   document.body.classList.toggle('hq-mode', isHQ);
 }
 
-/* ================ 팀별 테마 컬러 적용 ================ */
+/* ================ 팀별 테마 컬러 적용 (v22 → v21 원복: no-op) ================ */
 function applyTeamThemeColor(teamId){
-  // 모든 팀 + HQ는 메인 빨강 (#E60021) 유지가 기본
-  // 사용자 요구는 "팀별 컬러 정돈" - 팀별 식별만 일관되게
-  // body data-team 속성으로 팀별 differentiated style 적용 가능
-  document.body.setAttribute('data-team-id', teamId);
+  // v22의 사이드바 팀별 컬러 차별화 제거됨 (v21 상태)
+  // 모든 팀이 메인 빨강 사이드바 active 컬러 사용
 }
 
 /* ================ Team Switcher ================ */
