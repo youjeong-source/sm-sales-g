@@ -247,7 +247,7 @@
 
   /* ============ Layout ============ */
   .shell{display:grid;grid-template-columns:218px 1fr;gap:0;min-height:calc(100vh - 110px);max-width:1640px;margin:0 auto;padding:0;width:100%}
-  aside.side{background:#fff;border:1px solid #EEF0F4;border-radius:16px;padding:24px 14px;margin:24px 0 24px 0;height:fit-content;position:sticky;top:24px}
+  aside.side{background:#fff;border:1px solid var(--line);border-radius:16px;padding:24px 14px;margin:24px 0 24px 0;height:fit-content;position:sticky;top:24px}
   aside.side h5{font-size:10px;color:var(--muted);margin:0 12px 8px;text-transform:uppercase;letter-spacing:.8px;font-weight:600}
   aside.side .nav{display:flex;flex-direction:column;gap:2px;margin-bottom:22px}
   aside.side .nav button{
@@ -591,8 +591,9 @@
   .ba.up .tag{background:#E60021;color:#fff}
   .ba.down .tag{background:#1D4ED8;color:#fff}
   .ba .info{flex:1;min-width:0}
-  .ba .info b{font-size:13px;color:var(--ink);font-weight:700;display:block}
-  .ba .info span{font-size:11px;color:var(--ink3)}
+  .ba .info b{font-size:15px;color:var(--ink);font-weight:500;display:block;margin-bottom:3px;letter-spacing:-.2px}
+  .ba .info span{font-size:12px;color:var(--ink3)}
+  .ba .info span b{font-weight:700;color:var(--ink);font-size:12px;display:inline}
 
   .chip{font-size:11px;color:var(--ink2);background:var(--bg2);padding:6px 10px;border-radius:6px;display:inline-flex;gap:5px;align-items:center;cursor:pointer;font-weight:600}
   .chip input{margin:0;cursor:pointer}
@@ -2673,7 +2674,7 @@ function renderBrandAlerts(){
     if(d<=45 && d>=-1){
       alerts.push({type:'warn', tag:`계약 종료 D-${Math.max(0,d)}`,
         title:`${b} 계약 종료일 임박`,
-        sub:`${ADV_MAP[b]||'-'} · 담당 ${OWNERS[b]||'-'} · 종료 예정 ${meta.contractEnd}`});
+        sub:`종료 예정 <b>${meta.contractEnd}</b>`});
     }
   });
   scope.forEach(b=>{
@@ -2693,7 +2694,7 @@ function renderBrandAlerts(){
       const pct = prevRev ? (diff/prevRev*100) : (curRev?100:0);
       alerts.push({type: up ? 'up' : 'down', tag: up ? '매출 급증' : '매출 급감',
         title:`${b} 전월 대비 ${up?'+':''}${fmtShort(diff)}원 (${up?'+':''}${pct.toFixed(1)}%)`,
-        sub:`${ADV_MAP[b]||'-'} · 담당 ${OWNERS[b]||'-'} · 전월 ${prevMonth} ${fmtShort(prevRev)} → 당월 ${curMonth} <b>${fmtShort(curRev)}</b>`});
+        sub:`전월 ${prevMonth} ${fmtShort(prevRev)} → 당월 ${curMonth} <b>${fmtShort(curRev)}원</b>`});
     }
   });
   document.getElementById('brand-alert-count').textContent = alerts.length+'건';
