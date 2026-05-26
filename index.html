@@ -213,9 +213,8 @@
   header.app h1{font-size:16px;margin:0;font-weight:600;color:var(--ink);letter-spacing:-.3px;display:flex;align-items:center;gap:10px;flex-wrap:wrap}
   header.app h1 b{color:var(--pt);font-weight:800;font-size:17px;letter-spacing:-.5px}
   header.app .brand-sep{color:var(--muted);font-weight:400}
-  /* HQ 모드 - brand-sep 흰 라인 제거 (보이지 않게) */
-  body.hq-mode header.app .brand-sep{display:none}
-  body.hq-mode header.app h1{gap:14px}
+  /* HQ 모드 - brand-sep 재노출 (빨강 배경에 어울리는 톤) */
+  body.hq-mode header.app .brand-sep{color:rgba(255,255,255,.45);font-weight:400}
   header.app .team-chip{background:#0F0F10;color:#fff;font-size:11px;font-weight:700;padding:3px 9px;border-radius:5px;letter-spacing:.3px;margin-left:2px}
   header.app .meta{display:flex;align-items:center;gap:14px}
   header.app .pill{background:var(--bg2);padding:6px 12px;border-radius:999px;font-size:11px;color:var(--ink2);font-weight:600}
