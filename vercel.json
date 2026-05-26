@@ -1,20 +1,8 @@
 {
   "rewrites": [
-    { "source": "/g", "destination": "/index.html" },
-    { "source": "/d", "destination": "/index.html" },
-    { "source": "/u", "destination": "/index.html" },
-    { "source": "/e", "destination": "/index.html" },
-    { "source": "/i", "destination": "/index.html" },
-    { "source": "/r", "destination": "/index.html" },
-    { "source": "/hq", "destination": "/index.html" },
-    { "source": "/G", "destination": "/index.html" },
-    { "source": "/D", "destination": "/index.html" },
-    { "source": "/U", "destination": "/index.html" },
-    { "source": "/E", "destination": "/index.html" },
-    { "source": "/I", "destination": "/index.html" },
-    { "source": "/R", "destination": "/index.html" },
-    { "source": "/HQ", "destination": "/index.html" }
-  ],
-  "cleanUrls": true,
-  "trailingSlash": false
+    {
+      "source": "/((?!_next|api|favicon\\.ico|.*\\.(?:js|css|json|png|jpg|jpeg|svg|gif|webp|ico|woff|woff2|ttf|otf|map)).*)",
+      "destination": "/index.html"
+    }
+  ]
 }
