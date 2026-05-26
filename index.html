@@ -167,7 +167,7 @@
   body.hq-mode .hq-new-brands{padding:8px 0}
   /* 분기 카드 그리드 너비 강제 */
   body.hq-mode .hq-quarters{grid-template-columns:repeat(4,1fr);gap:14px;width:100%}
-  body.hq-mode aside.side{background:#fff;border-right:1px solid var(--line)}
+  body.hq-mode aside.side{background:#fff}
   body.hq-mode aside.side h5{color:#64748B}
   body.hq-mode aside.side .nav button{color:#475569}
   body.hq-mode aside.side .nav button:hover{background:#E2E8F0;color:#1E293B}
@@ -247,7 +247,7 @@
 
   /* ============ Layout ============ */
   .shell{display:grid;grid-template-columns:218px 1fr;gap:0;min-height:calc(100vh - 110px);max-width:1640px;margin:0 auto;padding:0;width:100%}
-  aside.side{background:#fff;border-right:1px solid var(--line);padding:24px 14px}
+  aside.side{background:#fff;border:1px solid #EEF0F4;border-radius:16px;box-shadow:0 4px 14px rgba(15,23,42,.05);padding:24px 14px;margin:16px 0 16px 0;height:fit-content;position:sticky;top:16px}
   aside.side h5{font-size:10px;color:var(--muted);margin:0 12px 8px;text-transform:uppercase;letter-spacing:.8px;font-weight:600}
   aside.side .nav{display:flex;flex-direction:column;gap:2px;margin-bottom:22px}
   aside.side .nav button{
@@ -258,6 +258,8 @@
   aside.side .nav button.active{background:var(--pt-l);color:var(--pt);font-weight:700}
   aside.side .nav button .ico{width:18px;display:inline-flex;justify-content:center;align-items:center;color:var(--ink3)}
   aside.side .nav button.active .ico,aside.side .nav button:hover .ico{color:var(--pt)}
+  aside.side .nav button .nav-badge{margin-left:auto;background:#E60021;color:#fff;font-size:10.5px;font-weight:700;padding:1.5px 7px;border-radius:999px;min-width:18px;text-align:center;line-height:1.4;font-variant-numeric:tabular-nums}
+  aside.side .nav button.active .nav-badge{background:#fff;color:#E60021}
 
   main{padding:24px 36px 60px;max-width:none}
 
@@ -999,7 +1001,7 @@
       <button data-tab="hq-sales" class="hq-menu-only"><span class="ico"><svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 3v18h18"/><path d="M7 14l4-4 4 4 5-6"/></svg></span>브랜드별 매출표</button>
       <button data-tab="brand"><span class="ico"><svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="4" y1="20" x2="20" y2="20"/><rect x="5" y="11" width="3" height="8"/><rect x="11" y="6" width="3" height="13"/><rect x="17" y="14" width="3" height="5"/></svg></span>브랜드별 매출표</button>
       <button data-tab="ops"><span class="ico"><svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M14 4l6 6L8 22H2v-6z"/><path d="M14 4l6 6"/></svg></span>월간 운영</button>
-      <button data-tab="alerts"><span class="ico"><svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M18 16v-5a6 6 0 10-12 0v5l-2 2v1h16v-1z"/><path d="M10 21h4"/></svg></span>변동 알림</button>
+      <button data-tab="alerts"><span class="ico"><svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M18 16v-5a6 6 0 10-12 0v5l-2 2v1h16v-1z"/><path d="M10 21h4"/></svg></span>변동 알림<span class="nav-badge" id="nav-alert-badge" style="display:none">0</span></button>
     </div>
 
     <h5 class="req-tl">팀 관리</h5>
@@ -2907,6 +2909,17 @@ function renderAlerts(){
     document.getElementById('alerts-side').innerHTML = sideHtml || '<div style="color:var(--ink3);font-size:12px;padding:10px">변동 없음</div>';
     document.getElementById('alert-count-side').textContent = sideList.length+'건';
   }
+  // 사이드바 변동 알림 메뉴 배지 업데이트 (전체 알림 개수 기준)
+  const navBadge = document.getElementById('nav-alert-badge');
+  if(navBadge){
+    const totalCnt = buildAllAlerts().length;
+    if(totalCnt > 0){
+      navBadge.textContent = totalCnt > 99 ? '99+' : String(totalCnt);
+      navBadge.style.display = 'inline-flex';
+    } else {
+      navBadge.style.display = 'none';
+    }
+  }
   const all = buildAllAlerts();
   // 14일 이내 필터링 (alert.time 기반)
   const cutoff = new Date(STATE.today);
@@ -3548,8 +3561,7 @@ function doLoginByName(){
   let p = TEAM_ROSTER.find(x=>x.name===raw);
   if(!p) p = TEAM_ROSTER.find(x=>x.name.includes(raw) || raw.includes(x.name));
   if(!p){
-    err.innerHTML = `'${raw}' 사용자를 찾을 수 없습니다. 등록된 팀원: ` +
-      TEAM_ROSTER.map(x=>x.name).join(' · ');
+    err.innerHTML = `'${raw}' 사용자를 찾을 수 없습니다. 이름을 다시 확인해주세요.`;
     err.style.display = 'block';
     return;
   }
