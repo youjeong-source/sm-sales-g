@@ -935,7 +935,7 @@
         <button type="submit" class="login-submit">접근</button>
         <button type="button" class="login-cancel" onclick="cancelPwGate()">취소</button>
       </form>
-      <div class="login-pw-hint">비밀번호는 본인에게만 부여됩니다. 분실 시 관리자(본부장)에게 문의해주세요.</div>
+      <div class="login-pw-hint">비밀번호는 본인에게만 부여됩니다 · 1회 로그인 시 <b style="color:var(--ink)">5시간</b> 유지 · 분실 시 관리자(본부장) 문의</div>
     </div>
   </div>
 </div>
@@ -3434,7 +3434,8 @@ function showLogin(){
   buildLoginScreen();
   document.getElementById('login-gate').classList.add('open');
 }
-function loginAs(role, user){
+function loginAs(role, user, opts){
+  opts = opts || {};
   STATE.role = role;
   STATE.memberUser = user || STATE.memberUser;
   document.body.setAttribute('data-role', role);
@@ -3443,19 +3444,18 @@ function loginAs(role, user){
   document.getElementById('who-name').textContent = display;
   document.getElementById('who-init').textContent = (user||'?').charAt(0);
   document.getElementById('login-gate').classList.remove('open');
-  // 사용자 소속 팀으로 자동 전환 + URL 요청 팀 우선 반영
   const myTeam = (p && p.team) ? p.team : 'G';
   let initialTeam;
-  if(URL_REQUESTED_TEAM){
-    // URL이 요청한 팀이 권한 있는지 확인
+  if(opts.initialTeam){
+    initialTeam = opts.initialTeam;
+  } else if(URL_REQUESTED_TEAM){
     if(role==='head'){
-      initialTeam = URL_REQUESTED_TEAM;  // 본부장은 모두 가능
+      initialTeam = URL_REQUESTED_TEAM;
     } else if(role==='lead' && (URL_REQUESTED_TEAM === myTeam || URL_REQUESTED_TEAM === 'HQ')){
-      initialTeam = URL_REQUESTED_TEAM;  // 팀장은 자기팀+HQ
+      initialTeam = URL_REQUESTED_TEAM;
     } else if(URL_REQUESTED_TEAM === myTeam){
-      initialTeam = URL_REQUESTED_TEAM;  // 본인 팀이면 OK
+      initialTeam = URL_REQUESTED_TEAM;
     } else {
-      // 권한 없는 팀 URL → 본인 팀으로 폴백 + 안내
       initialTeam = (role==='head') ? 'HQ' : myTeam;
       setTimeout(()=>alert(`'${URL_REQUESTED_TEAM === 'HQ' ? 'SM본부' : URL_REQUESTED_TEAM+'팀'}' 접근 권한이 없어 본인 소속(${myTeam==='HQ'?'SM본부':myTeam+'팀'})으로 이동합니다.`), 100);
     }
@@ -3465,18 +3465,61 @@ function loginAs(role, user){
   STATE.team = initialTeam;
   STATE.goals = applyTeamGoals(STATE.team);
   applyTeamData(STATE.team);
-  // body 테마
   document.body.setAttribute('data-team', STATE.team);
   applyTeamThemeColor(STATE.team);
-  // 드롭다운 갱신
   buildTeamSwitcher();
   applyHQMenuVisibility();
   updateTeamSubLabel();
+  // 세션 저장 (5시간) - skipSessionSave 옵션이 true면 저장 안 함 (세션 복원 시)
+  if(!opts.skipSessionSave){
+    saveSession(role, user, STATE.team);
+  }
   refreshAll();
 }
+
+/* ===== 5시간 세션 유지 (localStorage) ===== */
+const SESSION_KEY = 'sm_sales_session_v1';
+const SESSION_DURATION = 5 * 60 * 60 * 1000;  // 5시간
+
+function saveSession(role, user, team){
+  try {
+    const data = {
+      role, user, team,
+      expiresAt: Date.now() + SESSION_DURATION,
+      savedAt: Date.now()
+    };
+    localStorage.setItem(SESSION_KEY, JSON.stringify(data));
+  } catch(e){ console.warn('세션 저장 실패', e); }
+}
+
+function restoreSession(){
+  try {
+    const raw = localStorage.getItem(SESSION_KEY);
+    if(!raw) return null;
+    const data = JSON.parse(raw);
+    if(!data.user || !data.role) return null;
+    if(Date.now() > data.expiresAt){
+      // 만료
+      localStorage.removeItem(SESSION_KEY);
+      return null;
+    }
+    // 사용자 존재 확인
+    const p = findRoster(data.user);
+    if(!p) return null;
+    return data;
+  } catch(e){
+    return null;
+  }
+}
+
+function clearSession(){
+  try { localStorage.removeItem(SESSION_KEY); } catch(e){}
+}
 function logout(){
-  // 로그인 기능 임시 해제 상태 - 안내만
-  alert('로그인 기능이 일시적으로 해제되어 있습니다.');
+  if(!confirm('로그아웃 하시겠습니까?')) return;
+  clearSession();
+  // 페이지 새로고침으로 깔끔하게 초기화
+  window.location.reload();
 }
 
 /* ================ Goal edit ================ */
@@ -3883,35 +3926,29 @@ document.addEventListener('click', e=>{
   }
 });
 
-/* ================ Init ================ */
-// 로그인 기능 임시 해제 - 자동으로 본부장 권한 진입
-// URL 요청 팀이 있으면 해당 팀으로, 없으면 본부장(HQ)으로
-(function autoLogin(){
-  // 페이지 진입 시 본부 합산 한 번 더 보장
+/* ================ Init - 세션 복원 또는 로그인 게이트 ================ */
+(function init(){
   recomputeHQGoals();
-  const urlTeam = URL_REQUESTED_TEAM;
-  // 본부장 권한으로 진입 (모든 팀 접근 가능)
-  STATE.role = 'head';
-  STATE.memberUser = '남진현';
-  document.body.setAttribute('data-role', 'head');
-  const p = findRoster('남진현');
-  const display = p ? '남진현 본부장' : '남진현';
-  const wn = document.getElementById('who-name'); if(wn) wn.textContent = display;
-  const wi = document.getElementById('who-init'); if(wi) wi.textContent = '남';
-  // 초기 팀: URL 우선, 없으면 HQ
-  let initialTeam = 'HQ';
-  if(urlTeam && ['G','D','U','E','I','R','HQ'].includes(urlTeam)) initialTeam = urlTeam;
-  STATE.team = initialTeam;
-  STATE.goals = applyTeamGoals(initialTeam);
-  applyTeamData(initialTeam);
-  document.body.setAttribute('data-team', initialTeam);
-  applyTeamThemeColor(initialTeam);
-  buildTeamSwitcher();
-  applyHQMenuVisibility();
-  updateTeamSubLabel();
-  // 로그인 모달 숨김
-  const lg = document.getElementById('login-gate'); if(lg) lg.classList.remove('open');
-  refreshAll();
+  // 5시간 세션 복원 시도
+  const restored = restoreSession();
+  if(restored){
+    // 세션 유효 → 자동 진입
+    const urlTeam = URL_REQUESTED_TEAM;
+    // URL이 요청한 팀이 권한 있는지 확인 후 적용
+    const me = findRoster(restored.user);
+    const myTeam = me ? me.team : null;
+    let initTeam = restored.team || (restored.role==='head' ? 'HQ' : myTeam);
+    if(urlTeam){
+      if(restored.role === 'head') initTeam = urlTeam;
+      else if(restored.role === 'lead' && (urlTeam === myTeam || urlTeam === 'HQ')) initTeam = urlTeam;
+      else if(urlTeam === myTeam) initTeam = urlTeam;
+    }
+    loginAs(restored.role, restored.user, {skipSessionSave: false, initialTeam: initTeam});
+  } else {
+    // 세션 없음 → 로그인 화면
+    refreshAll();
+    showLogin();
+  }
 })();
 </script>
 
