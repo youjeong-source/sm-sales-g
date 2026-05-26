@@ -115,6 +115,10 @@
   body.hq-mode .row.hq-only{display:grid !important}
   body.hq-mode .panel.hq-only{display:block !important}
 
+  /* 매출 관리 메뉴는 HQ 전용 */
+  .hq-menu-only{display:none !important}
+  body.hq-mode .hq-menu-only{display:flex !important}
+
   /* HQ 모드: 팀 전용 메뉴 숨김 */
   body.hq-mode .nav button[data-tab="brand"],
   body.hq-mode .nav button[data-tab="ops"],
@@ -130,17 +134,17 @@
 
   /* SM본부 전용 컬러 테마 (네이비/골드) */
   body.hq-mode{
-    background:#F7F8FA;
+    background:linear-gradient(180deg,#FFFAFB 0%,#FFFFFF 100%);
   }
-  body.hq-mode header.app{background:linear-gradient(180deg,#1E293B 0%,#0F172A 100%);border-bottom:1px solid #1E293B}
+  body.hq-mode header.app{background:linear-gradient(135deg,#E60021 0%,#B8001A 100%);border-bottom:1px solid #B8001A;box-shadow:0 1px 0 rgba(255,255,255,.05) inset}
   body.hq-mode header.app h1,
   body.hq-mode header.app h1 b{color:#fff !important}
   body.hq-mode header.app .brand-sep,
-  body.hq-mode header.app .team-chip{color:#94A3B8;background:rgba(255,255,255,.08);border:1px solid rgba(255,255,255,.12)}
+  body.hq-mode header.app .team-chip{color:rgba(255,255,255,.85);background:rgba(255,255,255,.12);border:1px solid rgba(255,255,255,.18)}
   body.hq-mode header.app .who{color:#fff}
-  body.hq-mode header.app .pill{background:rgba(255,255,255,.1);color:#E2E8F0;border:1px solid rgba(255,255,255,.15)}
+  body.hq-mode header.app .pill{background:rgba(255,255,255,.14);color:#fff;border:1px solid rgba(255,255,255,.22);font-weight:600}
   body.hq-mode header.app .sep{color:rgba(255,255,255,.3)}
-  body.hq-mode header.app .avatar{background:#E60021;color:#fff}
+  body.hq-mode header.app .avatar{background:#fff;color:#E60021;font-weight:800}
   body.hq-mode header.app .logout-btn{background:rgba(255,255,255,.1);color:#fff;border-color:rgba(255,255,255,.2)}
   body.hq-mode header.app .logout-btn:hover{background:rgba(255,255,255,.2);color:#fff;border-color:rgba(255,255,255,.3)}
   body.hq-mode .ts-trigger{background:rgba(255,255,255,.95);border-color:transparent}
@@ -159,7 +163,7 @@
   body.hq-mode .hq-new-brands{padding:8px 0}
   /* 분기 카드 그리드 너비 강제 */
   body.hq-mode .hq-quarters{grid-template-columns:repeat(4,1fr);gap:14px;width:100%}
-  body.hq-mode aside.side{background:#F7F8FA;border-right:1px solid #E2E8F0}
+  body.hq-mode aside.side{background:#fff;border-right:1px solid var(--line)}
   body.hq-mode aside.side h5{color:#64748B}
   body.hq-mode aside.side .nav button{color:#475569}
   body.hq-mode aside.side .nav button:hover{background:#E2E8F0;color:#1E293B}
@@ -248,48 +252,53 @@
 
   main{padding:24px 36px 60px;max-width:none}
 
-  /* ============ SM본부 KPI Hero v2 (밝은 톤 + 빨강 액센트) ============ */
-  .hq-hero-v2{
-    background:#fff;
-    border:1px solid var(--line);border-radius:16px;
-    padding:24px 28px;margin-bottom:14px;
-    box-shadow:0 2px 10px rgba(0,0,0,.04);
-    position:relative;overflow:hidden
+  /* ============ SM본부 KPI Hero v3 (세그먼트 진행률, 배경 그라데이션) ============ */
+  .hq-hero-v3{
+    background:linear-gradient(135deg,#FFF5F7 0%,#FFFFFF 50%,#FFFAFB 100%);
+    border:1px solid var(--pt-l);border-radius:16px;
+    padding:26px 30px;margin-bottom:14px;
+    box-shadow:0 4px 16px rgba(230,0,33,.06)
   }
-  .hq-hero-v2::before{
-    content:'';position:absolute;left:0;top:0;bottom:0;width:6px;
-    background:linear-gradient(180deg,#E60021,#FF4D6A);
-  }
-  .hh-top{display:flex;justify-content:space-between;align-items:center;margin-bottom:18px}
+  .hh-top{display:flex;justify-content:space-between;align-items:center;margin-bottom:22px}
   .hh-label{font-size:12px;color:var(--ink3);font-weight:600;letter-spacing:.3px}
   .hh-label .hh-fy{background:#E60021;color:#fff;padding:2px 8px;border-radius:4px;font-weight:800;margin-right:6px;letter-spacing:0}
-  .hh-date{font-size:11px;color:var(--ink3);background:var(--bg);padding:5px 10px;border-radius:6px;border:1px solid var(--line2)}
+  .hh-date{font-size:11px;color:var(--ink3);background:#fff;padding:6px 12px;border-radius:6px;border:1px solid var(--line);font-weight:500}
 
-  .hh-main-grid{display:grid;grid-template-columns:1fr 200px;gap:32px;align-items:center;margin-bottom:18px}
+  .hh-main-row{display:flex;align-items:flex-end;justify-content:space-between;gap:24px;margin-bottom:20px;flex-wrap:wrap}
   .hh-kpi-main{}
   .hh-lab{font-size:12px;color:var(--ink3);font-weight:600;letter-spacing:.3px;margin-bottom:8px;text-transform:uppercase}
-  .hh-num{display:flex;align-items:baseline;gap:10px;flex-wrap:wrap;margin-bottom:14px}
-  .hh-cur{font-size:42px;font-weight:900;letter-spacing:-1.5px;color:var(--ink);line-height:1}
-  .hh-slash{font-size:24px;color:var(--ink3);font-weight:400}
-  .hh-goal{font-size:22px;color:var(--ink3);font-weight:700}
-  .hh-progress-row{display:flex;align-items:center;gap:14px;max-width:520px}
-  .hh-pbar{flex:1;height:10px;background:var(--bg2);border-radius:999px;overflow:hidden}
-  .hh-pbar > i{display:block;height:100%;background:linear-gradient(90deg,#E60021,#FF4D6A);border-radius:999px;transition:width .4s ease-out}
-  .hh-pct-num{font-size:22px;font-weight:900;color:#E60021;letter-spacing:-.5px;line-height:1;white-space:nowrap}
-  .hh-pct-num b{font-size:26px;font-weight:900}
-  .hh-pct-num span{font-size:15px;color:#E60021;margin-left:2px}
+  .hh-num{display:flex;align-items:baseline;gap:10px;flex-wrap:wrap}
+  .hh-cur{font-size:46px;font-weight:900;letter-spacing:-1.7px;color:var(--ink);line-height:1}
+  .hh-slash{font-size:26px;color:var(--ink3);font-weight:400}
+  .hh-goal{font-size:24px;color:var(--ink3);font-weight:700}
+  .hh-pct-display{text-align:right}
+  .hh-pct-big{font-size:48px;font-weight:900;letter-spacing:-2px;color:#E60021;line-height:1}
+  .hh-pct-big b{font-weight:900}
+  .hh-pct-big span{font-size:24px;color:#E60021;margin-left:2px;font-weight:800}
+  .hh-pct-lab{font-size:11px;color:var(--ink3);font-weight:600;letter-spacing:.3px;text-transform:uppercase;margin-top:4px}
 
-  /* 우측 원형 진행률 */
-  .hh-ring-wrap{position:relative;width:170px;height:170px;justify-self:center}
-  .hh-ring{width:170px;height:170px;display:block}
-  .hh-ring-circle{transition:stroke-dashoffset .6s ease-out}
-  .hh-ring-center{position:absolute;inset:0;display:flex;flex-direction:column;align-items:center;justify-content:center}
-  .hh-ring-pct{font-size:32px;font-weight:900;color:var(--ink);letter-spacing:-1px;line-height:1}
-  .hh-ring-pct span{color:#E60021}
-  .hh-ring-lab{font-size:11px;color:var(--ink3);font-weight:600;margin-top:3px;letter-spacing:.3px;text-transform:uppercase}
+  /* 12개월 세그먼트 진행바 */
+  .hh-segments-wrap{margin-bottom:20px}
+  .hh-segments-lab{display:flex;justify-content:space-between;align-items:center;font-size:11px;color:var(--ink3);font-weight:600;margin-bottom:8px;letter-spacing:.2px}
+  .hh-segments-lab span:first-child{text-transform:uppercase;font-weight:700}
+  .hh-segments-info{color:var(--ink);font-weight:600}
+  .hh-segments-info b{color:#E60021;font-weight:800}
+  .hh-segments{display:grid;grid-template-columns:repeat(12,1fr);gap:4px;height:36px}
+  .hh-seg{
+    border-radius:5px;background:var(--bg2);position:relative;
+    transition:all .3s ease;cursor:default
+  }
+  .hh-seg.filled{background:linear-gradient(180deg,#E60021,#FF4D6A);box-shadow:0 1px 4px rgba(230,0,33,.2)}
+  .hh-seg.partial{background:linear-gradient(180deg,#FFE5E9,#FFB3C0)}
+  .hh-seg.future{background:repeating-linear-gradient(45deg,#F4F4F5,#F4F4F5 4px,#FAFAFA 4px,#FAFAFA 8px)}
+  .hh-seg.now{box-shadow:0 0 0 2px #E60021,0 4px 10px rgba(230,0,33,.25);z-index:2}
+  .hh-segments-ticks{display:flex;justify-content:space-between;font-size:10px;color:var(--ink3);font-weight:500;margin-top:6px;padding:0 2px}
+  .hh-segments-ticks span:nth-child(2){margin-left:8.5%}
+  .hh-segments-ticks span:nth-child(3){margin-left:8.5%}
+  .hh-segments-ticks span:nth-child(4){margin-left:8.5%}
 
   /* 4 stats */
-  .hh-stats{display:grid;grid-template-columns:repeat(4,1fr);gap:10px;padding-top:18px;border-top:1px solid var(--line2)}
+  .hh-stats{display:grid;grid-template-columns:repeat(4,1fr);gap:14px;padding-top:18px;border-top:1px solid var(--pt-l)}
   .hh-stat{display:flex;flex-direction:column;gap:3px;padding:4px 2px}
   .hh-stat .lab{font-size:10.5px;color:var(--ink3);font-weight:600;letter-spacing:.3px;text-transform:uppercase}
   .hh-stat .val{font-size:18px;font-weight:800;color:var(--ink);letter-spacing:-.3px}
@@ -318,12 +327,17 @@
   /* HQ 인사이트 카드 그리드 (맨 아래로 이동) */
   body.hq-mode .panel.hq-insight-panel{background:#fff;border-color:var(--line);margin-bottom:14px;margin-top:6px}
   .hq-insight-cards{display:grid;grid-template-columns:repeat(3,1fr);gap:12px}
-  .hi-card{background:var(--bg);border:1px solid var(--line);border-radius:11px;padding:14px 16px;display:flex;flex-direction:column;gap:6px;transition:all .15s}
+  .hi-card{background:var(--bg);border:1px solid var(--line);border-radius:11px;padding:14px 16px;display:flex;flex-direction:column;gap:8px;transition:all .15s;position:relative}
   .hi-card:hover{border-color:#E60021;background:#fff;box-shadow:0 4px 12px rgba(230,0,33,.06)}
+  .hi-card.editable:hover .hi-edit-btn{opacity:1}
+  .hi-card .hi-row1{display:flex;align-items:center;gap:8px}
   .hi-card .hi-ico{font-size:18px;width:30px;height:30px;border-radius:8px;background:#FFE5E9;color:#E60021;display:flex;align-items:center;justify-content:center;flex:none}
-  .hi-card .hi-h{font-size:12px;font-weight:800;color:var(--ink);letter-spacing:-.2px}
-  .hi-card .hi-body{font-size:12px;color:var(--ink2);line-height:1.55;font-weight:500}
+  .hi-card .hi-h{font-size:12.5px;font-weight:800;color:var(--ink);letter-spacing:-.2px;flex:1}
+  .hi-card .hi-body{font-size:12px;color:var(--ink2);line-height:1.6;font-weight:500;white-space:pre-wrap}
   .hi-card .hi-body b{color:#E60021;font-weight:800}
+  .hi-card .hi-edited{font-size:10px;font-weight:700;color:#1D4ED8;background:#DBEAFE;padding:2px 6px;border-radius:4px}
+  .hi-card .hi-edit-btn{background:none;border:1px solid var(--line);color:var(--ink3);width:24px;height:24px;border-radius:5px;cursor:pointer;font-size:11px;opacity:0;transition:opacity .15s}
+  .hi-card .hi-edit-btn:hover{border-color:#E60021;color:#E60021}
 
   /* SM본부 분기별 대시보드 */
   .hq-quarters{display:grid;grid-template-columns:repeat(4,1fr);gap:12px}
@@ -860,6 +874,7 @@
     <h5>매출 관리</h5>
     <div class="nav" id="nav-main">
       <button data-tab="dash" class="active"><span class="ico"><svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="9"/><circle cx="12" cy="12" r="5"/><circle cx="12" cy="12" r="1.6" fill="currentColor"/></svg></span>연간 KPI 목표</button>
+      <button data-tab="hq-sales" class="hq-menu-only"><span class="ico"><svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 3v18h18"/><path d="M7 14l4-4 4 4 5-6"/></svg></span>매출 관리</button>
       <button data-tab="brand"><span class="ico"><svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="4" y1="20" x2="20" y2="20"/><rect x="5" y="11" width="3" height="8"/><rect x="11" y="6" width="3" height="13"/><rect x="17" y="14" width="3" height="5"/></svg></span>브랜드별 매출표</button>
       <button data-tab="ops"><span class="ico"><svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M14 4l6 6L8 22H2v-6z"/><path d="M14 4l6 6"/></svg></span>월간 운영</button>
       <button data-tab="alerts"><span class="ico"><svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M18 16v-5a6 6 0 10-12 0v5l-2 2v1h16v-1z"/><path d="M10 21h4"/></svg></span>변동 알림</button>
@@ -898,13 +913,13 @@
       <p id="welcome-greeting">오늘의 인사를 불러오는 중…</p>
     </div>
 
-    <!-- HQ 전용 메인 KPI Hero v2 - 밝은 톤 + 빨강 액센트 -->
-    <div class="hq-hero-v2 hq-only" id="hq-kpi-hero">
+    <!-- HQ 전용 메인 KPI Hero v3 - 12개월 세그먼트 진행률 -->
+    <div class="hq-hero-v3 hq-only" id="hq-kpi-hero">
       <div class="hh-top">
         <div class="hh-label"><span class="hh-fy">2026</span> · SM본부 연간 KPI</div>
         <div class="hh-date" id="hh-date">기준일 -</div>
       </div>
-      <div class="hh-main-grid">
+      <div class="hh-main-row">
         <div class="hh-kpi-main">
           <div class="hh-lab">연 매출 (누적)</div>
           <div class="hh-num">
@@ -912,21 +927,23 @@
             <span class="hh-slash">/</span>
             <span id="hq-rev-goal" class="hh-goal">300억</span>
           </div>
-          <div class="hh-progress-row">
-            <div class="hh-pbar"><i id="hq-rev-bar"></i></div>
-            <div class="hh-pct-num"><b id="hq-rev-pct">0</b><span>%</span></div>
-          </div>
         </div>
-        <div class="hh-ring-wrap">
-          <svg class="hh-ring" id="hh-ring-svg" viewBox="0 0 140 140">
-            <circle cx="70" cy="70" r="58" fill="none" stroke="#F4F4F5" stroke-width="14"/>
-            <circle id="hh-ring-circle" cx="70" cy="70" r="58" fill="none" stroke="#E60021" stroke-width="14"
-                    stroke-dasharray="364" stroke-dashoffset="364" transform="rotate(-90 70 70)" stroke-linecap="round"/>
-          </svg>
-          <div class="hh-ring-center">
-            <div class="hh-ring-pct"><span id="hh-ring-pct">0</span>%</div>
-            <div class="hh-ring-lab">달성률</div>
-          </div>
+        <div class="hh-pct-display">
+          <div class="hh-pct-big"><b id="hq-rev-pct">0</b><span>%</span></div>
+          <div class="hh-pct-lab">달성률</div>
+        </div>
+      </div>
+      <!-- 12개월 세그먼트 진행바 -->
+      <div class="hh-segments-wrap">
+        <div class="hh-segments-lab">
+          <span>연간 매출 진행</span>
+          <span class="hh-segments-info" id="hh-segments-info">-</span>
+        </div>
+        <div class="hh-segments" id="hh-segments">
+          <!-- 12개 세그먼트 동적 -->
+        </div>
+        <div class="hh-segments-ticks">
+          <span>1월</span><span>3월</span><span>6월</span><span>9월</span><span>12월</span>
         </div>
       </div>
       <div class="hh-stats" id="hq-hero-stats">
@@ -1048,25 +1065,6 @@
       </div>
     </div>
 
-    <!-- 매출 관리 - 팀 전체 브랜드별 매출 (NEW) -->
-    <div class="panel hq-only">
-      <div class="head-row">
-        <h3>매출 관리 <span class="tag">팀 전체 브랜드별 · YTD</span></h3>
-        <div class="toolbar" style="margin:0">
-          <input id="hq-brand-search" placeholder="브랜드/광고주/팀 검색…" style="width:220px" />
-          <select id="hq-brand-sort" style="padding:7px 10px;border:1px solid var(--line);border-radius:7px;font-size:12px;background:#fff;font-family:inherit">
-            <option value="rev">매출 높은 순</option>
-            <option value="net">순매출 높은 순</option>
-            <option value="margin">이익률 높은 순</option>
-            <option value="team">팀 순</option>
-          </select>
-        </div>
-      </div>
-      <div class="hq-brand-tbl-wrap">
-        <table class="hq-brand-tbl" id="hq-brand-tbl"></table>
-      </div>
-    </div>
-
     <!-- 신규 브랜드 / 카테고리 비중 -->
     <div class="row r2 hq-only">
       <div class="panel">
@@ -1082,11 +1080,11 @@
       </div>
     </div>
 
-    <!-- 본부 인사이트 (맨 아래, 카드 그리드) -->
+    <!-- 본부 인사이트 (맨 아래, 카드 그리드, 본부장/그룹장 편집 가능) -->
     <div class="panel hq-only hq-insight-panel">
       <div class="head-row">
-        <h3>📊 본부 인사이트 <span class="tag">분석 데이터</span></h3>
-        <div style="font-size:11px;color:var(--ink3)">자동 계산</div>
+        <h3>본부 인사이트 <span class="tag">분석 + 편집</span></h3>
+        <div style="font-size:11px;color:var(--ink3)" id="hq-insight-edit-hint">본부장 / 그룹장은 카드 클릭 시 직접 수정 가능</div>
       </div>
       <div class="hq-insight-cards" id="hq-insight"></div>
     </div>
@@ -1100,6 +1098,30 @@
       <div class="panel">
         <h3>광고주별 매출 분포 <span class="tag">YTD</span></h3>
         <div class="chart-wrap sm"><canvas id="ch-adv"></canvas></div>
+      </div>
+    </div>
+  </section>
+
+  <!-- =============== HQ 매출 관리 (별도 탭) =============== -->
+  <section id="tab-hq-sales" class="hide">
+    <div class="panel">
+      <div class="head-row">
+        <h3>매출 관리 <span class="tag">팀 전체 브랜드별 · YTD</span></h3>
+        <div class="toolbar" style="margin:0">
+          <input id="hq-brand-search" placeholder="브랜드/광고주/팀 검색…" style="width:220px" />
+          <select id="hq-brand-sort" style="padding:7px 10px;border:1px solid var(--line);border-radius:7px;font-size:12px;background:#fff;font-family:inherit">
+            <option value="rev">매출 높은 순</option>
+            <option value="net">순매출 높은 순</option>
+            <option value="margin">이익률 높은 순</option>
+            <option value="team">팀 순</option>
+          </select>
+        </div>
+      </div>
+      <div class="hq-brand-tbl-wrap">
+        <table class="hq-brand-tbl" id="hq-brand-tbl"></table>
+      </div>
+      <div style="margin-top:14px;padding:12px 14px;background:#FFF5F7;border:1px solid var(--pt-l);border-radius:8px;font-size:11.5px;color:var(--ink2);line-height:1.6">
+        <b style="color:#E60021">매출 관리 안내</b> · 본부장/그룹장 권한으로 G·D·U 3팀 전체 브랜드 매출을 통합 조회합니다. 검색·정렬을 활용해 빠른 분석이 가능합니다.
       </div>
     </div>
   </section>
@@ -1194,7 +1216,6 @@
           <button class="al-pill active" data-filter="all">전체</button>
           <button class="al-pill" data-filter="revenue">매출 변동</button>
           <button class="al-pill" data-filter="contract">계약</button>
-          <button class="al-pill" data-filter="tax">마감</button>
           <button class="al-pill" data-filter="notes">비고</button>
         </div>
       </div>
@@ -1447,6 +1468,7 @@ const STATE = {
     U: '1. 신규 브랜드 발굴 및 안정적 운영 체계 구축\n2. 인플루언서 채널 확장',
     HQ: '1. SM본부 전체 매출 30억 달성\n2. 팀별 균형 성장과 시너지 창출',
   },
+  hqInsightOverrides: {},  // 본부장이 수정한 인사이트 카드 내용
   renewedSet: new Set(),
   today: (function(){
     const d = new Date();
@@ -1636,16 +1658,39 @@ function renderHQDashboard(){
   setT('hq-rev-pct', pct.toFixed(1));
   const bar = document.getElementById('hq-rev-bar');
   if(bar) bar.style.width = Math.min(100, pct) + '%';
-  // 원형 진행률
-  const ringEl = document.getElementById('hh-ring-circle');
-  const ringPctEl = document.getElementById('hh-ring-pct');
-  if(ringEl){
-    const circ = 2 * Math.PI * 58;  // r=58
-    const offset = circ * (1 - Math.min(100, pct)/100);
-    ringEl.setAttribute('stroke-dasharray', circ);
-    ringEl.setAttribute('stroke-dashoffset', offset);
+  // 12개월 세그먼트 진행바
+  const segEl = document.getElementById('hh-segments');
+  if(segEl){
+    // 각 월별 매출 (모든 팀 합산)
+    const monthLabels = ['26년 1월','26년 2월','26년 3월','26년 4월','26년 5월','26년 6월',
+                         '26년 7월','26년 8월','26년 9월','26년 10월','26년 11월','26년 12월'];
+    const monthlyGoal = goal / 12;
+    const today = new Date();
+    const curMonthIdx = today.getMonth();  // 0=Jan
+    let segHtml = '';
+    let dataMonths = 0;
+    let totalAchieved = 0;
+    monthLabels.forEach((m,i)=>{
+      let mRev = 0;
+      Object.keys(ALL_TEAMS_DATA.teams).forEach(tid=>{
+        ALL_TEAMS_DATA.teams[tid].records.forEach(r=>{ if(r.month===m) mRev+=r.revenue||0; });
+      });
+      totalAchieved += mRev;
+      let cls = 'hh-seg';
+      if(mRev >= monthlyGoal*0.7){ cls += ' filled'; dataMonths++; }
+      else if(mRev > 0){ cls += ' partial'; dataMonths++; }
+      else if(i > curMonthIdx) cls += ' future';
+      if(i === curMonthIdx) cls += ' now';
+      const ratio = monthlyGoal>0 ? Math.min(100, mRev/monthlyGoal*100).toFixed(0) : 0;
+      segHtml += `<div class="${cls}" title="${m}: ${fmtShort(mRev)}원 (월 목표 ${ratio}%)"></div>`;
+    });
+    segEl.innerHTML = segHtml;
+    // 정보 라인
+    const infoEl = document.getElementById('hh-segments-info');
+    if(infoEl){
+      infoEl.innerHTML = `데이터 입력 <b>${dataMonths}개월</b> · 월 평균 목표 <b>${fmtShort(monthlyGoal)}원</b>`;
+    }
   }
-  if(ringPctEl) ringPctEl.textContent = pct.toFixed(1);
   // 기준일
   const dateEl = document.getElementById('hh-date');
   if(dateEl){
@@ -1740,7 +1785,20 @@ function renderHQDashboard(){
       {ico:'🚀', h:'인력 배치 제안', body:placeSuggestion},
       {ico:'💰', h:'수익성', body:`YTD 순매출 <b>${fmtShort(netTotal)}원</b> · 이익률 <b>${margin.toFixed(1)}%</b> (본부 목표 ${ALL_TEAMS_DATA.hq_goals.margin}%). ${margin>=ALL_TEAMS_DATA.hq_goals.margin?'목표 상회 - 수익 구조 건강':'목표 미달 - 외주비/매체비 조정 검토'}.`},
     ];
-    insightEl.innerHTML = cards.map(c=>`<div class="hi-card"><div class="hi-ico">${c.ico}</div><div class="hi-h">${c.h}</div><div class="hi-body">${c.body}</div></div>`).join('');
+    // 사용자 수정 오버라이드 적용
+    const editable = STATE.role === 'head';
+    insightEl.innerHTML = cards.map((c,i)=>{
+      const overrideKey = 'hi_'+i;
+      const overrideBody = STATE.hqInsightOverrides && STATE.hqInsightOverrides[overrideKey];
+      const finalBody = overrideBody !== undefined ? overrideBody : c.body;
+      const editedTag = overrideBody !== undefined ? '<span class="hi-edited">수정됨</span>' : '';
+      return `<div class="hi-card ${editable?'editable':''}" data-idx="${i}" data-original="${encodeURIComponent(c.body)}">
+        <div class="hi-row1"><div class="hi-ico">${c.ico}</div><div class="hi-h">${c.h}</div>${editedTag}
+          ${editable?`<button class="hi-edit-btn" onclick="event.stopPropagation();editHQInsight(${i},'${encodeURIComponent(c.h)}')" title="수정">✎</button>`:''}
+        </div>
+        <div class="hi-body">${finalBody}</div>
+      </div>`;
+    }).join('');
   }
 
   // 3) 분기별 대시보드
@@ -1861,6 +1919,39 @@ function renderHQDashboard(){
   }
   // 7) 매출 관리 - 팀 전체 브랜드별 매출 표
   renderHQBrandTable();
+}
+
+function editHQInsight(idx, encodedHeader){
+  if(STATE.role !== 'head'){
+    alert('본부장 / 그룹장 권한이 필요합니다.');
+    return;
+  }
+  const header = decodeURIComponent(encodedHeader);
+  const card = document.querySelector(`.hi-card[data-idx="${idx}"]`);
+  if(!card) return;
+  const original = decodeURIComponent(card.dataset.original || '');
+  const current = (STATE.hqInsightOverrides[`hi_${idx}`] !== undefined) ? STATE.hqInsightOverrides[`hi_${idx}`] : original;
+  // HTML 태그 제거 (편집 모드에서는 plain text)
+  const plain = current.replace(/<[^>]+>/g,'');
+  const html = `
+    <div class="fm-row"><label>인사이트 항목</label><input type="text" value="${header}" disabled /></div>
+    <div class="fm-row"><label>내용 (HTML 태그 사용 가능, 예: &lt;b&gt;강조&lt;/b&gt;)</label>
+      <textarea id="fm-hi-body" rows="6" style="padding:9px 11px;border:1px solid var(--line);border-radius:7px;font-size:13px;background:#fff;font-family:inherit;resize:vertical;line-height:1.55">${current.replace(/</g,'&lt;')}</textarea>
+      <span class="help">자동 분석 내용을 수정하면 '수정됨' 배지가 표시됩니다.</span></div>
+    <div class="fm-row chk"><label style="color:var(--ink3);font-size:11.5px;cursor:pointer" onclick="resetHQInsight(${idx})">↻ 자동 분석값으로 되돌리기</label></div>
+  `;
+  openFormModal(`본부 인사이트 - ${header}`, html, ()=>{
+    const val = document.getElementById('fm-hi-body').value;
+    STATE.hqInsightOverrides[`hi_${idx}`] = val;
+    renderHQDashboard();
+  });
+}
+function resetHQInsight(idx){
+  if(STATE.hqInsightOverrides[`hi_${idx}`] !== undefined){
+    delete STATE.hqInsightOverrides[`hi_${idx}`];
+    closeFormModal();
+    renderHQDashboard();
+  }
 }
 
 function renderHQBrandTable(){
@@ -2255,22 +2346,23 @@ function renderBrandAlerts(){
   scope.forEach(b=>{
     const meta = getMeta(b);
     if(meta.ended) return;
-    // 누적 평균 대비 비교
+    // 주차별 평균 비교
     const months = DATA.months;
     const last = months[months.length-1];
-    const curRev = brandMonth(b,last).rev;
-    let priorSum=0, priorCount=0;
+    const lastMonthRev = brandMonth(b, last).rev;
+    const thisWeekAvg = lastMonthRev / 4;
+    let priorTotal=0, priorWeeks=0;
     for(let i=0; i<months.length-1; i++){
       const bm = brandMonth(b, months[i]);
-      if(bm.rev>0){ priorSum+=bm.rev; priorCount++; }
+      if(bm.rev>0){ priorTotal+=bm.rev; priorWeeks+=4; }
     }
-    const priorAvg = priorCount>0 ? priorSum/priorCount : 0;
-    const diff = curRev - priorAvg;
-    if(Math.abs(diff) >= 5_000_000){
+    const priorWeekAvg = priorWeeks>0 ? priorTotal/priorWeeks : 0;
+    const diff = thisWeekAvg - priorWeekAvg;
+    if(Math.abs(diff) >= 1_500_000){
       const up = diff > 0;
       alerts.push({type: up ? 'up' : 'down', tag: up ? '매출 급증' : '매출 급감',
-        title:`${b} 누적 평균 대비 ${up?'+':''}${fmtShort(diff)}원`,
-        sub:`${ADV_MAP[b]||'-'} · 담당 ${OWNERS[b]||'-'} · 이전 평균 ${fmtShort(priorAvg)} → 당월 ${fmtShort(curRev)} · 확인/점검 필요`});
+        title:`${b} 주차 평균 ${up?'+':''}${fmtShort(diff)}원`,
+        sub:`${ADV_MAP[b]||'-'} · 담당 ${OWNERS[b]||'-'} · 이전 ${priorWeeks}주 평균 ${fmtShort(priorWeekAvg)} → 이번달 주 평균 ${fmtShort(thisWeekAvg)} · 평일 5일 단위 점검`});
     }
   });
   document.getElementById('brand-alert-count').textContent = alerts.length+'건';
@@ -2412,26 +2504,29 @@ function buildAllAlerts(){
   const prev = months[months.length-2];
   const out = [];
   // 1) 매출 변동 - 당월 vs 이전 누적 월평균 비교 (500만원 이상 가감)
+  // 매출 변동 - 주차별 비교 (월 ÷ 4 = 주 평균, 평일 5일씩 4주 시뮬레이션)
   brandsInScope().forEach(b=>{
     if(getMeta(b).ended) return;
-    const c = brandMonth(b,last);
-    // 이전 월들의 평균 매출 계산 (데이터 있는 월만)
-    let priorSum=0, priorCount=0;
+    // 마지막 월 = 이번 주차 (최근 4주차의 평균)
+    const lastMonthRev = brandMonth(b, last).rev;
+    const thisWeekAvg = lastMonthRev / 4;  // 이번 달 주 평균
+    // 이전 월들의 주 평균
+    let priorTotalRev = 0, priorWeekCount = 0;
     for(let i=0; i<months.length-1; i++){
-      const m = months[i];
-      const bm = brandMonth(b,m);
-      if(bm.rev>0){ priorSum+=bm.rev; priorCount++; }
+      const bm = brandMonth(b, months[i]);
+      if(bm.rev>0){ priorTotalRev += bm.rev; priorWeekCount += 4; }  // 각 월 = 4주
     }
-    const priorAvg = priorCount>0 ? priorSum/priorCount : 0;
-    if(priorAvg===0 && c.rev===0) return;
-    const diff = c.rev - priorAvg;
-    if(Math.abs(diff) >= 5_000_000){  // 500만원 이상 가감
-      const pct = priorAvg ? (diff/priorAvg*100) : (c.rev?100:0);
+    const priorWeekAvg = priorWeekCount>0 ? priorTotalRev/priorWeekCount : 0;
+    if(priorWeekAvg===0 && thisWeekAvg===0) return;
+    const diff = thisWeekAvg - priorWeekAvg;
+    // 주차 기준이므로 임계값도 작게 (월 500만원 = 주 125만원, 안전하게 150만원 기준)
+    if(Math.abs(diff) >= 1_500_000){
+      const pct = priorWeekAvg ? (diff/priorWeekAvg*100) : (thisWeekAvg?100:0);
       out.push({kind:'revenue', dir:diff>0?'up':'down',
-        severity: Math.abs(diff)>=30_000_000 ? 'high' : 'mid',
+        severity: Math.abs(diff)>=7_500_000 ? 'high' : 'mid',
         brand:b, month:last, adv:ADV_MAP[b]||'-', owner:OWNERS[b]||'-',
-        title:`${b} 매출 ${diff>0?'급증':'급감'} (누적 평균 대비 ${diff>0?'+':''}${fmtShort(diff)}원)`,
-        body:`이전 ${priorCount}개월 평균 ${fmtShort(priorAvg)}원 → 당월(${last}) ${fmtShort(c.rev)}원 (${diff>0?'+':''}${pct.toFixed(1)}%) · 확인/점검 필요`,
+        title:`${b} 매출 ${diff>0?'급증':'급감'} (주차 평균 대비 ${diff>0?'+':''}${fmtShort(diff*4)}원/월 환산)`,
+        body:`이전 ${priorWeekCount}주 평균 ${fmtShort(priorWeekAvg)}원/주 → 이번 ${last} 평균 ${fmtShort(thisWeekAvg)}원/주 (${diff>0?'+':''}${pct.toFixed(1)}%) · 평일 5일 단위 변동 감지`,
         time:last});
     }
   });
@@ -2447,19 +2542,7 @@ function buildAllAlerts(){
         time:meta.contractEnd});
     }
   });
-  months.forEach(m=>{
-    DATA.brands.forEach(b=>{
-      if(getMeta(b).ended) return;
-      const bm = brandMonth(b,m);
-      if(bm.rev>0 && !isTaxIssued(b,m)){
-        out.push({kind:'tax', severity: m===last ? 'mid' : 'low',
-          brand:b, month:m, adv:ADV_MAP[b]||'-', owner:OWNERS[b]||'-',
-          title:`${b} · ${m} 세금계산서 미발행`,
-          body:`매출 ${fmtShort(bm.rev)}원 등록됨 · 마감 처리 대기`,
-          time:m});
-      }
-    });
-  });
+  // 세금계산서 미발행 알림 제거 (사용자 요청)
   DATA.notes.slice(-12).reverse().forEach(n=>{
     out.push({kind:'notes', severity:'low',
       brand:n.brand, month:n.month, adv:ADV_MAP[n.brand]||'-', owner:OWNERS[n.brand]||'-',
@@ -3244,7 +3327,7 @@ function exportCSV(){
 /* ================ Tabs ================ */
 function goTab(t){
   document.querySelectorAll('aside.side .nav button').forEach(b=>b.classList.toggle('active', b.dataset.tab===t));
-  ['dash','brand','ops','alerts','team','goal-set','org','approve','wf','role'].forEach(k=>{
+  ['dash','brand','ops','alerts','team','goal-set','org','approve','wf','role','hq-sales'].forEach(k=>{
     const el = document.getElementById('tab-'+k);
     if(el) el.classList.toggle('hide', k!==t);
   });
@@ -3253,6 +3336,7 @@ function goTab(t){
   if(t==='team') renderTeam();
   if(t==='org') renderOrg();
   if(t==='approve') renderApprove();
+  if(t==='hq-sales') renderHQBrandTable();
   if(t==='goal-set') {refreshGoalForm(); setTimeout(renderCharts,50);}
   if(t==='approve') renderApprove();
 }
