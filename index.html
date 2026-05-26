@@ -192,6 +192,9 @@
   .ts-trigger .ts-dot.g{background:var(--team-g)}
   .ts-trigger .ts-dot.d{background:var(--team-d)}
   .ts-trigger .ts-dot.u{background:var(--team-u)}
+  .ts-trigger .ts-dot.e{background:#7C3AED}
+  .ts-trigger .ts-dot.i{background:#0891B2}
+  .ts-trigger .ts-dot.r{background:#16A34A}
   .ts-trigger svg{color:var(--ink3)}
   .ts-menu{
     position:absolute;top:calc(100% + 6px);left:0;
@@ -273,13 +276,13 @@
   .hh-kpi-main{}
   .hh-lab{font-size:12px;color:var(--ink3);font-weight:600;letter-spacing:.3px;margin-bottom:8px;text-transform:uppercase}
   .hh-num{display:flex;align-items:baseline;gap:10px;flex-wrap:wrap}
-  .hh-cur{font-size:46px;font-weight:900;letter-spacing:-1.7px;color:var(--ink);line-height:1}
-  .hh-slash{font-size:26px;color:var(--ink3);font-weight:400}
-  .hh-goal{font-size:24px;color:var(--ink3);font-weight:700}
+  .hh-cur{font-size:36px;font-weight:900;letter-spacing:-1.3px;color:var(--ink);line-height:1}
+  .hh-slash{font-size:22px;color:var(--ink3);font-weight:400}
+  .hh-goal{font-size:20px;color:var(--ink3);font-weight:700}
   .hh-pct-display{text-align:right}
-  .hh-pct-big{font-size:48px;font-weight:900;letter-spacing:-2px;color:#E60021;line-height:1}
+  .hh-pct-big{font-size:40px;font-weight:900;letter-spacing:-1.6px;color:#E60021;line-height:1}
   .hh-pct-big b{font-weight:900}
-  .hh-pct-big span{font-size:24px;color:#E60021;margin-left:2px;font-weight:800}
+  .hh-pct-big span{font-size:22px;color:#E60021;margin-left:2px;font-weight:800}
   .hh-pct-lab{font-size:11px;color:var(--ink3);font-weight:600;letter-spacing:.3px;text-transform:uppercase;margin-top:4px}
 
   /* 12개월 세그먼트 진행바 (컴팩트) */
@@ -364,6 +367,9 @@
   .hq-brand-tbl .team-pill.g{background:var(--team-g-bg);color:var(--team-g)}
   .hq-brand-tbl .team-pill.d{background:var(--team-d-bg);color:var(--team-d)}
   .hq-brand-tbl .team-pill.u{background:var(--team-u-bg);color:var(--team-u)}
+  .hq-brand-tbl .team-pill.e{background:#EDE7F9;color:#7C3AED}
+  .hq-brand-tbl .team-pill.i{background:#CFFAFE;color:#0891B2}
+  .hq-brand-tbl .team-pill.r{background:#DCFCE7;color:#16A34A}
   .hq-brand-tbl .b-name{font-weight:700;color:var(--ink)}
   .hq-brand-tbl .adv-name{color:var(--ink3);font-size:11px}
   .hq-brand-tbl .net-val{color:#1D4ED8;font-weight:700}
@@ -408,6 +414,9 @@
   .hq-new-row .team-dot.g{background:var(--team-g)}
   .hq-new-row .team-dot.d{background:var(--team-d)}
   .hq-new-row .team-dot.u{background:var(--team-u)}
+  .hq-new-row .team-dot.e{background:#7C3AED}
+  .hq-new-row .team-dot.i{background:#0891B2}
+  .hq-new-row .team-dot.r{background:#16A34A}
   .hq-new-row .nm{flex:1;font-size:13px;font-weight:700}
   .hq-new-row .bar{width:160px;height:7px;background:var(--bg2);border-radius:999px;overflow:hidden}
   .hq-new-row[data-team="G"] .bar > i{background:var(--team-g)}
@@ -1087,7 +1096,7 @@
     <div class="row r2-32 hq-hide">
       <div class="panel">
         <div class="head-row">
-          <h3>브랜드별 매출 진행 현황 <span class="tag pt">YTD TOP 5</span></h3>
+          <h3>브랜드별 매출 진행 현황 <span class="tag pt">TOP 5</span></h3>
           <button class="btn" onclick="goTab('brand')" style="padding:6px 12px;border:1px solid var(--line);background:#fff;border-radius:6px;font-size:11px;cursor:pointer;color:var(--ink2)">전체 보기 →</button>
         </div>
         <div class="prog-list" id="prog-list"></div>
@@ -1448,8 +1457,9 @@ function applyTeamData(teamId){
     const allAdvMap = {};
     const allOwners = {};
     const allAdvOrder = [];
-    ['G','D','U'].forEach(tid=>{
+    ['G','D','U','E','I','R'].forEach(tid=>{
       const t = ALL_TEAMS_DATA.teams[tid];
+      if(!t) return;
       t.brands.forEach(b=>{ if(!allBrands.includes(b)) allBrands.push(b); });
       t.records.forEach(r=>allRecords.push(Object.assign({_team:tid}, r)));
       (t.notes||[]).forEach(n=>allNotes.push(Object.assign({_team:tid}, n)));
@@ -1530,7 +1540,10 @@ const STATE = {
     G: '1. 개인별 매체 경험 확장 및 경력직 셀원 중심으로 팀 확장\n2. 브랜드 운영 건으로 매출 안정화 / 순이익률 상향 목표',
     D: '1. 빅 클라이언트 비중 확대\n2. 매체 운영 전문성 강화',
     U: '1. 신규 브랜드 발굴 및 안정적 운영 체계 구축\n2. 인플루언서 채널 확장',
-    HQ: '1. SM본부 전체 매출 30억 달성\n2. 팀별 균형 성장과 시너지 창출',
+    E: '1. F&B/대기업 클라이언트 운영 노하우 축적\n2. LG 캠페인 안정 운영 + 신규 브랜드 발굴',
+    I: '1. 빅 클라이언트 SPC/하인즈/메디웰 운영 확장\n2. 매체 광고 운영 전문성 강화',
+    R: '1. 신규 광고주 발굴 본격화\n2. 안정적 매출 흐름 구축',
+    HQ: '1. SM본부 전체 매출 300억 달성\n2. 팀별 균형 성장과 시너지 창출',
   },
   hqInsightOverrides: {},  // 본부장이 수정한 인사이트 카드 내용
   renewedSet: new Set(),
@@ -1897,8 +1910,8 @@ function renderHQDashboard(){
   if(qEl) qEl.innerHTML = qHtml;
 
   // 4) 팀별 매출/순매출 차트
-  const teamColors = {G:'#E60021', D:'#1D4ED8', U:'#D97706'};
-  const teamLabels = {G:'G팀', D:'D팀', U:'U팀'};
+  const teamColors = {G:'#E60021', D:'#1D4ED8', U:'#D97706', E:'#7C3AED', I:'#0891B2', R:'#16A34A'};
+  const teamLabels = {G:'G팀', D:'D팀', U:'U팀', E:'E팀', I:'I팀', R:'R팀'};
   function teamMonthly(tid, key){
     return months.map(m=>{
       let v=0;
@@ -1911,15 +1924,16 @@ function renderHQDashboard(){
       return v;
     });
   }
-  // 매출 차트
+  // 매출 차트 - 6팀 모두 (G/D/U/E/I/R)
+  const allTeamIds = Object.keys(ALL_TEAMS_DATA.teams);
   if(chHQRev) try{chHQRev.destroy();}catch(e){}
   const revCanvas = document.getElementById('ch-hq-rev');
   if(revCanvas){
     chHQRev = new Chart(revCanvas, {
       type:'bar',
-      data:{labels:months, datasets:['G','D','U'].map(tid=>({
-        label:teamLabels[tid], data:teamMonthly(tid,'rev'),
-        backgroundColor:teamColors[tid], borderRadius:5
+      data:{labels:months, datasets:allTeamIds.map(tid=>({
+        label:teamLabels[tid]||tid, data:teamMonthly(tid,'rev'),
+        backgroundColor:teamColors[tid]||'#71717A', borderRadius:5
       }))},
       options:{maintainAspectRatio:false,
         plugins:{legend:{position:'bottom',labels:{boxWidth:10,font:{size:11}}}},
@@ -1927,15 +1941,15 @@ function renderHQDashboard(){
                 x:{grid:{display:false}}}}
     });
   }
-  // 순매출 차트
+  // 순매출 차트 - 6팀 모두
   if(chHQNet) try{chHQNet.destroy();}catch(e){}
   const netCanvas = document.getElementById('ch-hq-net');
   if(netCanvas){
     chHQNet = new Chart(netCanvas, {
       type:'line',
-      data:{labels:months, datasets:['G','D','U'].map(tid=>({
-        label:teamLabels[tid], data:teamMonthly(tid,'net'),
-        borderColor:teamColors[tid], backgroundColor:teamColors[tid]+'30',
+      data:{labels:months, datasets:allTeamIds.map(tid=>({
+        label:teamLabels[tid]||tid, data:teamMonthly(tid,'net'),
+        borderColor:teamColors[tid]||'#71717A', backgroundColor:(teamColors[tid]||'#71717A')+'30',
         fill:false, tension:.3, pointRadius:4, borderWidth:2.5
       }))},
       options:{maintainAspectRatio:false,
@@ -1945,17 +1959,17 @@ function renderHQDashboard(){
     });
   }
 
-  // 5) 신규 브랜드 (팀별)
-  const newBrandHTML = ['G','D','U'].map(tid=>{
+  // 5) 신규 브랜드 (전 팀)
+  const newBrandHTML = allTeamIds.map(tid=>{
     const t = ALL_TEAMS_DATA.teams[tid];
+    if(!t) return '';
     const goal = t.goals.brand || 5;
-    // 단순화: brand 수를 신규 카운트로 가정 (실제로는 BRAND_META 사용해야 함)
     const cnt = t.brands.length;
     const pct = Math.min(100, cnt/goal*100);
     return `<div class="hq-new-row" data-team="${tid}">
-      <span class="team-dot ${tid.toLowerCase()}"></span>
+      <span class="team-dot ${tid.toLowerCase()}" style="background:${teamColors[tid]||'#71717A'}"></span>
       <div class="nm">${t.name}</div>
-      <div class="bar"><i style="width:${pct}%"></i></div>
+      <div class="bar"><i style="width:${pct}%;background:${teamColors[tid]||'var(--ink)'}"></i></div>
       <div class="num">${cnt} / ${goal}건</div>
     </div>`;
   }).join('');
@@ -3141,14 +3155,14 @@ function getUrlTeam(){
   let path = (window.location.pathname || '').toLowerCase().replace(/^\/+|\/+$/g, '');
   // GitHub Pages 등 prefix 대응
   path = path.split('/').pop();
-  if(['g','d','u','hq'].includes(path)) return path.toUpperCase();
+  if(['g','d','u','e','i','r','hq'].includes(path)) return path.toUpperCase();
   // 2순위: ?team=X
   const sp = new URLSearchParams(window.location.search);
   const q = (sp.get('team')||'').toUpperCase();
-  if(['G','D','U','HQ'].includes(q)) return q;
+  if(['G','D','U','E','I','R','HQ'].includes(q)) return q;
   // 3순위: #G 형식 해시
   const h = (window.location.hash||'').replace('#','').toUpperCase();
-  if(['G','D','U','HQ'].includes(h)) return h;
+  if(['G','D','U','E','I','R','HQ'].includes(h)) return h;
   return null;
 }
 const URL_REQUESTED_TEAM = getUrlTeam();  // null 또는 'G'/'D'/'U'/'HQ'
@@ -3450,6 +3464,7 @@ function renderOrg(){
   const teamSummary = [];
   Object.keys(ALL_TEAMS_DATA.teams).forEach(tid=>{
     const t = ALL_TEAMS_DATA.teams[tid];
+    if(!t) return;
     let r=0, e=0;
     t.records.forEach(rec=>{ r+=rec.revenue||0; e+=rec.expense||0; });
     const pct = t.goals.rev ? (r/t.goals.rev*100) : 0;
@@ -3457,7 +3472,7 @@ function renderOrg(){
     const activeBrands = t.brands.filter(b=>{
       return t.records.some(rec=>rec.brand===b && (rec.revenue>0||rec.expense>0));
     }).length;
-    const newCnt = t.brands.length;  // 단순 카운트 (META는 G팀에만 있음)
+    const newCnt = t.brands.length;
     teamSummary.push({tid, name:t.name, r, e, margin, pct, goal:t.goals.rev, active:activeBrands, total:t.brands.length});
     totRev += r; totExp += e; totGoal += t.goals.rev;
     html += `<tr><td><b>${t.name}</b></td><td>${fmtShort(t.goals.rev)}원</td><td>${fmtShort(r)}원</td><td>${pct.toFixed(1)}%</td><td style="color:#1D4ED8;font-weight:700">${fmtShort(r-e)}원</td><td>${margin.toFixed(1)}%</td><td>${activeBrands}/${t.brands.length}</td><td>${newCnt}건</td></tr>`;
@@ -3625,6 +3640,9 @@ function buildTeamSwitcher(){
     options.push({id:'G', name:'G팀'});
     options.push({id:'D', name:'D팀'});
     options.push({id:'U', name:'U팀'});
+    options.push({id:'E', name:'E팀'});
+    options.push({id:'I', name:'I팀'});
+    options.push({id:'R', name:'R팀'});
   } else if(STATE.role === 'lead'){
     // 팀장: 자기 팀 + SM본부
     options.push({id:myTeam, name: ALL_TEAMS_DATA.teams[myTeam].name});
@@ -3684,7 +3702,7 @@ document.addEventListener('click', e=>{
   const wi = document.getElementById('who-init'); if(wi) wi.textContent = '남';
   // 초기 팀: URL 우선, 없으면 HQ
   let initialTeam = 'HQ';
-  if(urlTeam && ['G','D','U','HQ'].includes(urlTeam)) initialTeam = urlTeam;
+  if(urlTeam && ['G','D','U','E','I','R','HQ'].includes(urlTeam)) initialTeam = urlTeam;
   STATE.team = initialTeam;
   STATE.goals = applyTeamGoals(initialTeam);
   applyTeamData(initialTeam);
