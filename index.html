@@ -391,6 +391,7 @@
   /* HQ 인사이트 카드 그리드 (맨 아래로 이동) */
   body.hq-mode .panel.hq-insight-panel{background:#fff;border-color:var(--line);margin-bottom:14px;margin-top:6px}
   .hq-insight-cards{display:grid;grid-template-columns:repeat(3,1fr);gap:12px}
+  @keyframes spin{from{transform:rotate(0)}to{transform:rotate(360deg)}}
   .hi-card{background:var(--bg);border:1px solid var(--line);border-radius:11px;padding:14px 16px;display:flex;flex-direction:column;gap:8px;transition:all .15s;position:relative}
   .hi-card:hover{border-color:#E60021;background:#fff;box-shadow:0 4px 12px rgba(199,29,46,.05)}
   .hi-card.editable:hover .hi-edit-btn{opacity:1}
@@ -1216,11 +1217,14 @@
       </div>
     </div>
 
-    <!-- 본부 인사이트 (맨 아래, 카드 그리드, 본부장/그룹장 편집 가능) -->
+    <!-- 본부 인사이트 -->
     <div class="panel hq-only hq-insight-panel">
       <div class="head-row">
-        <h3>본부 인사이트 <span class="tag">분석 + 편집</span></h3>
-        <div style="font-size:11px;color:var(--ink3);display:none" id="hq-insight-edit-hint"></div>
+        <h3>본부 인사이트</h3>
+        <button class="btn req-head" id="hq-insight-refresh" onclick="refreshHQInsight()" style="padding:6px 12px;font-size:11.5px;font-weight:700;display:inline-flex;align-items:center;gap:5px" title="인사이트 새로고침 (본부장 권한)">
+          <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="23 4 23 10 17 10"/><path d="M20.49 15a9 9 0 11-2.12-9.36L23 10"/></svg>
+          새로고침
+        </button>
       </div>
       <div class="hq-insight-cards" id="hq-insight"></div>
     </div>
@@ -1895,6 +1899,31 @@ function renderKPI(){
 
 /* ================ SM본부 HQ 렌더 함수 ================ */
 let chHQRev=null, chHQNet=null, chHQCat=null;
+
+/* 본부 인사이트 새로고침 (본부장 권한) */
+function refreshHQInsight(){
+  if(getCurrentLevel() < 3){
+    showToast('인사이트 새로고침은 본부장 권한입니다.', 'warn');
+    return;
+  }
+  const btn = document.getElementById('hq-insight-refresh');
+  if(btn){
+    btn.disabled = true;
+    btn.style.opacity = '0.5';
+    btn.querySelector('svg').style.animation = 'spin 0.7s linear';
+  }
+  // 사용자 수정 오버라이드도 함께 초기화 옵션 - 여기선 기본 데이터 기준으로 재계산만
+  setTimeout(()=>{
+    try { renderHQDashboard(); } catch(e){ console.warn('인사이트 재계산 실패', e); }
+    if(btn){
+      btn.disabled = false;
+      btn.style.opacity = '1';
+      btn.querySelector('svg').style.animation = '';
+    }
+    showToast('✓ 본부 인사이트가 최신 데이터로 갱신되었습니다', 'success');
+  }, 600);
+}
+
 function renderHQDashboard(){
   if(STATE.team !== 'HQ') return;
   // 1) 누적 매출 + 인사이트
@@ -2015,14 +2044,14 @@ function renderHQDashboard(){
     // 인력 배치 제안
     const placeSuggestion = (() => {
       if(weakTeam.pct < 30){
-        return `<b>${weakTeam.name}</b>의 달성률이 ${weakTeam.pct.toFixed(0)}%로 가장 낮습니다. 대리/과장급 경력 인력 1~2명 추가 배치 또는 기존 ${topPerCap.name} 핵심 인력의 일부 시니어 코칭이 매출 방어에 효과적일 것입니다.`;
+        return `<b>${weakTeam.name}</b>의 달성률이 ${weakTeam.pct.toFixed(0)}%로 가장 낮습니다. 대리/과장급 경력 인력 1~2명 추가 배치 또는 ${topPerCap.name} 핵심 인력의 시니어 코칭이 매출 방어에 효과적일 것입니다.`;
       }
       if(weakTeam.ppl <= 4){
         return `<b>${weakTeam.name}</b>은 인원 ${weakTeam.ppl}명으로 가장 적습니다. 신규 브랜드 수주를 위해 사원~대리급 신규 충원이 권장됩니다.`;
       }
       return `현재 인력 구조 안정적. ${strongTeam.name}의 운영 노하우를 본부 전체로 확산하면 분기 달성률 추가 상승 여력 있음.`;
     })();
-    // 매출 동기부여 메시지
+    // 매출 동기부여
     const motivation = (() => {
       if(pct >= 50) return `상반기 절반 통과 시점에 본부 목표의 <b>${pct.toFixed(1)}%</b> 달성. 1인당 평균 매출 <b>${fmtShort(perCapitaAvg)}원</b>으로 업계 평균을 상회하는 성과입니다.`;
       if(pct >= 30) return `현재까지 <b>${fmtShort(totalRev)}원</b> 매출 확보. 1인당 평균 <b>${fmtShort(perCapitaAvg)}원</b>. 하반기 페이스 가속이 필요한 시점입니다.`;
@@ -2033,11 +2062,55 @@ function renderHQDashboard(){
       ? `현재 월 평균 <b>${fmtShort(monthlyAvg)}원</b> → 잔여 기간 <b>월 +${fmtShort(monthlyAvgNeeded-monthlyAvg)}원</b> 가속 필요.`
       : `현재 월 평균 <b>${fmtShort(monthlyAvg)}원</b>으로 목표 페이스를 <b>상회</b>하고 있습니다.`;
 
+    // (1) 6팀 통합 인원 분포
+    const teamOrder = ['G','D','U','E','I','R'];
+    const teamPplLine = teamOrder
+      .filter(tid=>teamStats[tid])
+      .map(tid=>`${teamStats[tid].name} <b>${teamStats[tid].ppl}명</b>`)
+      .join(' · ');
+    // (2) 카테고리별 매출 비중 (본부 전체)
+    const catTotals = {};
+    Object.keys(ALL_TEAMS_DATA.teams).forEach(tid=>{
+      ALL_TEAMS_DATA.teams[tid].records.forEach(r=>{
+        const c = r.category || '기타';
+        catTotals[c] = (catTotals[c]||0) + (r.revenue||0);
+      });
+    });
+    const catEntries = Object.entries(catTotals).sort((a,b)=>b[1]-a[1]);
+    const catTotalSum = catEntries.reduce((s,[,v])=>s+v,0);
+    const topCat = catEntries[0];
+    const cat2nd = catEntries[1];
+    const catLine = catEntries.slice(0,3).map(([c,v])=>{
+      const pp = catTotalSum ? (v/catTotalSum*100).toFixed(1) : '0';
+      return `${c} <b>${pp}%</b>`;
+    }).join(' · ');
+    const catAnalysis = topCat
+      ? `매출 1위 카테고리 <b>${topCat[0]}</b> (<b>${(topCat[1]/catTotalSum*100).toFixed(1)}%</b>, ${fmtShort(topCat[1])}원). 상위 3개: ${catLine}. ${cat2nd && (topCat[1]/catTotalSum)>=0.5 ? `편중도가 높아 <b>${cat2nd[0]}</b> 카테고리 확장 검토 필요.` : '카테고리 다양성 양호.'}`
+      : '카테고리 데이터가 부족합니다. 월간 운영에서 카테고리별 매출/지출을 입력해주세요.';
+    // (3) 팀별 운영 구성 - 브랜드 수, 1인당 브랜드
+    const teamBrandStats = teamOrder
+      .filter(tid=>teamStats[tid])
+      .map(tid=>{
+        const t = ALL_TEAMS_DATA.teams[tid];
+        const activeBrands = (t.brands||[]).filter(b=>!getMeta(b).ended);
+        const perPpl = teamStats[tid].ppl ? (activeBrands.length/teamStats[tid].ppl).toFixed(1) : '-';
+        return {tid, name:t.name, brands:activeBrands.length, perPpl, ppl:teamStats[tid].ppl};
+      });
+    teamBrandStats.sort((a,b)=>b.brands-a.brands);
+    const orgLine = teamBrandStats.map(t=>`${t.name} <b>${t.brands}개</b>(인당 ${t.perPpl})`).join(' · ');
+    const heaviest = teamBrandStats[0];
+    const lightest = teamBrandStats[teamBrandStats.length-1];
+    const orgAnalysis = `본부 전체 <b>${totalPeople}명</b> · ${teamPplLine}. 운영 브랜드 수: ${orgLine}. ${heaviest && lightest && (heaviest.brands - lightest.brands) >= 3 ? `<b>${heaviest.name}</b>(${heaviest.brands}개)과 <b>${lightest.name}</b>(${lightest.brands}개)의 운영 부담 차이가 큽니다.` : '팀별 운영 부담 균형 양호.'}`;
+    // (4) 인당 매출 6팀 비교
+    const perCapLine = teamArr.slice().sort((a,b)=>b.perCapita-a.perCapita)
+      .map(t=>`${t.name} <b>${fmtShort(t.perCapita)}</b>원`).join(' · ');
+
     const cards = [
       {ico:'🎯', h:'달성 평가', body:motivation},
       {ico:'📈', h:'목표 달성 시나리오', body:`잔여 <b>${monthsLeft}개월</b>간 월 평균 <b>${fmtShort(monthlyAvgNeeded)}원</b> 매출 시 연간 ${fmtShort(goal)}원 달성. 남은 매출 <b>${fmtShort(remaining)}원</b>. ${pace}`},
-      {ico:'⚡', h:'팀 효율성', body:`1인당 매출 1위 <b>${topPerCap.name}</b> (인당 ${fmtShort(topPerCap.perCapita)}원, ${topPerCap.ppl}명) · 본부 평균 <b>${fmtShort(perCapitaAvg)}원</b>. ${lowPerCap.name}은 인당 ${fmtShort(lowPerCap.perCapita)}원으로 매출 여력 있음.`},
-      {ico:'👥', h:'조직 구성', body:`본부 전체 <b>${totalPeople}명</b> · ${titleSummary}. 팀별 인원: G팀 ${teamStats.G.ppl}명 / D팀 ${teamStats.D.ppl}명 / U팀 ${teamStats.U.ppl}명.`},
+      {ico:'⚡', h:'팀 효율성 (1인당 매출)', body:`1위 <b>${topPerCap.name}</b> ${fmtShort(topPerCap.perCapita)}원 (${topPerCap.ppl}명). 본부 평균 <b>${fmtShort(perCapitaAvg)}원</b>. 6팀 비교: ${perCapLine}.`},
+      {ico:'📊', h:'카테고리 비중 분석', body:catAnalysis},
+      {ico:'👥', h:'조직 구성 · 운영 부담', body:orgAnalysis},
       {ico:'🚀', h:'인력 배치 제안', body:placeSuggestion},
       {ico:'💰', h:'수익성', body:`누적 순매출 <b>${fmtShort(netTotal)}원</b> · 이익률 <b>${margin.toFixed(1)}%</b> (본부 목표 ${ALL_TEAMS_DATA.hq_goals.margin}%). ${margin>=ALL_TEAMS_DATA.hq_goals.margin?'목표 상회 - 수익 구조 건강':'목표 미달 - 외주비/매체비 조정 검토'}.`},
     ];
@@ -3453,6 +3526,18 @@ function openBrandAdd(){
     <div style="margin-top:6px;font-size:11px;color:var(--ink3);background:var(--bg2);padding:9px 12px;border-radius:6px;line-height:1.55">
       ※ 계약 시작일~종료일 범위의 월에만 자동 노출됩니다. 월간 운영에서 개별 월 제외도 가능합니다.
     </div>
+    <div style="margin-top:14px;padding:12px;border:1px solid var(--line);border-radius:8px;background:#FAFAFA">
+      <div style="font-size:12px;font-weight:700;color:var(--ink);margin-bottom:8px">📅 운영 월 · 초기 매출/지출 입력 (선택)</div>
+      <div class="fm-row"><label style="font-size:11.5px">운영 월</label>
+        <select id="fm-init-month" style="padding:8px 10px;border:1px solid var(--line);border-radius:6px;font-size:12.5px;background:#fff">
+          <option value="">선택 안 함 (입력 생략)</option>
+          ${(DATA.months||[]).map(m=>`<option value="${m}">${m}</option>`).join('')}
+        </select>
+      </div>
+      <div class="fm-row"><label style="font-size:11.5px">매출 (원)</label><input type="text" id="fm-init-rev" placeholder="예: 5,000,000" /></div>
+      <div class="fm-row"><label style="font-size:11.5px">지출 (원)</label><input type="text" id="fm-init-exp" placeholder="예: 3,000,000" /></div>
+      <div style="font-size:10.5px;color:var(--ink3);margin-top:4px">※ 운영 월 선택 시 해당 월의 '기타' 카테고리에 매출/지출이 자동 기록됩니다. 카테고리별 세부 입력은 월간 운영 카드에서 수정 가능합니다.</div>
+    </div>
   `;
   openFormModal('＋ 브랜드 추가', html, ()=>{
     const name = getFM('fm-brand').trim();
@@ -3466,6 +3551,16 @@ function openBrandAdd(){
     if(!ADV_ORDER.includes(adv)) ADV_ORDER.push(adv);
     BRAND_META[name] = {newBrand:getFMChk('fm-new'), contractStart:getFM('fm-cs'), contractEnd:getFM('fm-ce'), ended:false};
     TAX_INVOICE[name] = {};
+    // 초기 운영 월 + 매출/지출 (선택)
+    const initMonth = (getFM('fm-init-month')||'').trim();
+    if(initMonth){
+      const initRev = parseInt((getFM('fm-init-rev')||'0').replace(/[^0-9-]/g,''),10) || 0;
+      const initExp = parseInt((getFM('fm-init-exp')||'0').replace(/[^0-9-]/g,''),10) || 0;
+      if(initRev>0 || initExp>0){
+        DATA.records.push({brand:name, month:initMonth, category:'기타', revenue:initRev, expense:initExp, note:''});
+        try { logChange(STATE.team || 'HQ', name, initMonth, 'revenue', 0, initRev); } catch(e){}
+      }
+    }
     // ALL_TEAMS_DATA 동기화
     if(STATE.team !== 'HQ' && ALL_TEAMS_DATA.teams[STATE.team]){
       const t = ALL_TEAMS_DATA.teams[STATE.team];
@@ -3478,7 +3573,8 @@ function openBrandAdd(){
     persistTeamsData();
     try { rebuildREC(); } catch(e){}
     refreshAll();
-    showToast(`✓ ${name} 브랜드 추가 완료`, 'success');
+    const monthMsg = initMonth ? ` · ${initMonth} 초기 데이터 입력됨` : '';
+    showToast(`✓ ${name} 브랜드 추가 완료${monthMsg}`, 'success');
   });
 }
 function renameBrand(oldName){
