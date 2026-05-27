@@ -363,6 +363,11 @@
   .hq-brand-tbl{width:100%;border-collapse:collapse;font-size:12px}
   .hq-brand-tbl thead th{background:#FAFAFA;color:var(--ink3);font-weight:700;font-size:10.5px;text-transform:uppercase;letter-spacing:.3px;padding:10px 10px;text-align:center;border-bottom:2px solid var(--line)}
   .hq-brand-tbl thead th.r{text-align:center}
+  .hq-brand-tbl thead th.sortable{cursor:pointer;user-select:none;transition:background .12s, color .12s}
+  .hq-brand-tbl thead th.sortable:hover{background:#F1F3F7;color:var(--ink)}
+  .hq-brand-tbl thead th.sortable.active{color:#E60021;background:#FFF5F7}
+  .hq-brand-tbl thead th .sort-arrow{display:inline-block;margin-left:4px;font-size:9px;opacity:.5;line-height:1;vertical-align:1px}
+  .hq-brand-tbl thead th.sortable.active .sort-arrow{opacity:1}
   .hq-brand-tbl tbody td{padding:10px 10px;border-bottom:1px solid var(--line2);font-variant-numeric:tabular-nums;text-align:center}
   .hq-brand-tbl tbody td.r{text-align:center}
   .hq-brand-tbl tbody tr:hover{background:var(--bg)}
@@ -1240,9 +1245,12 @@
         <div class="toolbar" style="margin:0">
           <input id="hq-brand-search" placeholder="브랜드/광고주/팀 검색…" style="width:220px" />
           <select id="hq-brand-sort" style="padding:7px 10px;border:1px solid var(--line);border-radius:7px;font-size:12px;background:#fff;font-family:inherit">
-            <option value="rev">매출 높은 순</option>
-            <option value="net">순매출 높은 순</option>
-            <option value="margin">이익률 높은 순</option>
+            <option value="rev_desc">매출 높은 순</option>
+            <option value="rev_asc">매출 낮은 순</option>
+            <option value="net_desc">순매출 높은 순</option>
+            <option value="net_asc">순매출 낮은 순</option>
+            <option value="margin_desc">이익률 높은 순</option>
+            <option value="margin_asc">이익률 낮은 순</option>
             <option value="team">팀 순</option>
           </select>
         </div>
@@ -2158,7 +2166,7 @@ function renderHQBrandTable(){
   const tbl = document.getElementById('hq-brand-tbl');
   if(!tbl) return;
   const search = (document.getElementById('hq-brand-search')?.value||'').trim();
-  const sort = document.getElementById('hq-brand-sort')?.value || 'rev';
+  const sort = document.getElementById('hq-brand-sort')?.value || 'rev_desc';
   // 모든 팀 브랜드 수집
   const rows = [];
   Object.keys(ALL_TEAMS_DATA.teams).forEach(tid=>{
@@ -2172,12 +2180,28 @@ function renderHQBrandTable(){
     });
   });
   let filtered = search ? rows.filter(r=>r.brand.includes(search)||r.adv.includes(search)||r.teamName.includes(search)||r.team.includes(search.toUpperCase())) : rows;
-  if(sort==='rev') filtered.sort((a,b)=>b.rev-a.rev);
-  else if(sort==='net') filtered.sort((a,b)=>b.net-a.net);
-  else if(sort==='margin') filtered.sort((a,b)=>b.margin-a.margin);
+  // sort: rev_desc, rev_asc, net_desc, net_asc, margin_desc, margin_asc, team
+  if(sort==='rev_desc') filtered.sort((a,b)=>b.rev-a.rev);
+  else if(sort==='rev_asc') filtered.sort((a,b)=>a.rev-b.rev);
+  else if(sort==='net_desc') filtered.sort((a,b)=>b.net-a.net);
+  else if(sort==='net_asc') filtered.sort((a,b)=>a.net-b.net);
+  else if(sort==='margin_desc') filtered.sort((a,b)=>b.margin-a.margin);
+  else if(sort==='margin_asc') filtered.sort((a,b)=>a.margin-b.margin);
   else if(sort==='team') filtered.sort((a,b)=>a.team.localeCompare(b.team) || b.rev-a.rev);
 
-  let html = '<thead><tr><th style="width:9%">팀</th><th style="width:19%">광고주</th><th style="width:20%">브랜드</th><th class="r">YTD 매출</th><th class="r">순매출</th><th class="r">이익률</th><th style="width:14%">담당자</th></tr></thead><tbody>';
+  // 컬럼별 정렬 표시
+  const arrow = (col)=>{
+    if(sort === col+'_desc') return '<span class="sort-arrow">▼</span>';
+    if(sort === col+'_asc') return '<span class="sort-arrow">▲</span>';
+    return '<span class="sort-arrow">⇅</span>';
+  };
+  const cls = (col)=> (sort===col+'_desc'||sort===col+'_asc') ? 'r sortable active' : 'r sortable';
+
+  let html = `<thead><tr><th style="width:9%">팀</th><th style="width:19%">광고주</th><th style="width:20%">브랜드</th>`+
+    `<th class="${cls('rev')}" onclick="toggleHQSort('rev')">매출${arrow('rev')}</th>`+
+    `<th class="${cls('net')}" onclick="toggleHQSort('net')">순매출${arrow('net')}</th>`+
+    `<th class="${cls('margin')}" onclick="toggleHQSort('margin')">이익률${arrow('margin')}</th>`+
+    `<th style="width:14%">담당자</th></tr></thead><tbody>`;
   if(filtered.length===0){
     html += '<tr><td colspan="7" style="text-align:center;color:var(--ink3);padding:24px">조건에 맞는 브랜드가 없습니다.</td></tr>';
   } else {
@@ -2209,6 +2233,19 @@ document.addEventListener('input', e=>{
 document.addEventListener('change', e=>{
   if(e.target.id === 'hq-brand-sort') renderHQBrandTable();
 });
+
+// 컬럼 헤더 클릭으로 정렬 토글 (높은순 → 낮은순 → 높은순)
+function toggleHQSort(col){
+  const sel = document.getElementById('hq-brand-sort');
+  if(!sel) return;
+  const cur = sel.value;
+  let next;
+  if(cur === col+'_desc') next = col+'_asc';
+  else if(cur === col+'_asc') next = col+'_desc';
+  else next = col+'_desc';  // 다른 컬럼이면 높은순부터
+  sel.value = next;
+  renderHQBrandTable();
+}
 
 /* ================ Welcome + 보조 KPI ================ */
 function renderWelcome(){
