@@ -1555,6 +1555,8 @@ function applyTeamData(teamId){
       advertiserOrder: (t.advertiserOrder||[]).slice(),
     };
   }
+  // 데이터 교체 후 REC/NOTES_MAP 캐시 무효화 필수
+  if(typeof rebuildREC === 'function') rebuildREC();
 }
 applyTeamData('G');  // 초기값
 function recomputeHQGoals(){
@@ -3200,6 +3202,52 @@ function renderOps(){
       document.getElementById('ms-exp').textContent = fmtShort(se)+'원';
       document.getElementById('ms-net').textContent = fmtShort(sr-se)+'원';
       document.getElementById('ms-margin').textContent = (sr?((sr-se)/sr*100):0).toFixed(1)+'%';
+
+      // 해당 브랜드 카드의 inline-sum / tfoot 합계 / row 이익률 실시간 갱신
+      try {
+        const card = wrap.querySelector(`.b-card[data-brand="${CSS.escape(b)}"]`);
+        if(card){
+          const bm = brandMonth(b, month);
+          // inline-sum (헤더 옆 4개 숫자)
+          const iSum = card.querySelector('.inline-sum');
+          if(iSum){
+            const revB = iSum.querySelector('.rev b');
+            const expB = iSum.querySelector('.exp b');
+            const netB = iSum.querySelector('.net b');
+            const margB = iSum.querySelector('.marg b');
+            if(revB) revB.textContent = fmtShort(bm.rev);
+            if(expB) expB.textContent = fmtShort(bm.exp);
+            if(netB) netB.textContent = fmtShort(bm.net);
+            if(margB) margB.textContent = bm.rev?((bm.net/bm.rev*100).toFixed(1)+'%'):'-';
+          }
+          // tfoot 합계
+          const tfCells = card.querySelectorAll('tfoot tr td');
+          if(tfCells && tfCells.length >= 5){
+            tfCells[1].textContent = fmtShort(bm.rev);
+            tfCells[2].textContent = fmtShort(bm.exp);
+            tfCells[3].innerHTML = bm.rev?((bm.net/bm.rev*100).toFixed(1)+'%'):'-';
+            tfCells[4].textContent = fmtShort(bm.net)+'원 (순매출)';
+          }
+          // row 이익률 셀 - 카테고리별
+          const rowMargin = (cRev, cExp) => cRev ? (((cRev-cExp)/cRev)*100) : null;
+          card.querySelectorAll('table.cat tbody tr').forEach(tr=>{
+            const cName = tr.querySelector('.cat-name')?.textContent?.trim();
+            if(!cName) return;
+            const x = brandCategoryMonth(b, month, cName);
+            const cM = rowMargin(x.rev, x.exp);
+            const cells = tr.querySelectorAll('td');
+            if(cells && cells.length >= 4){
+              const targetCell = cells[3];
+              if(cM === null){
+                targetCell.innerHTML = '<span style="color:var(--muted)">-</span>';
+              } else {
+                const cls = cM>=20?'good':cM>=0?'mid':'bad';
+                targetCell.innerHTML = `<span class="cat-margin ${cls}">${cM.toFixed(1)}%</span>`;
+              }
+            }
+          });
+        }
+      } catch(e){ console.warn('카드 실시간 갱신 실패', e); }
     });
   });
 }
@@ -3826,8 +3874,9 @@ function showSaveIndicator(status, msg){
   SAVE_INDICATOR_TIMER = setTimeout(()=>{ el.style.opacity = '0'; }, status==='error' ? 5000 : 2000);
 }
 
-function persistTeamsData(){
+function persistTeamsData(silent){
   // 핵심 변경 가능 데이터만 저장 (모든 ALL_TEAMS_DATA 저장은 크기 부담)
+  // silent=true 인 경우 UI 인디케이터 미노출 (백그라운드 주기 저장용)
   try {
     const snapshot = {
       teams: {},
@@ -3855,17 +3904,18 @@ function persistTeamsData(){
       };
     });
     localStorage.setItem(DATA_KEY, JSON.stringify(snapshot));
-    showSaveIndicator('saved');
+    if(!silent) showSaveIndicator('saved');
   } catch(e){
     console.warn('데이터 저장 실패', e);
+    // 저장 실패는 무조건 알림 (사일런트라도)
     showSaveIndicator('error', e && e.name === 'QuotaExceededError' ? '저장 용량 초과' : (e && e.message) || '');
   }
 }
 
-// 주기적 자동 저장 (15초마다 백업)
+// 주기적 자동 저장 (15초마다 백업) - 사일런트 모드: UI 노출 X
 setInterval(()=>{
   try {
-    if(typeof ALL_TEAMS_DATA !== 'undefined' && ALL_TEAMS_DATA.teams) persistTeamsData();
+    if(typeof ALL_TEAMS_DATA !== 'undefined' && ALL_TEAMS_DATA.teams) persistTeamsData(true);
   } catch(e){}
 }, 15000);
 
@@ -3964,6 +4014,10 @@ function restoreTeamsData(){
     if(snapshot.approvalStatus) Object.assign(APPROVAL_STATUS, snapshot.approvalStatus);
     if(snapshot.renewed && Array.isArray(snapshot.renewed)){
       STATE.renewedSet = new Set(snapshot.renewed);
+    }
+    // 데이터 복원 직후에도 REC 캐시 무효화 - applyTeamData가 나중에 호출되긴 하지만 안전망
+    if(typeof rebuildREC === 'function') {
+      try { rebuildREC(); } catch(e){}
     }
     return true;
   } catch(e){
