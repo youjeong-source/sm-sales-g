@@ -1556,7 +1556,8 @@ function applyTeamData(teamId){
     };
   }
   // 데이터 교체 후 REC/NOTES_MAP 캐시 무효화 필수
-  if(typeof rebuildREC === 'function') rebuildREC();
+  // 단, 모듈 초기 로드 시점(REC/NOTES_MAP 선언 전)에는 TDZ로 인해 ReferenceError 발생 → try/catch
+  try { if(typeof rebuildREC === 'function') rebuildREC(); } catch(e){ /* initial load, REC not yet declared */ }
 }
 applyTeamData('G');  // 초기값
 function recomputeHQGoals(){
@@ -3598,10 +3599,13 @@ function processOpsExcel(workbook, fileName){
 }
 
 function rebuildREC(){
-  for(const k in REC) delete REC[k];
-  for(const k in NOTES_MAP) delete NOTES_MAP[k];
-  DATA.records.forEach(r=>{REC[keyR(r.brand,r.month,r.category)] = r;});
-  DATA.notes.forEach(n=>{NOTES_MAP[keyR(n.brand,n.month,n.category||'기타')] = n.note;});
+  try {
+    if(typeof REC === 'undefined' || typeof NOTES_MAP === 'undefined' || typeof DATA === 'undefined') return;
+    for(const k in REC) delete REC[k];
+    for(const k in NOTES_MAP) delete NOTES_MAP[k];
+    (DATA.records||[]).forEach(r=>{REC[keyR(r.brand,r.month,r.category)] = r;});
+    (DATA.notes||[]).forEach(n=>{NOTES_MAP[keyR(n.brand,n.month,n.category||'기타')] = n.note;});
+  } catch(e){ /* TDZ guard - module init order */ }
 }
 
 /* ===== 세금계산서 발행 체크 (월 마감 대체) ===== */
