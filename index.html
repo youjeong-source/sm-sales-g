@@ -1337,7 +1337,7 @@
         <div class="sub">전월 대비 <span id="ms-rev-d">-</span></div>
       </div>
       <div class="sum-card">
-        <div class="lab">지출 (원가)</div>
+        <div class="lab">지출</div>
         <div class="val" id="ms-exp">-</div>
         <div class="sub">전월 대비 <span id="ms-exp-d">-</span></div>
       </div>
@@ -3419,7 +3419,7 @@ function renderOps(){
       <table class="cat">
         <thead><tr><th style="width:18%">카테고리</th><th class="r" style="width:16%">매출</th><th class="r" style="width:16%">지출</th><th class="r" style="width:14%">순이익률</th><th style="width:36%">비고 (전주 대비)</th></tr></thead>
         <tbody>${rows}</tbody>
-        <tfoot><tr><td>합계</td><td class="r"><b>${fmt(bm.rev)}</b></td><td class="r"><b>${fmt(bm.exp)}</b></td><td class="r net">${bm.rev?((bm.net/bm.rev*100).toFixed(1)+'%'):'-'}</td><td class="r net" style="text-align:right"><b>${fmt(bm.net)}원</b> (순매출)</td></tr></tfoot>
+        <tfoot><tr><td>합계</td><td class="r"><b>${fmt(bm.rev)}</b></td><td class="r"><b>${fmt(bm.exp)}</b></td><td class="r net">${bm.rev?((bm.net/bm.rev*100).toFixed(1)+'%'):'-'}</td><td class="r net"><b>${fmt(bm.net)}원</b> (순매출)</td></tr></tfoot>
       </table>
     </div>`;
   }).join('');
