@@ -3355,9 +3355,9 @@ function renderOps(){
       `세금계산서 발행 <b>${issuedCnt}/${targetCnt}</b>건`;
   }
 
-  document.getElementById('ms-rev').textContent = fmtShort(sr)+'원';
-  document.getElementById('ms-exp').textContent = fmtShort(se)+'원';
-  document.getElementById('ms-net').textContent = fmtShort(sr-se)+'원';
+  document.getElementById('ms-rev').textContent = fmt(sr)+'원';
+  document.getElementById('ms-exp').textContent = fmt(se)+'원';
+  document.getElementById('ms-net').textContent = fmt(sr-se)+'원';
   document.getElementById('ms-margin').textContent = margin.toFixed(1)+'%';
   document.getElementById('ms-rev-d').textContent = psr?((sr-psr)/psr*100>=0?'+':'')+((sr-psr)/psr*100).toFixed(1)+'%':'-';
   document.getElementById('ms-exp-d').textContent = pse?((se-pse)/pse*100>=0?'+':'')+((se-pse)/pse*100).toFixed(1)+'%':'-';
@@ -3478,9 +3478,9 @@ function renderOps(){
       renderKPI(); renderCharts(); renderAlerts();
       // update top sums w/o re-rendering all cards
       let sr=0,se=0; scope.forEach(bb=>{const bm=brandMonth(bb,month);sr+=bm.rev;se+=bm.exp;});
-      document.getElementById('ms-rev').textContent = fmtShort(sr)+'원';
-      document.getElementById('ms-exp').textContent = fmtShort(se)+'원';
-      document.getElementById('ms-net').textContent = fmtShort(sr-se)+'원';
+      document.getElementById('ms-rev').textContent = fmt(sr)+'원';
+      document.getElementById('ms-exp').textContent = fmt(se)+'원';
+      document.getElementById('ms-net').textContent = fmt(sr-se)+'원';
       document.getElementById('ms-margin').textContent = (sr?((sr-se)/sr*100):0).toFixed(1)+'%';
 
       // 해당 브랜드 카드의 inline-sum / tfoot 합계 / row 이익률 실시간 갱신
