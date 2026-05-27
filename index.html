@@ -3833,6 +3833,7 @@ function openBrandAdd(){
     persistTeamsData();
     try { rebuildREC(); } catch(e){}
     refreshAll();
+    refreshAfterBrandChange();  // v60: 모든 페이지 강제 갱신
     const monthMsg = initMonth ? ` · ${initMonth} 초기 데이터 입력됨` : '';
     showToast(`✓ ${name} 브랜드 추가 완료${monthMsg}`, 'success');
   });
@@ -3883,9 +3884,17 @@ function renameBrand(oldName){
       t.notes = DATA.notes.slice();
       t.advertiserMap = Object.assign({}, DATA.advertiserMap);
       t.owners = Object.assign({}, DATA.owners);
+      t.advertiserOrder = (DATA.advertiserOrder||[]).slice();  // v60: advertiserOrder 동기화 추가
+      // brandMeta/taxInvoice는 reference이지만 명시적으로 확인
+      t.brandMeta = DATA.brandMeta;
+      t.taxInvoice = DATA.taxInvoice;
     }
     persistTeamsData();
+    try { rebuildREC(); } catch(e){}
     refreshAll();
+    // v60: 모든 페이지 강제 갱신
+    refreshAfterBrandChange();
+    showToast(`✓ '${newName}' 브랜드 정보가 모든 페이지에 반영되었습니다`, 'success');
   });
 }
 
@@ -3974,13 +3983,14 @@ async function deleteBrand(name){
     t.notes = DATA.notes.slice();
     t.advertiserMap = Object.assign({}, DATA.advertiserMap);
     t.owners = Object.assign({}, DATA.owners);
-    // brandMeta/taxInvoice는 DATA가 직접 reference이므로 별도 sync 불필요하지만 명시적으로
+    t.advertiserOrder = (DATA.advertiserOrder||[]).slice();
     t.brandMeta = DATA.brandMeta;
     t.taxInvoice = DATA.taxInvoice;
   }
   persistTeamsData();
   rebuildREC();
-  refreshAll();
+  // v60: 모든 페이지 강제 갱신
+  refreshAfterBrandChange();
 }
 /* ===== 월간 운영 엑셀 업로드 ===== */
 function uploadOpsExcel(event){
@@ -4741,9 +4751,14 @@ function renderTeam(){
           const t = ALL_TEAMS_DATA.teams[STATE.team];
           t.advertiserMap = Object.assign({}, DATA.advertiserMap);
           t.owners = Object.assign({}, DATA.owners);
+          t.advertiserOrder = (DATA.advertiserOrder||[]).slice();  // v60: 추가
+          // brandMeta/taxInvoice는 reference이지만 명시 보장
+          t.brandMeta = DATA.brandMeta;
+          t.taxInvoice = DATA.taxInvoice;
         }
         try { persistTeamsData(); } catch(err){}
-        renderProgList(); renderBrandTbl(); renderKPI(); renderTeam();
+        // v60: 모든 페이지 강제 갱신 (renderTeam은 안에 포함됨)
+        refreshAfterBrandChange();
       });
     });
   }
@@ -4927,6 +4942,20 @@ function refreshAll(){
   }
   const active = document.querySelector('aside.side .nav button.active');
   if(active && active.dataset.tab!=='dash') goTab(active.dataset.tab);
+}
+
+/* v60: 브랜드 변경 후 모든 페이지에 즉시 반영하는 강제 갱신 */
+function refreshAfterBrandChange(){
+  try { rebuildREC(); } catch(e){}
+  try { renderKPI(); } catch(e){}
+  try { renderCharts(); } catch(e){}
+  try { renderProgList(); } catch(e){}
+  try { renderAlerts(); } catch(e){}
+  try { renderBrandTbl(); } catch(e){}
+  try { renderTeam(); } catch(e){}
+  try { renderOps(); } catch(e){}  // OPS 페이지도 강제 리렌더 (백그라운드)
+  try { if(STATE.team === 'HQ') renderHQDashboard(); } catch(e){}
+  try { renderApprove(); } catch(e){}
 }
 
 /* ================ HQ 모드 사이드바 가시성 ================ */
