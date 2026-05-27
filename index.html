@@ -771,14 +771,18 @@
   .al-pill{background:#fff;border:1px solid var(--line);border-radius:999px;padding:5px 12px;font-size:11px;color:var(--ink2);cursor:pointer;font-family:inherit;font-weight:600}
   .al-pill:hover{border-color:var(--ink2);color:var(--ink)}
   .al-pill.active{background:#0F0F10;border-color:#0F0F10;color:#fff}
-  .alert-feed{display:flex;flex-direction:column;gap:8px}
-  .af-item{display:flex;gap:14px;padding:14px 16px;border:1px solid var(--line);border-radius:10px;background:#fff;align-items:flex-start;transition:border-color .12s}
-  .af-item:hover{border-color:var(--ink2)}
-  .af-item.severity-high{border-left:3px solid #E60021}
-  .af-item.severity-mid{border-left:3px solid #D97706}
-  .af-item.severity-low{border-left:3px solid #71717A}
-  /* 매출 급감 항목은 좌측 보더 파랑 우선 적용 */
-  .af-item[data-kind="revenue-down"]{border-left-color:#1D4ED8 !important}
+  .alert-feed{display:flex;flex-direction:column;gap:10px}
+  /* v59: 좌측 컬러 라인 제거, 파스텔 배경으로 알림 종류 구분 */
+  .af-item{display:flex;gap:14px;padding:16px 18px;border:1px solid var(--line);border-radius:10px;background:#fff;align-items:flex-start;transition:border-color .12s,box-shadow .12s}
+  .af-item:hover{border-color:#CFCFD2;box-shadow:0 2px 8px rgba(0,0,0,.04)}
+  /* 매출 급증 - 연한 빨강 파스텔 */
+  .af-item[data-kind="revenue-up"]{background:#FFF5F7;border-color:#FBDCE1}
+  /* 매출 급감 - 연한 파랑 파스텔 */
+  .af-item[data-kind="revenue-down"]{background:#F0F6FF;border-color:#D8E5F5}
+  /* 계약 - 연한 오렌지 파스텔 */
+  .af-item[data-kind="contract"]{background:#FFFAF0;border-color:#FBE5C6}
+  /* 비고 - 그대로 흰색 */
+  .af-item[data-kind="notes"]{background:#FAFAFA;border-color:#ECECEC}
   .af-icon{width:34px;height:34px;border-radius:8px;display:flex;align-items:center;justify-content:center;flex:none;background:var(--bg2);color:var(--ink2)}
   .af-icon.up{background:#FFE5E9;color:#E60021}        /* 매출 급증 - 빨강 톤다운 */
   .af-icon.down{background:#DBEAFE;color:#1D4ED8}      /* 매출 급감 - 파랑 */
@@ -787,15 +791,25 @@
   .af-icon.note{background:#F5F5F5;color:var(--ink2)}
   .af-content{flex:1;min-width:0}
   .af-top{display:flex;align-items:center;gap:8px;margin-bottom:3px;flex-wrap:wrap}
-  .af-cat{font-size:10px;font-weight:800;padding:2px 7px;border-radius:4px;letter-spacing:.3px;text-transform:uppercase}
+  .af-cat{font-size:11px;font-weight:800;padding:3px 9px;border-radius:5px;letter-spacing:.3px;text-transform:uppercase;flex:none}
   .af-cat.revenue-up{background:#FFE5E9;color:#E60021;border:1px solid #FFB3C0}
   .af-cat.revenue-down{background:#DBEAFE;color:#1D4ED8;border:1px solid #BFDBFE}
   .af-cat.contract{background:#FFF7E6;color:#D97706}
   .af-cat.tax{background:#EFF6FF;color:#1D4ED8}
   .af-cat.note{background:var(--bg2);color:var(--ink2)}
-  .af-title{font-size:13px;font-weight:700;color:var(--ink)}
-  .af-meta{font-size:11px;color:var(--ink3);margin-bottom:5px}
-  .af-body{font-size:11.5px;color:var(--ink2);line-height:1.5}
+  /* v59: 글씨 크기 확대 */
+  .af-title{font-size:15px;font-weight:700;color:var(--ink);letter-spacing:-.2px}
+  .af-meta{font-size:12px;color:var(--ink3);margin-bottom:5px;display:none}  /* 광고주/담당자 메타는 숨김 */
+  .af-body{font-size:14px;color:var(--ink2);line-height:1.6;margin-top:6px}
+  /* 변동 본문 줄 - 큰 글씨로 강조 */
+  .af-body .va-line{font-size:14px;line-height:1.55}
+  .af-body .va-label{color:var(--ink3);font-weight:500;font-size:13px}
+  .af-body .va-arrow{color:var(--ink3);font-weight:500;margin:0 2px}
+  .af-body .va-prev{font-weight:600;color:var(--ink2);font-variant-numeric:tabular-nums}
+  .af-body .va-now{font-weight:800;color:var(--ink);font-variant-numeric:tabular-nums}
+  .af-body .va-pct{font-weight:800;font-size:14px;margin-left:4px;font-variant-numeric:tabular-nums}
+  .af-body .va-pct.pos{color:#E60021}
+  .af-body .va-pct.neg{color:#1D4ED8}
   .af-actions{display:flex;gap:6px;margin-top:7px}
   .af-actions button{font-size:10.5px;padding:4px 9px;background:#fff;border:1px solid var(--line);border-radius:5px;cursor:pointer;color:var(--ink2);font-weight:600}
   .af-actions button:hover{border-color:#0F0F10;color:var(--ink)}
@@ -1377,7 +1391,7 @@
     <div class="panel">
       <div class="head-row">
         <h3>변동 알림 피드 <span class="tag" id="alert-count-full">-</span>
-          <span style="font-size:11px;color:var(--ink3);font-weight:500;margin-left:6px">· 최근 10일 이내</span>
+          <span style="font-size:11px;color:var(--ink3);font-weight:500;margin-left:6px">· 매주 금요일 기준 · 최근 10일 이내</span>
         </h3>
         <div class="al-filters" id="al-filters">
           <button class="al-pill active" data-filter="all">전체</button>
@@ -1405,7 +1419,7 @@
         <button class="btn req-tl" onclick="openBrandAdd()">＋ 브랜드 추가</button>
       </div>
       <table class="role-table contract-tbl" id="contract-tbl"></table>
-      <div style="margin-top:8px;font-size:11px;color:var(--ink3)">※ 2026년에 운영했던 브랜드는 종료 후에도 누적 노출됩니다. 매출 변동 알림은 <b>작성일 기준 최근 7일 내 변경된 데이터</b>를 비교합니다 (500만원 이상 변동 시).</div>
+      <div style="margin-top:8px;font-size:11px;color:var(--ink3)">※ 2026년에 운영했던 브랜드는 종료 후에도 누적 노출됩니다. 매출 변동 알림은 <b>최근 10일 내 변경된 데이터</b>를 비교합니다 (500만원 이상 변동 시).</div>
     </div>
   </section>
 
@@ -3190,41 +3204,52 @@ function buildAllAlerts(){
   const last = months[months.length-1];
   const prev = months[months.length-2];
   const out = [];
-  // 1) 매출 변동 - 작성일 기준 최근 7일 내 변경 이력 기반 (CHANGE_LOG)
+  // 1) 매출 변동 - 작성일 기준 최근 10일 내 변경 이력 기반 (CHANGE_LOG)
+  // v59 버그 수정: 카테고리별 firstPrev/lastNext 누적 후 brand+month 단위로 합산
   const recent = getRecent7DayChanges();
-  // 브랜드+월 기준으로 그룹핑
-  const grouped = {};  // {brand+'|'+month: {revDelta, expDelta, latestTs, baseRev, baseExp, currentRev, currentExp}}
+  const perCat = {}; // brand|month|category -> {firstPrev, lastNext, brand, month, latestTs, field}
   recent.forEach(e=>{
-    const key = e.brand + '|' + e.month;
+    if(e.field !== 'revenue' && e.field !== 'expense') return;
+    const ck = e.brand + '|' + e.month + '|' + (e.category||'') + '|' + e.field;
+    if(!perCat[ck]){
+      perCat[ck] = {brand:e.brand, month:e.month, field:e.field, firstPrev:e.prev, lastNext:e.next, latestTs:e.ts};
+    } else {
+      perCat[ck].lastNext = e.next;
+      if(e.ts > perCat[ck].latestTs) perCat[ck].latestTs = e.ts;
+    }
+  });
+  // brand+month 단위로 합산
+  const grouped = {};
+  Object.values(perCat).forEach(pc=>{
+    const key = pc.brand + '|' + pc.month;
     if(!grouped[key]){
-      grouped[key] = {brand:e.brand, month:e.month, revDelta:0, expDelta:0, latestTs:0, firstPrevRev:null, firstPrevExp:null};
+      grouped[key] = {brand:pc.brand, month:pc.month, revDelta:0, expDelta:0, latestTs:0};
     }
     const g = grouped[key];
-    if(e.field === 'revenue'){
-      if(g.firstPrevRev === null) g.firstPrevRev = e.prev;
-      g.revDelta = e.next - g.firstPrevRev;
-    }
-    if(e.field === 'expense'){
-      if(g.firstPrevExp === null) g.firstPrevExp = e.prev;
-      g.expDelta = e.next - g.firstPrevExp;
-    }
-    if(e.ts > g.latestTs) g.latestTs = e.ts;
+    const d = pc.lastNext - pc.firstPrev;
+    if(pc.field === 'revenue') g.revDelta += d;
+    else if(pc.field === 'expense') g.expDelta += d;
+    if(pc.latestTs > g.latestTs) g.latestTs = pc.latestTs;
   });
 
   Object.values(grouped).forEach(g=>{
     if(getMeta(g.brand) && getMeta(g.brand).ended) return;
     if(!brandsInScope().includes(g.brand)) return;
     const diff = g.revDelta;
-    // 임계값: 500만원 이상 변동
     if(Math.abs(diff) < 5_000_000) return;
-    const baseRev = g.firstPrevRev ?? 0;
-    const curRev = baseRev + diff;
+    // 실시간 현재 매출 = brandMonth 합산
+    const curRev = brandMonth(g.brand, g.month).rev;
+    const baseRev = curRev - diff;  // 10일 전 = 현재 - 누적 변동
     const pct = baseRev ? (diff/baseRev*100) : (curRev?100:0);
     out.push({kind:'revenue', dir:diff>0?'up':'down',
       severity: Math.abs(diff) >= 20_000_000 ? 'high' : 'mid',
       brand:g.brand, month:g.month, adv:ADV_MAP[g.brand]||'-', owner:OWNERS[g.brand]||'-',
       title:`${g.brand} 매출 ${diff>0?'급증':'급감'} (${diff>0?'+':''}${fmtShort(diff)}원)`,
-      body:`7일 전 ${fmtShort(baseRev)}원 → 현재 <b>${fmtShort(curRev)}원</b> (${diff>0?'+':''}${pct.toFixed(1)}%) · ${g.month} 기준 · ${fmtRelTime(g.latestTs)} 업데이트`,
+      bodyHTML: `<div class="va-line"><span class="va-label">10일 전</span> <b class="va-prev">${fmt(baseRev)}원</b> <span class="va-arrow">→</span> <span class="va-label">현재</span> <b class="va-now">${fmt(curRev)}원</b> <span class="va-pct ${diff>0?'pos':'neg'}">(${diff>0?'+':''}${pct.toFixed(1)}%)</span></div>`,
+      baseRev:baseRev,
+      curRev:curRev,
+      diff:diff,
+      pct:pct,
       time:fmtRelTime(g.latestTs),
       ts:g.latestTs});
   });
@@ -3254,9 +3279,10 @@ function renderAlerts(){
   const sideHtml = sideList.map(a=>{
     const type = a.kind==='notes' ? 'note' : a.dir;
     const delta = a.kind==='notes' ? '비고' : (a.title.includes('급증')?'급증':'급감');
+    const bodyContent = a.bodyHTML || a.body || '';
     return `<div class="alert ${type}">
       <div class="top-r"><div><span class="b">${a.brand}</span><span class="m">· ${a.month||''}</span></div><div class="delta">${delta}</div></div>
-      <div class="body">${a.body}</div></div>`;
+      <div class="body">${bodyContent}</div></div>`;
   }).join('');
   if(document.getElementById('alerts-side')){
     document.getElementById('alerts-side').innerHTML = sideHtml || '<div style="color:var(--ink3);font-size:12px;padding:10px">변동 없음</div>';
@@ -3326,15 +3352,16 @@ function renderAlerts(){
               ? `<div class="af-actions"><button onclick="goTab('brand')">브랜드별 매출표 열기</button></div>`
               : '';
         const kindAttr = a.kind==='revenue' ? `revenue-${a.dir||'up'}` : a.kind;
+        const bodyContent = a.bodyHTML || a.body || '';
+        const monthSuffix = a.month ? ` · ${a.month}` : '';
         return `<div class="af-item severity-${a.severity}" data-kind="${kindAttr}">
           <div class="af-icon ${iconCls}">${iconMap[iconKey]||iconMap['note']}</div>
           <div class="af-content">
             <div class="af-top">
               <span class="af-cat ${catCls}">${catLabel[cKey]||a.kind}</span>
-              <span class="af-title">${a.title}</span>
+              <span class="af-title">${a.title}${monthSuffix}</span>
             </div>
-            <div class="af-meta">${a.adv} · 담당 ${a.owner}${a.month?` · ${a.month}`:''}</div>
-            <div class="af-body">${a.body}</div>
+            <div class="af-body">${bodyContent}</div>
             ${actions}
           </div>
           <div class="af-time">${a.time||''}</div>
@@ -4327,9 +4354,10 @@ function logChange(team, brand, month, field, prev, next){
   try { localStorage.setItem(CHANGE_LOG_KEY, JSON.stringify(CHANGE_LOG)); } catch(e){}
 }
 
-// 7일 전 이후 변경 이력만 추출 (현재 팀 또는 'HQ'면 전체)
+// 10일 전 이후 변경 이력만 추출 (현재 팀 또는 'HQ'면 전체)
 function getRecent7DayChanges(){
-  const cutoff = Date.now() - 7*24*60*60*1000;
+  // v59: 7일 → 10일로 확장 (매주 금요일 기준 1주 + 여유 3일)
+  const cutoff = Date.now() - 10*24*60*60*1000;
   const teamFilter = STATE.team;
   return CHANGE_LOG.filter(e=>{
     if(e.ts < cutoff) return false;
