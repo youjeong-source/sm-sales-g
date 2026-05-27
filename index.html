@@ -1422,7 +1422,7 @@
   <section id="tab-approve" class="hide">
     <div class="panel">
       <div class="head-row">
-        <h3>✅ 월 마감 확인 <span class="tag">전체 열람 · 확인은 본부장 권한</span></h3>
+        <h3>✅ 월 마감 확인 <span class="tag">세금계산서 발행 완료 브랜드</span></h3>
         <div style="font-size:11px;color:var(--ink3)">월간 운영 → 세금계산서 발행 완료한 브랜드가 자동으로 노출됩니다.</div>
       </div>
       <table class="role-table" id="approve-tbl"></table>
@@ -1766,6 +1766,59 @@ function advertiserYTD(){
 function brandsInScope(){
   // 팀원도 팀 전체 매출 인식이 필요하므로 전체 브랜드 노출 (편집은 카드별 권한으로 제어)
   return DATA.brands;
+}
+
+/* ========= 월별 브랜드 운영 관리 (Phase 4) ========= */
+const MONTHLY_HIDDEN = {};
+function _mkHideKey(brand, month){ return brand + '§' + month; }
+function isHiddenInMonth(brand, month){ return !!MONTHLY_HIDDEN[_mkHideKey(brand, month)]; }
+function setHiddenInMonth(brand, month, hidden){
+  const k = _mkHideKey(brand, month);
+  if(hidden) MONTHLY_HIDDEN[k] = true;
+  else delete MONTHLY_HIDDEN[k];
+  try { persistTeamsData(); } catch(e){}
+}
+async function removeBrandFromMonth(brand, month){
+  const ok = await confirmUI(
+    `[${brand}] 을(를) <b>${month}</b> 에서만 제외하시겠습니까?<br/>다른 월의 데이터와 팀 브랜드 명단은 그대로 유지됩니다.`,
+    '월별 운영 제외',
+    {danger:false, yesLabel:'제외'}
+  );
+  if(!ok) return;
+  setHiddenInMonth(brand, month, true);
+  renderOps();
+  showToast(`✓ ${brand} 을(를) ${month} 에서 제외했습니다`, 'info');
+}
+function isEndedBeforeMonth(brand, month){
+  const meta = getMeta(brand);
+  if(!meta.ended && !meta.contractEnd) return false;
+  const mm = (month||'').match(/(\d+)년\s*(\d+)월/);
+  if(!mm) return false;
+  const yy = 2000 + parseInt(mm[1], 10);
+  const mn = parseInt(mm[2], 10);
+  const monthStart = new Date(yy, mn-1, 1);
+  if(!meta.contractEnd) return false;
+  const endDate = new Date(meta.contractEnd);
+  if(isNaN(endDate.getTime())) return false;
+  return monthStart > endDate;
+}
+function isBeforeStart(brand, month){
+  const meta = getMeta(brand);
+  if(!meta.contractStart) return false;
+  const mm = (month||'').match(/(\d+)년\s*(\d+)월/);
+  if(!mm) return false;
+  const yy = 2000 + parseInt(mm[1], 10);
+  const mn = parseInt(mm[2], 10);
+  const monthEnd = new Date(yy, mn, 0);
+  const startDate = new Date(meta.contractStart);
+  if(isNaN(startDate.getTime())) return false;
+  return monthEnd < startDate;
+}
+function shouldShowInMonth(brand, month){
+  if(isHiddenInMonth(brand, month)) return false;
+  if(isEndedBeforeMonth(brand, month)) return false;
+  if(isBeforeStart(brand, month)) return false;
+  return true;
 }
 
 /* ================ KPI ================ */
@@ -3103,7 +3156,9 @@ function renderOps(){
   }
   const m = sel.value;
   const search = (document.getElementById('ops-search').value||'').trim();
-  let scope = brandsInScope().filter(b=>!search || b.includes(search) || (ADV_MAP[b]||'').includes(search));
+  let scope = brandsInScope()
+    .filter(b=>!search || b.includes(search) || (ADV_MAP[b]||'').includes(search))
+    .filter(b=>shouldShowInMonth(b, m));
   // 종료 브랜드는 항상 하단으로
   scope.sort((a,b)=>{
     const ea = getMeta(a).ended, eb = getMeta(b).ended;
@@ -3173,6 +3228,7 @@ function renderOps(){
       </span>`;
     const taxToggle = `<label class="tax-toggle ${taxIssued?'done':''}"><input type="checkbox" ${taxIssued?'checked':''} ${canEdit?'':'disabled'} onchange="toggleTaxIssued('${b.replace(/'/g,"\\'")}','${m}', this.checked)" />세금계산서 ${taxIssued?'발행완료(월마감)':'발행여부'}</label>`;
     const endToggle = (canEdit && editing) ? `<label class="end-toggle"><input type="checkbox" ${meta.ended?'checked':''} onchange="toggleBrandEnded('${b.replace(/'/g,"\\'")}', this.checked)" />브랜드 종료</label>` : '';
+    const removeMonthBtn = (canEdit && editing && !isHiddenInMonth(b, m)) ? '<button class="expand-btn" data-remove-month-brand="' + encodeURIComponent(b) + '" data-month="' + m + '" style="color:#D97706">이 달에서 제외</button>' : '';
     const editToggleBtn = canEdit ? `<button class="expand-btn ${editing?'pri':''}" onclick="toggleEditBrand('${b.replace(/'/g,"\\'")}')">${editing?'저장':'수정'}</button>` : '';
     const renameBtn = (canEdit && STATE.role==='lead') ? `<button class="expand-btn" onclick="renameBrand('${b.replace(/'/g,"\\'")}')">설정</button>` : '';
     const deleteBtn = (canEdit && STATE.role==='lead') ? `<button class="expand-btn" onclick="deleteBrand('${b.replace(/'/g,"\\'")}')" style="color:#B8001A">삭제</button>` : '';
@@ -3183,6 +3239,7 @@ function renderOps(){
         <div style="display:flex;align-items:center;gap:8px;flex-wrap:wrap">
           ${taxToggle}
           ${endToggle}
+          ${removeMonthBtn}
           ${expandBtn}
           ${editToggleBtn}
           ${renameBtn}
@@ -3197,6 +3254,14 @@ function renderOps(){
     </div>`;
   }).join('');
 
+  // 이 달에서 제외 버튼 이벤트 위임
+  wrap.querySelectorAll('button[data-remove-month-brand]').forEach(btn=>{
+    btn.addEventListener('click',()=>{
+      const b = decodeURIComponent(btn.getAttribute('data-remove-month-brand')||'');
+      const mm = btn.getAttribute('data-month')||'';
+      if(b && mm) removeBrandFromMonth(b, mm);
+    });
+  });
   wrap.querySelectorAll('input').forEach(inp=>{
     inp.addEventListener('change',()=>{
       const b=inp.dataset.b, c=inp.dataset.c, f=inp.dataset.f;
@@ -3382,9 +3447,12 @@ function openBrandAdd(){
     <div class="fm-row"><label>브랜드명 <span style="color:var(--pt)">*</span></label><input type="text" id="fm-brand" placeholder="예: 새브랜드" /></div>
     <div class="fm-row"><label>광고주명</label><input type="text" id="fm-adv" placeholder="예: 매일유업" /></div>
     <div class="fm-row"><label>담당자 (콤마로 다중 입력)</label><input type="text" id="fm-owner" placeholder="예: 안혜인 또는 안혜인, 최진영" /></div>
-    <div class="fm-row"><label>계약 시작일</label><input type="date" id="fm-cs" /></div>
-    <div class="fm-row"><label>계약 종료일</label><input type="date" id="fm-ce" /></div>
+    <div class="fm-row"><label>계약 시작일 <span style="color:var(--ink3);font-size:10.5px">· 운영 시작월</span></label><input type="date" id="fm-cs" /></div>
+    <div class="fm-row"><label>계약 종료일 <span style="color:var(--ink3);font-size:10.5px">· 종료월 다음달부터 자동 미노출</span></label><input type="date" id="fm-ce" /></div>
     <div class="fm-row chk"><input type="checkbox" id="fm-new" checked /><label for="fm-new">2026년 신규 계약 브랜드로 표시</label></div>
+    <div style="margin-top:6px;font-size:11px;color:var(--ink3);background:var(--bg2);padding:9px 12px;border-radius:6px;line-height:1.55">
+      ※ 계약 시작일~종료일 범위의 월에만 자동 노출됩니다. 월간 운영에서 개별 월 제외도 가능합니다.
+    </div>
   `;
   openFormModal('＋ 브랜드 추가', html, ()=>{
     const name = getFM('fm-brand').trim();
@@ -3954,6 +4022,7 @@ function persistTeamsData(silent){
     const snapshot = {
       teams: {},
       months: ALL_TEAMS_DATA.months,
+      monthlyHidden: MONTHLY_HIDDEN,
       hq_goals: ALL_TEAMS_DATA.hq_goals,
       hqInsightOverrides: STATE.hqInsightOverrides || {},
       qualGrowth: STATE.qualGrowth || {},
@@ -4083,6 +4152,9 @@ function restoreTeamsData(){
     if(snapshot.hqInsightOverrides) STATE.hqInsightOverrides = snapshot.hqInsightOverrides;
     if(snapshot.qualGrowth) Object.assign(STATE.qualGrowth, snapshot.qualGrowth);
     if(snapshot.taxInvoice) Object.assign(TAX_INVOICE, snapshot.taxInvoice);
+    if(snapshot.monthlyHidden){
+      Object.keys(snapshot.monthlyHidden).forEach(k=>{ MONTHLY_HIDDEN[k] = snapshot.monthlyHidden[k]; });
+    }
     if(snapshot.brandMeta) Object.assign(BRAND_META, snapshot.brandMeta);
     if(snapshot.approvalStatus) Object.assign(APPROVAL_STATUS, snapshot.approvalStatus);
     if(snapshot.renewed && Array.isArray(snapshot.renewed)){
@@ -4276,6 +4348,7 @@ function renderTeam(){
 
 /* ================ Approve (head): 세금계산서 발행된 브랜드 노출 ================ */
 function renderApprove(){
+  // Phase 4: 월마감 단순화 - 세금계산서 발행 = 완료만, 액션 없음
   const tbl = document.getElementById('approve-tbl');
   if(!tbl) return;
   const months = DATA.months;
@@ -4284,32 +4357,40 @@ function renderApprove(){
     DATA.brands.forEach(b=>{
       if(!isTaxIssued(b,m)) return;
       const bm = brandMonth(b,m);
-      const status = APPROVAL_STATUS[b] && APPROVAL_STATUS[b][m] || 'pending';
-      rows.push({m, b, rev:bm.rev, exp:bm.exp, net:bm.net, owner:OWNERS[b]||'-', adv:ADV_MAP[b]||'-', status});
+      rows.push({m, b, rev:bm.rev, exp:bm.exp, net:bm.net, owner:OWNERS[b]||'-', adv:ADV_MAP[b]||'-'});
     });
   });
-  let html = '<thead><tr><th style="width:11%">월</th><th style="width:11%">광고주</th><th style="width:14%">브랜드</th><th style="width:14%">담당</th><th>매출</th><th>순매출</th><th>상태</th><th style="width:18%">액션</th></tr></thead><tbody>';
+  rows.sort((a,b)=>{
+    if(a.m !== b.m) return b.m.localeCompare(a.m);
+    return b.rev - a.rev;
+  });
+  let html = '<thead><tr>'
+    + '<th style="width:11%">월</th>'
+    + '<th style="width:14%">광고주</th>'
+    + '<th style="width:17%">브랜드</th>'
+    + '<th style="width:14%">담당</th>'
+    + '<th>매출</th><th>순매출</th>'
+    + '<th style="width:11%">상태</th>'
+    + '</tr></thead><tbody>';
   if(rows.length===0){
-    html += '<tr><td colspan="8" style="text-align:center;color:var(--ink3);padding:20px">세금계산서 발행 완료된 브랜드가 없습니다.<br/>월간 운영 → 카드 상단의 "세금계산서" 체크박스 활성화 시 자동으로 표시됩니다.</td></tr>';
+    html += '<tr><td colspan="7" style="text-align:center;color:var(--ink3);padding:20px">세금계산서 발행 완료된 브랜드가 없습니다.<br/>월간 운영 → 카드 상단의 "세금계산서" 체크박스 활성화 시 자동으로 표시됩니다.</td></tr>';
   } else {
     rows.forEach(r=>{
-      const badge = r.status==='approved'
-        ? '<span class="apr-badge ok">✓ 확인 완료</span>'
-        : r.status==='rejected'
-          ? '<span class="apr-badge ng">! 보류</span>'
-          : '<span class="apr-badge wait">대기 중</span>';
-      const actions = (STATE.role==='head' && r.status==='pending')
-        ? `<button class="btn" onclick="approveItem('${r.b.replace(/'/g,"\\'")}','${r.m}',true)" style="padding:5px 11px;font-size:11px">확인</button>
-           <button class="btn" onclick="approveItem('${r.b.replace(/'/g,"\\'")}','${r.m}',false)" style="padding:5px 11px;font-size:11px;color:#B8001A;border-color:#FFB3C0">보류</button>`
-        : (STATE.role==='head'
-            ? `<button class="btn" onclick="approveItem('${r.b.replace(/'/g,"\\'")}','${r.m}',null)" style="padding:5px 11px;font-size:11px;color:var(--ink3)">대기로 되돌리기</button>`
-            : '<span style="color:var(--ink3);font-size:11px">본부장 권한</span>');
-      html += `<tr><td><b>${r.m}</b></td><td>${r.adv}</td><td><b>${r.b}</b></td><td>${r.owner}</td><td>${fmtShort(r.rev)}원</td><td class="y">${fmtShort(r.net)}원</td><td>${badge}</td><td>${actions}</td></tr>`;
+      html += '<tr>'
+        + '<td><b>'+r.m+'</b></td>'
+        + '<td>'+r.adv+'</td>'
+        + '<td><b>'+r.b+'</b></td>'
+        + '<td>'+r.owner+'</td>'
+        + '<td>'+fmtShort(r.rev)+'원</td>'
+        + '<td class="y">'+fmtShort(r.net)+'원</td>'
+        + '<td><span class="apr-badge ok">✓ 완료</span></td>'
+        + '</tr>';
     });
   }
   html += '</tbody>';
   tbl.innerHTML = html;
 }
+
 const APPROVAL_STATUS = {};
 function approveItem(brand, month, ok){
   if(STATE.role!=='head'){showToast('본부장 권한이 필요합니다.','warn');return;}
@@ -4581,8 +4662,18 @@ function autoGenNextMonth(){
         // 현재 월 또는 가장 최근 월의 카테고리 추출
         t.records.forEach(r=>{ if(r.category) cats.add(r.category); });
         t.brands.forEach(b=>{
+          // 다음달 시작 시점에 이미 종료된 브랜드는 자동 카피 제외
+          const meta = (typeof BRAND_META !== 'undefined' && BRAND_META[b]) || {};
+          if(meta.ended) return;
+          if(meta.contractEnd){
+            const m2 = (nextLabel||'').match(/(\d+)년\s*(\d+)월/);
+            if(m2){
+              const monthStart = new Date(2000+parseInt(m2[1],10), parseInt(m2[2],10)-1, 1);
+              const endDate = new Date(meta.contractEnd);
+              if(!isNaN(endDate.getTime()) && monthStart > endDate) return;
+            }
+          }
           cats.forEach(c=>{
-            // 이미 존재하는지 확인
             const exists = t.records.some(r=>r.brand===b && r.month===nextLabel && r.category===c);
             if(!exists){
               t.records.push({brand:b, month:nextLabel, category:c, revenue:0, expense:0, note:''});
