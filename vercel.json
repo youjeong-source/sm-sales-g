@@ -59,6 +59,10 @@
     {
       "source": "/demo",
       "destination": "/demo.html"
+    },
+    {
+      "source": "/demo-hq",
+      "destination": "/demo-hq.html"
     }
   ]
 }

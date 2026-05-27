@@ -1,0 +1,430 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8">
+<title>SM본부 통합 상세 데모 - GOLDENAX</title>
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.1/chart.umd.min.js"></script>
+<style>
+  *{box-sizing:border-box;margin:0;padding:0}
+  :root{
+    --pt:#E60021;--pt-d:#B8001A;--ink:#0F0F10;--ink2:#475569;--ink3:#94A3B8;
+    --line:#E5E5E5;--line2:#F1F5F9;--bg:#FAFAFA;--bg2:#F4F4F5;
+    --grp1:#E60021;--grp2:#1D4ED8;
+    --team-g:#E60021;--team-d:#1D4ED8;--team-u:#D97706;
+    --team-e:#7C3AED;--team-i:#0891B2;--team-r:#16A34A;
+  }
+  body{font-family:'Pretendard','Apple SD Gothic Neo',-apple-system,sans-serif;background:#FAFAFA;color:var(--ink);font-size:13px;line-height:1.5;padding-bottom:80px}
+
+  .topbar{background:linear-gradient(135deg,#E60021 0%,#B8001A 100%);color:#fff;padding:14px 32px;display:flex;align-items:center;gap:20px;border-bottom:1px solid #B8001A}
+  .topbar .brand{font-weight:900;letter-spacing:-.5px;font-size:18px}
+  .topbar .title{font-weight:600;font-size:14px;opacity:.95}
+  .topbar .back{margin-left:auto;font-size:12px;color:#fff;text-decoration:none;background:rgba(255,255,255,.15);padding:7px 14px;border-radius:7px;border:1px solid rgba(255,255,255,.25)}
+  .topbar .back:hover{background:rgba(255,255,255,.25)}
+  .topbar .demo-tag{background:#FCD34D;color:#0F0F10;font-size:10.5px;font-weight:800;padding:3px 9px;border-radius:5px;letter-spacing:.3px}
+
+  .container{max-width:1400px;margin:24px auto;padding:0 32px;display:flex;flex-direction:column;gap:24px}
+  .section-title{display:flex;align-items:baseline;gap:10px;margin-bottom:14px}
+  .section-title h2{font-size:18px;font-weight:800;letter-spacing:-.4px}
+  .section-title .desc{font-size:12px;color:var(--ink3)}
+
+  /* === Section 1: 연간 달성 누적 === */
+  .annual-hero{background:#fff;border:1px solid var(--line);border-radius:16px;padding:24px 28px}
+  .annual-top{display:flex;justify-content:space-between;align-items:flex-start;margin-bottom:18px}
+  .annual-top .lab{font-size:11.5px;color:var(--ink3);font-weight:700;letter-spacing:.3px;text-transform:uppercase}
+  .annual-top h3{font-size:14px;font-weight:700;color:var(--ink);margin-top:2px}
+  .annual-top .basis{font-size:11px;color:var(--ink3);text-align:right}
+  .annual-top .basis b{color:var(--ink2)}
+  .annual-stats{display:grid;grid-template-columns:repeat(4,1fr);gap:14px;margin-bottom:18px}
+  .a-stat{background:var(--bg2);border-radius:10px;padding:16px 18px}
+  .a-stat .lab{font-size:11px;color:var(--ink3);font-weight:700;letter-spacing:.3px;text-transform:uppercase;margin-bottom:6px}
+  .a-stat .val{font-size:22px;font-weight:800;letter-spacing:-.5px;font-variant-numeric:tabular-nums}
+  .a-stat .val .small{font-size:13px;color:var(--ink3);margin-left:3px;font-weight:600}
+  .a-stat .sub{font-size:11.5px;color:var(--ink3);margin-top:6px}
+  .a-stat .sub b{color:var(--ink2)}
+  .a-stat.primary{background:linear-gradient(135deg,#FFF5F7 0%,#FFE5E9 100%);border:1px solid #FBDCE1}
+  .a-stat.primary .val{color:#E60021}
+  .a-stat .progress{height:6px;background:#fff;border-radius:3px;margin-top:9px;overflow:hidden}
+  .a-stat .progress > i{display:block;height:100%;background:linear-gradient(90deg,#E60021,#B8001A);border-radius:3px;transition:width .4s}
+  .annual-chart{height:280px;background:#fff;border-radius:10px;padding:8px}
+
+  /* === Section 2: 월별 매출 (3개월) === */
+  .monthly-3{display:grid;grid-template-columns:1fr 1fr 1fr;gap:14px}
+  .mo-card{background:#fff;border:1px solid var(--line);border-radius:14px;padding:20px 22px;transition:border-color .12s,box-shadow .12s}
+  .mo-card.cur{background:linear-gradient(135deg,#FFFAF0 0%,#FFF5F7 100%);border-color:#FFB3C0;box-shadow:0 4px 16px rgba(230,0,33,.08)}
+  .mo-card .mo-head{display:flex;justify-content:space-between;align-items:center;margin-bottom:14px}
+  .mo-card .mo-label{font-size:11.5px;color:var(--ink3);font-weight:700;text-transform:uppercase;letter-spacing:.3px}
+  .mo-card.cur .mo-label{color:#E60021}
+  .mo-card .mo-month{font-size:22px;font-weight:900;letter-spacing:-.5px;color:var(--ink)}
+  .mo-card .mo-pill{font-size:10px;font-weight:800;padding:3px 8px;border-radius:5px;letter-spacing:.3px}
+  .mo-card.prev .mo-pill{background:var(--bg2);color:var(--ink3)}
+  .mo-card.cur .mo-pill{background:#E60021;color:#fff}
+  .mo-card.next .mo-pill{background:#EFF6FF;color:#1D4ED8}
+  .mo-rows{display:flex;flex-direction:column;gap:9px}
+  .mo-row{display:flex;justify-content:space-between;align-items:baseline;padding:7px 0;border-bottom:1px solid var(--line2)}
+  .mo-row:last-child{border-bottom:none}
+  .mo-row .l{font-size:11.5px;color:var(--ink3);font-weight:600}
+  .mo-row .v{font-size:15px;font-weight:800;letter-spacing:-.3px;font-variant-numeric:tabular-nums}
+  .mo-row .v.pos{color:#0F0F10}
+  .mo-row .v.neg{color:#E60021}
+  .mo-row .v.muted{color:var(--ink3);font-weight:600}
+  .mo-chart-wrap{height:200px;background:#fff;border:1px solid var(--line);border-radius:14px;padding:14px 18px}
+
+  /* === Section 3: 그룹별 매출 보고 === */
+  .group-grid{display:grid;grid-template-columns:1fr 1fr;gap:18px}
+  .grp-card{background:#fff;border:1px solid var(--line);border-radius:14px;padding:22px 24px;display:flex;flex-direction:column;gap:16px}
+  .grp-head{display:flex;justify-content:space-between;align-items:flex-start}
+  .grp-head .grp-name{display:flex;align-items:center;gap:10px}
+  .grp-head .grp-badge{font-size:12px;font-weight:900;padding:5px 12px;border-radius:6px;letter-spacing:-.2px}
+  .grp-card.g1 .grp-badge{background:#FFE5E9;color:#E60021}
+  .grp-card.g2 .grp-badge{background:#DBEAFE;color:#1D4ED8}
+  .grp-head h3{font-size:18px;font-weight:800;letter-spacing:-.4px}
+  .grp-teams{font-size:12px;color:var(--ink3);font-weight:600;margin-top:4px}
+  .grp-teams span{display:inline-block;background:var(--bg2);color:var(--ink2);font-size:11px;padding:3px 8px;border-radius:5px;margin-right:5px;font-weight:700}
+
+  .grp-stats{display:grid;grid-template-columns:1fr 1fr;gap:12px}
+  .grp-stat{background:var(--bg2);border-radius:10px;padding:14px 16px}
+  .grp-stat .lab{font-size:11px;color:var(--ink3);font-weight:700;letter-spacing:.3px;text-transform:uppercase;margin-bottom:5px}
+  .grp-stat .val{display:flex;align-items:baseline;gap:4px;font-size:18px;font-weight:800;letter-spacing:-.3px}
+  .grp-stat .val .goal{font-size:12px;color:var(--ink3);font-weight:600}
+  .grp-stat .pct-row{display:flex;justify-content:space-between;align-items:baseline;font-size:11px;margin-top:7px;color:var(--ink3);font-weight:600}
+  .grp-stat .pct-row b{color:var(--ink);font-size:13px}
+  .grp-stat .pbar{height:6px;background:#fff;border-radius:3px;margin-top:4px;overflow:hidden}
+  .grp-card.g1 .grp-stat .pbar > i{background:linear-gradient(90deg,#E60021,#B8001A)}
+  .grp-card.g2 .grp-stat .pbar > i{background:linear-gradient(90deg,#1D4ED8,#1E3A8A)}
+  .grp-stat .pbar > i{display:block;height:100%;border-radius:3px;transition:width .4s}
+
+  .grp-chart-wrap{height:220px;background:#fff;border:1px solid var(--line2);border-radius:10px;padding:10px}
+
+  .grp-issues{background:#FFF8E1;border:1px solid #FCD34D;border-radius:9px;padding:13px 16px}
+  .grp-issues .l{font-size:11px;font-weight:800;color:#92400E;letter-spacing:.3px;text-transform:uppercase;margin-bottom:7px;display:flex;align-items:center;gap:5px}
+  .grp-issues ul{list-style:none;font-size:12px;color:#78350F;line-height:1.7}
+  .grp-issues li{padding:4px 0;border-bottom:1px dashed #FBBF24}
+  .grp-issues li:last-child{border-bottom:none}
+  .grp-issues li b{color:#92400E}
+  .grp-issues li .team-pill{display:inline-block;font-size:10px;font-weight:800;padding:2px 6px;border-radius:4px;margin-right:5px;letter-spacing:.3px;background:#fff}
+  .grp-issues li .team-pill.g{color:#E60021}
+  .grp-issues li .team-pill.d{color:#1D4ED8}
+  .grp-issues li .team-pill.u{color:#D97706}
+  .grp-issues li .team-pill.e{color:#7C3AED}
+  .grp-issues li .team-pill.i{color:#0891B2}
+  .grp-issues li .team-pill.r{color:#16A34A}
+
+  /* Footnote */
+  .footnote{font-size:11.5px;color:var(--ink3);text-align:center;padding:16px;background:var(--bg2);border-radius:8px;line-height:1.7}
+
+  @media(max-width:1100px){
+    .annual-stats,.monthly-3,.group-grid{grid-template-columns:1fr 1fr}
+    .grp-stats{grid-template-columns:1fr}
+  }
+</style>
+</head>
+<body>
+
+<div class="topbar">
+  <div class="brand">GOLDENAX</div>
+  <div class="title">SM본부 통합 상세 보고</div>
+  <span class="demo-tag">DEMO</span>
+  <a href="/" class="back">← 본 사이트로</a>
+</div>
+
+<div class="container">
+
+  <!-- Section 1: 연간 달성 누적 -->
+  <div>
+    <div class="section-title">
+      <h2>📊 SM본부 연간 달성 누적</h2>
+      <span class="desc">2026년 본부 통합 KPI · 1~5월 누적</span>
+    </div>
+    <div class="annual-hero">
+      <div class="annual-top">
+        <div>
+          <div class="lab">2026 SM본부 통합</div>
+          <h3>연간 누적 달성 현황</h3>
+        </div>
+        <div class="basis">기준일 <b>2026.05.27 (수)</b><br/>입력 완료 월 <b>1~5월 (5개월)</b></div>
+      </div>
+      <div class="annual-stats">
+        <div class="a-stat primary">
+          <div class="lab">연 매출 누적</div>
+          <div class="val">120<span class="small">억원</span></div>
+          <div class="sub">목표 <b>300억원</b> · 달성률 <b>40.0%</b></div>
+          <div class="progress"><i style="width:40%"></i></div>
+        </div>
+        <div class="a-stat">
+          <div class="lab">순매출 누적</div>
+          <div class="val">27<span class="small">억원</span></div>
+          <div class="sub">목표 <b>70억원</b> · 달성률 <b>38.6%</b></div>
+          <div class="progress"><i style="width:38.6%;background:#1D4ED8"></i></div>
+        </div>
+        <div class="a-stat">
+          <div class="lab">이익률</div>
+          <div class="val">22.5<span class="small">%</span></div>
+          <div class="sub">목표 <b>24%</b> · 차이 <b style="color:#D97706">-1.5%p</b></div>
+          <div class="progress"><i style="width:93.75%;background:#D97706"></i></div>
+        </div>
+        <div class="a-stat">
+          <div class="lab">잔여 매출 · 페이스</div>
+          <div class="val">180<span class="small">억원</span></div>
+          <div class="sub">잔여 <b>7개월</b> · 월 평균 필요 <b>25.7억원</b></div>
+          <div class="progress"><i style="width:60%;background:#16A34A"></i></div>
+        </div>
+      </div>
+      <div class="annual-chart">
+        <canvas id="ch-annual"></canvas>
+      </div>
+    </div>
+  </div>
+
+  <!-- Section 2: 월별 매출 현황 (3개월) -->
+  <div>
+    <div class="section-title">
+      <h2>📅 월별 매출 현황</h2>
+      <span class="desc">당월 기준 ± 1개월 · 전월·당월·익월 (예상)</span>
+    </div>
+    <div class="monthly-3">
+      <div class="mo-card prev">
+        <div class="mo-head">
+          <span class="mo-label">전월</span>
+          <span class="mo-pill">완료</span>
+        </div>
+        <div class="mo-month">26년 4월</div>
+        <div class="mo-rows" style="margin-top:14px">
+          <div class="mo-row"><span class="l">매출</span><span class="v">26.8억원</span></div>
+          <div class="mo-row"><span class="l">지출</span><span class="v muted">20.5억원</span></div>
+          <div class="mo-row"><span class="l">순매출</span><span class="v pos">6.3억원</span></div>
+          <div class="mo-row"><span class="l">이익률</span><span class="v">23.5%</span></div>
+          <div class="mo-row"><span class="l">목표 달성</span><span class="v">107%</span></div>
+        </div>
+      </div>
+      <div class="mo-card cur">
+        <div class="mo-head">
+          <span class="mo-label">당월</span>
+          <span class="mo-pill">진행 중</span>
+        </div>
+        <div class="mo-month">26년 5월</div>
+        <div class="mo-rows" style="margin-top:14px">
+          <div class="mo-row"><span class="l">매출</span><span class="v">19.3억원</span></div>
+          <div class="mo-row"><span class="l">지출</span><span class="v muted">15.2억원</span></div>
+          <div class="mo-row"><span class="l">순매출</span><span class="v pos">4.1억원</span></div>
+          <div class="mo-row"><span class="l">이익률</span><span class="v">21.2%</span></div>
+          <div class="mo-row"><span class="l">목표 달성 (진행)</span><span class="v">77%</span></div>
+        </div>
+      </div>
+      <div class="mo-card next">
+        <div class="mo-head">
+          <span class="mo-label">익월 (예상)</span>
+          <span class="mo-pill">계획</span>
+        </div>
+        <div class="mo-month">26년 6월</div>
+        <div class="mo-rows" style="margin-top:14px">
+          <div class="mo-row"><span class="l">예상 매출</span><span class="v">25.0억원</span></div>
+          <div class="mo-row"><span class="l">예상 지출</span><span class="v muted">19.2억원</span></div>
+          <div class="mo-row"><span class="l">예상 순매출</span><span class="v pos">5.8억원</span></div>
+          <div class="mo-row"><span class="l">이익률 (예상)</span><span class="v">23.2%</span></div>
+          <div class="mo-row"><span class="l">목표 대비</span><span class="v">100%</span></div>
+        </div>
+      </div>
+    </div>
+    <div class="mo-chart-wrap" style="margin-top:14px">
+      <canvas id="ch-monthly"></canvas>
+    </div>
+  </div>
+
+  <!-- Section 3: 그룹별 매출 보고 -->
+  <div>
+    <div class="section-title">
+      <h2>👥 그룹별 매출 보고</h2>
+      <span class="desc">1그룹(G·D·U) / 2그룹(E·I·R) · 달성 현황 + 월별 추이 + 이슈</span>
+    </div>
+    <div class="group-grid">
+
+      <!-- Group 1 -->
+      <div class="grp-card g1">
+        <div class="grp-head">
+          <div class="grp-name">
+            <span class="grp-badge">1그룹</span>
+            <div>
+              <h3>G·D·U팀</h3>
+              <div class="grp-teams"><span>G팀</span><span>D팀</span><span>U팀</span></div>
+            </div>
+          </div>
+        </div>
+
+        <div class="grp-stats">
+          <div class="grp-stat">
+            <div class="lab">매출 (누적)</div>
+            <div class="val">55<span class="goal">억 / 140억</span></div>
+            <div class="pct-row"><span>달성률</span><b>39.3%</b></div>
+            <div class="pbar"><i style="width:39.3%"></i></div>
+          </div>
+          <div class="grp-stat">
+            <div class="lab">순매출 (누적)</div>
+            <div class="val">12.5<span class="goal">억 / 34억</span></div>
+            <div class="pct-row"><span>달성률 · 이익률</span><b>36.8% · 22.7%</b></div>
+            <div class="pbar"><i style="width:36.8%"></i></div>
+          </div>
+        </div>
+
+        <div class="grp-chart-wrap"><canvas id="ch-grp1"></canvas></div>
+
+        <div class="grp-issues">
+          <div class="l">⚠️ 이슈 사항 · 1그룹</div>
+          <ul>
+            <li><span class="team-pill d">D팀</span><b>신규 클라이언트 발굴 지연</b> — 1Q 신규 0건, 목표 5건 대비 부족. 2Q 활동 가속 필요</li>
+            <li><span class="team-pill g">G팀</span>리얼베리어·드리미 운영 안정적, <b>5월 매체 광고 마진율 5%</b> 점검 필요 (목표 24%)</li>
+            <li><span class="team-pill u">U팀</span>1Q 운영 호조 · <b>인플루언서 채널 확장</b> 단계, 신규 브랜드 발굴 2건 진행 중</li>
+          </ul>
+        </div>
+      </div>
+
+      <!-- Group 2 -->
+      <div class="grp-card g2">
+        <div class="grp-head">
+          <div class="grp-name">
+            <span class="grp-badge">2그룹</span>
+            <div>
+              <h3>E·I·R팀</h3>
+              <div class="grp-teams"><span>E팀</span><span>I팀</span><span>R팀</span></div>
+            </div>
+          </div>
+        </div>
+
+        <div class="grp-stats">
+          <div class="grp-stat">
+            <div class="lab">매출 (누적)</div>
+            <div class="val">65<span class="goal">억 / 160억</span></div>
+            <div class="pct-row"><span>달성률</span><b>40.6%</b></div>
+            <div class="pbar"><i style="width:40.6%"></i></div>
+          </div>
+          <div class="grp-stat">
+            <div class="lab">순매출 (누적)</div>
+            <div class="val">14.5<span class="goal">억 / 36억</span></div>
+            <div class="pct-row"><span>달성률 · 이익률</span><b>40.3% · 22.3%</b></div>
+            <div class="pbar"><i style="width:40.3%"></i></div>
+          </div>
+        </div>
+
+        <div class="grp-chart-wrap"><canvas id="ch-grp2"></canvas></div>
+
+        <div class="grp-issues">
+          <div class="l">⚠️ 이슈 사항 · 2그룹</div>
+          <ul>
+            <li><span class="team-pill e">E팀</span><b>LG 가전 캠페인 호조</b> — 4월 LG 7.2억 매출 + 동원·SPC 안정 운영</li>
+            <li><span class="team-pill i">I팀</span>SPC 삼립·하인즈·메디웰 빅 클라이언트 운영 확장, <b>매체 운영 전문성 강화 중</b></li>
+            <li><span class="team-pill r">R팀</span><b>신규 광고주 발굴 부진</b> — 1Q 신규 1건, 목표 4건. 신규 비즈니스 활동 강화 필요</li>
+          </ul>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="footnote">
+    ※ 이 페이지는 <b>SM본부 통합 상세 보고 데모</b>입니다. 데이터는 예시 수치이며, 본 사이트 통합 시 실제 데이터로 자동 연동됩니다.<br/>
+    1그룹 목표: <b>매출 140억 / 순매출 34억</b> · 2그룹 목표: <b>매출 160억 / 순매출 36억</b> · 본부 통합: <b>매출 300억 / 순매출 70억</b>
+  </div>
+
+</div>
+
+<script>
+const fmtAxis = v => (v >= 100000000 ? (v/100000000).toFixed(0) + '억' : v >= 10000 ? (v/10000).toFixed(0) + '만' : v);
+
+// === Section 1: Annual cumulative chart (1-12월 누적 매출 vs 목표) ===
+const months = ['1월','2월','3월','4월','5월','6월','7월','8월','9월','10월','11월','12월'];
+const actualCum = [22, 45, 73, 100, 120, null, null, null, null, null, null, null].map(v => v ? v*1e8 : null);
+const targetCum = [25, 50, 75, 100, 125, 150, 175, 200, 225, 250, 275, 300].map(v => v*1e8);
+const projectionCum = [...actualCum];
+// Fill projection from current onwards (월평균 25.7억 가정)
+for(let i = 5; i < 12; i++){
+  projectionCum[i] = (projectionCum[i-1] || 12e9) + 25.7e8;
+}
+new Chart(document.getElementById('ch-annual'), {
+  type:'line',
+  data:{
+    labels:months,
+    datasets:[
+      {label:'목표 누적', data:targetCum, borderColor:'#94A3B8', borderWidth:2, borderDash:[6,4], fill:false, tension:0.2, pointRadius:3, pointBackgroundColor:'#94A3B8'},
+      {label:'실적 누적', data:actualCum, borderColor:'#E60021', backgroundColor:'rgba(230,0,33,0.08)', borderWidth:3, fill:true, tension:0.3, pointRadius:4, pointBackgroundColor:'#E60021'},
+      {label:'예상 누적 (페이스 유지 시)', data:projectionCum.map((v,i) => i>=5 ? v : null), borderColor:'#FBBF24', borderWidth:2, borderDash:[3,3], fill:false, tension:0.2, pointRadius:2, pointBackgroundColor:'#FBBF24'}
+    ]
+  },
+  options:{
+    maintainAspectRatio:false,
+    plugins:{
+      legend:{position:'bottom', labels:{boxWidth:14, padding:14, font:{size:12, weight:'600'}}},
+      tooltip:{callbacks:{label:ctx => `${ctx.dataset.label}: ${(ctx.parsed.y/1e8).toFixed(1)}억원`}}
+    },
+    scales:{
+      y:{ticks:{callback:v => (v/1e8).toFixed(0)+'억', font:{size:11}}, grid:{color:'#F4F4F5'}},
+      x:{grid:{display:false}, ticks:{font:{size:11}}}
+    }
+  }
+});
+
+// === Section 2: Monthly comparison (전월/당월/익월) - 매출/지출/순매출 그룹 막대 ===
+new Chart(document.getElementById('ch-monthly'), {
+  type:'bar',
+  data:{
+    labels:['26년 4월 (전월)','26년 5월 (당월)','26년 6월 (익월 예상)'],
+    datasets:[
+      {label:'매출', data:[26.8e8, 19.3e8, 25.0e8], backgroundColor:['#E60021CC','#E60021','#FBA5B3'], borderRadius:6},
+      {label:'지출', data:[20.5e8, 15.2e8, 19.2e8], backgroundColor:['#94A3B8CC','#94A3B8','#CBD5E1'], borderRadius:6},
+      {label:'순매출', data:[6.3e8, 4.1e8, 5.8e8], backgroundColor:['#1D4ED8CC','#1D4ED8','#93C5FD'], borderRadius:6}
+    ]
+  },
+  options:{
+    maintainAspectRatio:false,
+    plugins:{
+      legend:{position:'bottom', labels:{boxWidth:14, padding:14, font:{size:12, weight:'600'}}},
+      tooltip:{callbacks:{label:ctx => `${ctx.dataset.label}: ${(ctx.parsed.y/1e8).toFixed(1)}억원`}}
+    },
+    scales:{
+      y:{ticks:{callback:v => (v/1e8).toFixed(0)+'억', font:{size:11}}, grid:{color:'#F4F4F5'}},
+      x:{grid:{display:false}, ticks:{font:{size:11}}}
+    }
+  }
+});
+
+// === Section 3: Group monthly trend charts ===
+function makeGrpChart(canvasId, group){
+  const colors = group === 1
+    ? {G:'#E60021', D:'#1D4ED8', U:'#D97706'}
+    : {E:'#7C3AED', I:'#0891B2', R:'#16A34A'};
+  // Mock monthly revenue per team (in 100M units)
+  const data = group === 1 ? {
+    G:[3.2, 4.1, 4.8, 5.0, 4.5, null, null, null, null, null, null, null],
+    D:[3.8, 5.5, 6.0, 6.5, 4.8, null, null, null, null, null, null, null],
+    U:[2.8, 3.5, 4.2, 4.8, 4.2, null, null, null, null, null, null, null]
+  } : {
+    E:[4.5, 5.8, 6.5, 7.2, 5.8, null, null, null, null, null, null, null],
+    I:[3.8, 4.5, 5.2, 5.5, 4.8, null, null, null, null, null, null, null],
+    R:[2.5, 3.2, 3.8, 4.2, 3.5, null, null, null, null, null, null, null]
+  };
+  const datasets = Object.keys(data).map(tid => ({
+    label:tid+'팀',
+    data:data[tid].map(v => v ? v*1e8 : null),
+    backgroundColor:colors[tid],
+    borderRadius:5
+  }));
+  new Chart(document.getElementById(canvasId), {
+    type:'bar',
+    data:{labels:months, datasets},
+    options:{
+      maintainAspectRatio:false,
+      plugins:{
+        legend:{position:'bottom', labels:{boxWidth:11, padding:9, font:{size:11, weight:'600'}}},
+        tooltip:{callbacks:{label:ctx => `${ctx.dataset.label}: ${(ctx.parsed.y/1e8).toFixed(1)}억원`}}
+      },
+      scales:{
+        y:{stacked:true, ticks:{callback:v => (v/1e8).toFixed(0)+'억', font:{size:10}}, grid:{color:'#F4F4F5'}},
+        x:{stacked:true, grid:{display:false}, ticks:{font:{size:10}}}
+      }
+    }
+  });
+}
+makeGrpChart('ch-grp1', 1);
+makeGrpChart('ch-grp2', 2);
+</script>
+
+</body>
+</html>
