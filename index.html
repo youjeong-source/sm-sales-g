@@ -1035,7 +1035,7 @@
     <h5>Documentation</h5>
     <div class="nav">
       <button data-tab="wf"><span class="ico"><svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polygon points="1 6 8 3 16 6 23 3 23 18 16 21 8 18 1 21 1 6"/><line x1="8" y1="3" x2="8" y2="18"/><line x1="16" y1="6" x2="16" y2="21"/></svg></span>워크플로우</button>
-      <button data-tab="role" class="req-tl"><span class="ico"><svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="4" y="11" width="16" height="9" rx="1.5"/><path d="M8 11V7a4 4 0 018 0v4"/></svg></span>권한 매트릭스</button>
+      <button data-tab="role"><span class="ico"><svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="4" y="11" width="16" height="9" rx="1.5"/><path d="M8 11V7a4 4 0 018 0v4"/></svg></span>권한 매트릭스</button>
     </div>
   </aside>
 
@@ -1460,18 +1460,27 @@
     <div class="panel">
       <h3>🔐 역할별 권한 매트릭스</h3>
       <table class="role-table">
-        <thead><tr><th style="width:32%">기능</th><th>👤 팀원</th><th>⭐ 팀장</th><th>🏛 본부장/그룹장</th></tr></thead>
+        <thead><tr>
+          <th style="width:24%">기능</th>
+          <th>👤 팀원</th>
+          <th>📋 대리·과장</th>
+          <th>⭐ 팀장</th>
+          <th>🏛 본부장·그룹장</th>
+        </tr></thead>
         <tbody>
-          <tr><td>대시보드 열람</td><td class="y">자기 담당 브랜드만</td><td class="y">팀 전체</td><td class="y">전 팀 통합</td></tr>
-          <tr><td>월간 운영 입력</td><td class="y">자기 브랜드</td><td class="y">팀 전체 수정</td><td class="y">팀 전체 수정 (팀 뷰)</td></tr>
-          <tr><td>변동사항(비고) 작성</td><td class="y">자기 브랜드</td><td class="y">팀 전체</td><td class="y">코멘트</td></tr>
-          <tr><td>연간 목표 설정</td><td class="n">불가</td><td class="y">팀 목표 작성</td><td class="y">본부 통합 + 승인</td></tr>
-          <tr><td>팀원·브랜드 배정</td><td class="n">불가</td><td class="y">가능</td><td class="y">팀 단위 조정</td></tr>
-          <tr><td>월 마감</td><td class="n">제출만</td><td class="y">제출 → 본부장</td><td class="y">최종 승인</td></tr>
-          <tr><td>본부 통합 현황</td><td class="n">불가</td><td class="n">불가</td><td class="y">전 팀 비교</td></tr>
-          <tr><td>CSV 내보내기</td><td class="y">자기 브랜드</td><td class="y">팀 전체</td><td class="y">본부 전체</td></tr>
+          <tr><td>대시보드 열람</td><td class="y">팀 전체 열람</td><td class="y">팀 전체 열람</td><td class="y">팀 전체</td><td class="y">전 팀 통합</td></tr>
+          <tr><td>월간 운영 입력</td><td class="y">담당 브랜드</td><td class="y">담당 브랜드</td><td class="y">팀 전체 수정</td><td class="y">팀 전체 수정 (팀 뷰)</td></tr>
+          <tr><td>변동사항(비고) 작성</td><td class="y">담당 브랜드</td><td class="y">담당 브랜드</td><td class="y">팀 전체 수정</td><td class="y">코멘트</td></tr>
+          <tr><td>연간 목표 설정</td><td class="n">불가</td><td class="n">불가</td><td class="y">수정 가능</td><td class="y">열람만</td></tr>
+          <tr><td>팀원·브랜드 배정</td><td class="n">불가</td><td class="y">추가/수정 가능</td><td class="y">가능</td><td class="y">팀 단위 조정</td></tr>
+          <tr><td>월 마감</td><td class="y">제출 가능</td><td class="y">제출 가능</td><td class="y">제출 가능</td><td class="y">제출 가능</td></tr>
+          <tr><td>본부 통합 현황</td><td class="n">불가</td><td class="n">불가</td><td class="y">열람</td><td class="y">전 팀 비교</td></tr>
+          <tr><td>CSV 내보내기</td><td class="y">담당 브랜드</td><td class="y">팀 전체 브랜드</td><td class="y">팀 전체</td><td class="y">본부 전체</td></tr>
         </tbody>
       </table>
+      <div style="margin-top:10px;font-size:11.5px;color:var(--ink3);background:var(--bg2);padding:10px 14px;border-radius:7px;line-height:1.65">
+        <b style="color:var(--ink2)">💡 안내</b> · '대리·과장' 권한은 직급(<b>대리</b> 또는 <b>과장</b>)이 부여된 팀원에게 자동 적용됩니다. 그룹장은 본부장과 동일한 권한 체계에 속합니다.
+      </div>
     </div>
   </section>
 
@@ -1616,8 +1625,34 @@ function getOwners(brand){
   return (OWNERS[brand]||'').split(',').map(s=>s.trim()).filter(Boolean);
 }
 
+/* 역할 4단계 시스템 (Phase 3) */
+function getRoleLevel(person){
+  if(!person) return 0;
+  if(person.role === 'head') return 3;
+  if(person.role === 'lead') return 2;
+  if(person.role === 'member'){
+    const t = (person.title||'').trim();
+    if(t === '대리' || t === '과장') return 1;
+    return 0;
+  }
+  return 0;
+}
+function getCurrentLevel(){
+  try {
+    const me = TEAM_ROSTER.find(p=>p.name === STATE.memberUser);
+    if(me) return getRoleLevel(me);
+  } catch(e){}
+  if(STATE.role === 'head') return 3;
+  if(STATE.role === 'lead') return 2;
+  return 0;
+}
+function getRoleLabel(level){
+  return ['팀원','대리·과장','팀장','본부장·그룹장'][level]||'팀원';
+}
+
 const STATE = {
   role: 'lead',
+  level: 2,
   team: 'G',  // 현재 활성 팀 (G/D/U/HQ)
   goals: ALL_TEAMS_DATA.teams.G.goals,  // 현재 팀 목표 - applyTeamData에서 갱신
   edit: { brand: null, all: false },
@@ -3340,7 +3375,7 @@ function getFMChk(id){return document.getElementById(id).checked;}
 
 /* ===== 브랜드 CRUD (모달 폼 사용) ===== */
 function openBrandAdd(){
-  if(STATE.role==='member'){alert('브랜드 추가는 팀장 권한입니다.');return;}
+  if(getCurrentLevel() < 1){alert('브랜드 추가는 대리·과장 이상 권한입니다.');return;}
   // 본부 합산 갱신은 refreshAll 시 자동
   const memberOpts = TEAM_ROSTER.filter(p=>p.role!=='head').map(p=>`<option value="${p.name}">${p.name} (${p.title})</option>`).join('');
   const html = `
@@ -3379,7 +3414,7 @@ function openBrandAdd(){
   });
 }
 function renameBrand(oldName){
-  if(STATE.role==='member'){alert('브랜드 수정은 팀장 권한입니다.');return;}
+  if(getCurrentLevel() < 1){alert('브랜드 수정은 대리·과장 이상 권한입니다.');return;}
   const meta = getMeta(oldName);
   const html = `
     <div class="fm-row"><label>브랜드명</label><input type="text" id="fm-brand" value="${oldName.replace(/"/g,'&quot;')}" /></div>
@@ -3432,7 +3467,7 @@ function renameBrand(oldName){
 
 /* ===== 팀원 CRUD ===== */
 function openTeamMemberAdd(){
-  if(STATE.role==='member'){alert('팀원 추가는 팀장 권한입니다.');return;}
+  if(getCurrentLevel() < 1){alert('팀원 추가는 대리·과장 이상 권한입니다.');return;}
   const html = `
     <div class="fm-row"><label>이름 <span style="color:var(--pt)">*</span></label><input type="text" id="fm-name" /></div>
     <div class="fm-row"><label>직급</label><select id="fm-position">
@@ -3479,7 +3514,7 @@ function openTeamMemberAdd(){
   });
 }
 async function removeTeamMember(name){
-  if(STATE.role==='member'){showToast('팀원 삭제는 팀장 권한입니다.', 'warn');return;}
+  if(getCurrentLevel() < 1){showToast('팀원 삭제는 대리·과장 이상 권한입니다.', 'warn');return;}
   const ok = await confirmUI(`[${name}] 팀원을 명단에서 제외하시겠습니까?`, '팀원 제외', {danger:true, yesLabel:'제외'});
   if(!ok) return;
   const i = TEAM_ROSTER.findIndex(p=>p.name===name);
@@ -3487,7 +3522,7 @@ async function removeTeamMember(name){
   refreshAll();
 }
 async function deleteBrand(name){
-  if(STATE.role==='member'){showToast('브랜드 삭제는 팀장 권한입니다.', 'warn');return;}
+  if(getCurrentLevel() < 1){showToast('브랜드 삭제는 대리·과장 이상 권한입니다.', 'warn');return;}
   const ok = await confirmUI(`[${name}] 브랜드를 삭제하시겠습니까?\n매출 데이터도 함께 제거됩니다.`, '브랜드 삭제', {danger:true, yesLabel:'삭제'});
   if(!ok) return;
   DATA.brands = DATA.brands.filter(b=>b!==name);
@@ -3756,7 +3791,10 @@ function loginAs(role, user, opts){
   opts = opts || {};
   STATE.role = role;
   STATE.memberUser = user || STATE.memberUser;
+  // Phase 3: 권한 레벨 산출 (title 기반)
+  STATE.level = getCurrentLevel();
   document.body.setAttribute('data-role', role);
+  document.body.setAttribute('data-level', String(STATE.level));
   const p = findRoster(user);
   const display = p ? `${user} ${p.title}` : user;
   document.getElementById('who-name').textContent = display;
@@ -4124,7 +4162,7 @@ function saveGoals(){
 
 /* ================ Team Tab ================ */
 function renderTeam(){
-  const canEdit = STATE.role==='lead' || STATE.role==='head';
+  const canEdit = getCurrentLevel() >= 1;
 
   // 0) 통합 팀원 표 - 이름·직급·역할·담당브랜드·매출·순매출
   const rtbl = document.getElementById('roster-tbl');
