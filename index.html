@@ -2105,14 +2105,73 @@ function renderHQDashboard(){
     const perCapLine = teamArr.slice().sort((a,b)=>b.perCapita-a.perCapita)
       .map(t=>`${t.name} <b>${fmtShort(t.perCapita)}</b>원`).join(' · ');
 
+    // (5) 신규 제안 - 신규 브랜드 확보 분석
+    const newBrandsCnt = (DATA.brands||[]).filter(b=>getMeta(b).newBrand).length;
+    const newBrandGoal = ALL_TEAMS_DATA.hq_goals.brand || 30;
+    const newBrandPct = newBrandGoal ? (newBrandsCnt/newBrandGoal*100) : 0;
+    // 신규 광고주 다양화 - 광고주별 신규 비중
+    const advBrandMap = {};
+    Object.keys(ALL_TEAMS_DATA.teams).forEach(tid=>{
+      const t = ALL_TEAMS_DATA.teams[tid];
+      (t.brands||[]).forEach(b=>{
+        const adv = (t.advertiserMap||{})[b] || '미지정';
+        const meta = (typeof BRAND_META !== 'undefined' && BRAND_META[b]) || {};
+        if(meta.newBrand) advBrandMap[adv] = (advBrandMap[adv]||0)+1;
+      });
+    });
+    const advEntries = Object.entries(advBrandMap).sort((a,b)=>b[1]-a[1]);
+    const newBrandSuggest = (() => {
+      if(newBrandsCnt < newBrandGoal * 0.5){
+        return `2026 신규 브랜드 <b>${newBrandsCnt}/${newBrandGoal}건</b> (달성률 ${newBrandPct.toFixed(0)}%). 신규 발굴 가속이 필요합니다. ${weakTeam.name}/${lowPerCap.name}을 중심으로 신규 광고주 어프로치 강화, 인접 카테고리(${(cat2nd && cat2nd[0]) || '뷰티/F&B'}) 확장 권장.`;
+      }
+      if(newBrandsCnt < newBrandGoal){
+        return `신규 브랜드 <b>${newBrandsCnt}/${newBrandGoal}건</b> 확보 중. ${advEntries.length}개 광고주에서 신규 발굴. 잔여 ${newBrandGoal-newBrandsCnt}건을 ${topPerCap.name} 외 팀에 분산하여 운영 부담 균등화 권장.`;
+      }
+      return `신규 브랜드 목표 <b>${newBrandsCnt}/${newBrandGoal}건</b> 달성 (${newBrandPct.toFixed(0)}%). 다음 단계로 광고주 다양화 - 현재 ${advEntries.length}개 광고주 → 상위 의존도 축소를 위한 신규 광고주 유치 검토.`;
+    })();
+    // (6) 본부 운영 차원 리스크 방어/계획
+    const endingSoon = [];
+    (DATA.brands||[]).forEach(b=>{
+      const meta = (typeof BRAND_META !== 'undefined' && BRAND_META[b]) || {};
+      if(meta.ended || !meta.contractEnd) return;
+      const days = Math.ceil((new Date(meta.contractEnd) - new Date())/(1000*60*60*24));
+      if(days>=0 && days<=90) endingSoon.push({brand:b, days});
+    });
+    endingSoon.sort((a,b)=>a.days-b.days);
+    const heavyConcentration = topCat && catTotalSum && (topCat[1]/catTotalSum) >= 0.5;
+    const riskPlan = (() => {
+      const risks = [];
+      if(endingSoon.length >= 3){
+        const top3 = endingSoon.slice(0,3).map(x=>`<b>${x.brand}</b>(D-${x.days})`).join(', ');
+        risks.push(`3개월 내 계약 종료 <b>${endingSoon.length}건</b>: ${top3} → 재계약 협상 사전 착수 필요`);
+      } else if(endingSoon.length > 0){
+        risks.push(`3개월 내 계약 종료 <b>${endingSoon.length}건</b> → 재계약 협상 진행`);
+      }
+      if(heavyConcentration){
+        risks.push(`<b>${topCat[0]}</b> 카테고리 의존도 ${(topCat[1]/catTotalSum*100).toFixed(0)}% → 단일 카테고리 리스크`);
+      }
+      if(weakTeam.pct < 30){
+        risks.push(`<b>${weakTeam.name}</b> 달성률 ${weakTeam.pct.toFixed(0)}% → 본부 차원 지원 투입 검토`);
+      }
+      if(margin < ALL_TEAMS_DATA.hq_goals.margin){
+        risks.push(`이익률 ${margin.toFixed(1)}% (목표 ${ALL_TEAMS_DATA.hq_goals.margin}%) → 매체비/외주비 단가 재협상 필요`);
+      }
+      if(risks.length === 0){
+        return `현재 본부 단위 주요 리스크 없음. 다음 분기 신규 카테고리 진출 또는 시니어 인력 양성 프로그램 등 중장기 투자 검토 가능.`;
+      }
+      return risks.map((r,i)=>`<span style="display:block;margin-top:${i===0?0:6}px">▸ ${r}</span>`).join('');
+    })();
+
     const cards = [
       {ico:'🎯', h:'달성 평가', body:motivation},
       {ico:'📈', h:'목표 달성 시나리오', body:`잔여 <b>${monthsLeft}개월</b>간 월 평균 <b>${fmtShort(monthlyAvgNeeded)}원</b> 매출 시 연간 ${fmtShort(goal)}원 달성. 남은 매출 <b>${fmtShort(remaining)}원</b>. ${pace}`},
-      {ico:'⚡', h:'팀 효율성 (1인당 매출)', body:`1위 <b>${topPerCap.name}</b> ${fmtShort(topPerCap.perCapita)}원 (${topPerCap.ppl}명). 본부 평균 <b>${fmtShort(perCapitaAvg)}원</b>. 6팀 비교: ${perCapLine}.`},
-      {ico:'📊', h:'카테고리 비중 분석', body:catAnalysis},
-      {ico:'👥', h:'조직 구성 · 운영 부담', body:orgAnalysis},
+      {ico:'⚡', h:'팀 효율성', body:`1위 <b>${topPerCap.name}</b> ${fmtShort(topPerCap.perCapita)}원 (${topPerCap.ppl}명). 본부 평균 <b>${fmtShort(perCapitaAvg)}원</b>. 6팀 비교: ${perCapLine}.`},
+      {ico:'📊', h:'카테고리 비중', body:catAnalysis},
+      {ico:'👥', h:'조직 구성', body:orgAnalysis},
       {ico:'🚀', h:'인력 배치 제안', body:placeSuggestion},
       {ico:'💰', h:'수익성', body:`누적 순매출 <b>${fmtShort(netTotal)}원</b> · 이익률 <b>${margin.toFixed(1)}%</b> (본부 목표 ${ALL_TEAMS_DATA.hq_goals.margin}%). ${margin>=ALL_TEAMS_DATA.hq_goals.margin?'목표 상회 - 수익 구조 건강':'목표 미달 - 외주비/매체비 조정 검토'}.`},
+      {ico:'✨', h:'신규 제안', body:newBrandSuggest},
+      {ico:'🛡️', h:'본부 운영 리스크/계획', body:riskPlan},
     ];
     // 사용자 수정 오버라이드 적용
     const editable = STATE.role === 'head';
@@ -3476,7 +3535,8 @@ function showConfirm(message, title, opts){
   return new Promise(resolve=>{
     _confirmResolver = resolve;
     document.getElementById('cm-title').textContent = title || '확인';
-    document.getElementById('cm-body').textContent = message || '';
+    // HTML 허용 (브랜드 이름 등 사용자 입력은 호출자가 escape 책임)
+    document.getElementById('cm-body').innerHTML = message || '';
     const yes = document.getElementById('cm-yes');
     const no = document.getElementById('cm-no');
     yes.textContent = opts.yesLabel || '확인';
@@ -3491,7 +3551,7 @@ function resolveConfirm(result){
 }
 // confirm 오버라이드 - 동기 confirm은 await할 수 없어서, 호출처를 async 또는 .then 변환 필요
 // 일반 confirm() 호출은 그대로 두되, 명시적 사용처는 showConfirm으로 마이그레이션
-window.confirmUI = function(message, title){ return showConfirm(message, title); };
+window.confirmUI = function(message, title, opts){ return showConfirm(message, title, opts); };
 
 /* ===== 모달 폼 API ===== */
 function openFormModal(title, fieldsHtml, onSave){
@@ -3523,9 +3583,6 @@ function openBrandAdd(){
     <div class="fm-row"><label>계약 시작일 <span style="color:var(--ink3);font-size:10.5px">· 운영 시작월</span></label><input type="date" id="fm-cs" /></div>
     <div class="fm-row"><label>계약 종료일 <span style="color:var(--ink3);font-size:10.5px">· 종료월 다음달부터 자동 미노출</span></label><input type="date" id="fm-ce" /></div>
     <div class="fm-row chk"><input type="checkbox" id="fm-new" checked /><label for="fm-new">2026년 신규 계약 브랜드로 표시</label></div>
-    <div style="margin-top:6px;font-size:11px;color:var(--ink3);background:var(--bg2);padding:9px 12px;border-radius:6px;line-height:1.55">
-      ※ 계약 시작일~종료일 범위의 월에만 자동 노출됩니다. 월간 운영에서 개별 월 제외도 가능합니다.
-    </div>
     <div style="margin-top:14px;padding:12px;border:1px solid var(--line);border-radius:8px;background:#FAFAFA">
       <div style="font-size:12px;font-weight:700;color:var(--ink);margin-bottom:8px">📅 운영 월 · 초기 매출/지출 입력 (선택)</div>
       <div class="fm-row"><label style="font-size:11.5px">운영 월</label>
@@ -3536,7 +3593,10 @@ function openBrandAdd(){
       </div>
       <div class="fm-row"><label style="font-size:11.5px">매출 (원)</label><input type="text" id="fm-init-rev" placeholder="예: 5,000,000" /></div>
       <div class="fm-row"><label style="font-size:11.5px">지출 (원)</label><input type="text" id="fm-init-exp" placeholder="예: 3,000,000" /></div>
-      <div style="font-size:10.5px;color:var(--ink3);margin-top:4px">※ 운영 월 선택 시 해당 월의 '기타' 카테고리에 매출/지출이 자동 기록됩니다. 카테고리별 세부 입력은 월간 운영 카드에서 수정 가능합니다.</div>
+    </div>
+    <div style="margin-top:12px;font-size:11px;color:var(--ink3);background:var(--bg2);padding:10px 12px;border-radius:6px;line-height:1.65">
+      <div>※ 계약 시작일~종료일 범위의 월에만 자동 노출됩니다. 월간 운영에서 개별 월 제외도 가능합니다.</div>
+      <div style="margin-top:4px">※ 운영 월 선택 시 해당 월의 '기타' 카테고리에 매출/지출이 자동 기록됩니다. 카테고리별 세부 입력은 월간 운영 카드에서 수정 가능합니다.</div>
     </div>
   `;
   openFormModal('＋ 브랜드 추가', html, ()=>{
