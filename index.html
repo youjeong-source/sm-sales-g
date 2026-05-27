@@ -367,6 +367,9 @@
   .hq-brand-tbl thead th.sortable:hover{background:#F1F3F7;color:var(--ink)}
   .hq-brand-tbl thead th.sortable.active{color:#E60021;background:#FFF5F7}
   .hq-brand-tbl thead th .sort-arrow{display:inline-block;margin-left:4px;font-size:9px;opacity:.5;line-height:1;vertical-align:1px}
+  .hq-brand-tbl td.contract-cell{font-size:11.5px;color:var(--ink2);font-variant-numeric:tabular-nums;letter-spacing:-.2px;white-space:nowrap;text-align:center}
+  .hq-brand-tbl td.contract-cell.contract-soon{color:#D97706;font-weight:600}
+  .hq-brand-tbl td.contract-cell.contract-expired{color:#E60021;font-weight:600}
   .hq-brand-tbl thead th.sortable.active .sort-arrow{opacity:1}
   .hq-brand-tbl tbody td{padding:10px 10px;border-bottom:1px solid var(--line2);font-variant-numeric:tabular-nums;text-align:center}
   .hq-brand-tbl tbody td.r{text-align:center}
@@ -1364,7 +1367,7 @@
   <section id="tab-team" class="hide">
     <div class="panel">
       <div class="head-row">
-        <h3>G팀 팀원 명단 <span class="tag">팀장 권한</span></h3>
+        <h3>팀원 명단 <span class="tag">팀장 권한</span></h3>
         <button class="btn req-tl" onclick="openTeamMemberAdd()">＋ 팀원 추가</button>
       </div>
       <table class="role-table" id="roster-tbl"></table>
@@ -2176,7 +2179,11 @@ function renderHQBrandTable(){
       t.records.forEach(r=>{ if(r.brand===b){ rev+=r.revenue||0; exp+=r.expense||0; } });
       const net = rev - exp;
       const margin = rev ? (net/rev*100) : 0;
-      rows.push({team:tid, teamName:t.name, brand:b, adv:t.advertiserMap[b]||'-', owner:t.owners[b]||'-', rev, exp, net, margin});
+      const meta = (typeof BRAND_META !== 'undefined' && BRAND_META[b]) ? BRAND_META[b] : {};
+      const cs = meta.contractStart || '';
+      const ce = meta.contractEnd || '';
+      const contractStr = (cs||ce) ? `${cs||'-'} ~ ${ce||'-'}` : '-';
+      rows.push({team:tid, teamName:t.name, brand:b, adv:t.advertiserMap[b]||'-', owner:t.owners[b]||'-', rev, exp, net, margin, contractStr, contractEnd:ce});
     });
   });
   let filtered = search ? rows.filter(r=>r.brand.includes(search)||r.adv.includes(search)||r.teamName.includes(search)||r.team.includes(search.toUpperCase())) : rows;
@@ -2197,22 +2204,33 @@ function renderHQBrandTable(){
   };
   const cls = (col)=> (sort===col+'_desc'||sort===col+'_asc') ? 'r sortable active' : 'r sortable';
 
-  let html = `<thead><tr><th style="width:9%">팀</th><th style="width:19%">광고주</th><th style="width:20%">브랜드</th>`+
+  let html = `<thead><tr><th style="width:7%">팀</th><th style="width:14%">광고주</th><th style="width:14%">브랜드</th>`+
+    `<th style="width:15%">계약기간</th>`+
     `<th class="${cls('rev')}" onclick="toggleHQSort('rev')">매출${arrow('rev')}</th>`+
     `<th class="${cls('net')}" onclick="toggleHQSort('net')">순매출${arrow('net')}</th>`+
     `<th class="${cls('margin')}" onclick="toggleHQSort('margin')">이익률${arrow('margin')}</th>`+
-    `<th style="width:14%">담당자</th></tr></thead><tbody>`;
+    `<th style="width:11%">담당자</th></tr></thead><tbody>`;
   if(filtered.length===0){
-    html += '<tr><td colspan="7" style="text-align:center;color:var(--ink3);padding:24px">조건에 맞는 브랜드가 없습니다.</td></tr>';
+    html += '<tr><td colspan="8" style="text-align:center;color:var(--ink3);padding:24px">조건에 맞는 브랜드가 없습니다.</td></tr>';
   } else {
     let totalRev=0, totalNet=0;
     filtered.forEach(r=>{
       totalRev += r.rev; totalNet += r.net;
       const marginCls = r.margin<0 ? 'neg' : r.margin<10 ? 'low' : '';
+      // 계약 종료 임박/만료 표시
+      let contractCls = '';
+      if(r.contractEnd){
+        const today = new Date();
+        const endD = new Date(r.contractEnd);
+        const diffDays = Math.ceil((endD - today)/(1000*60*60*24));
+        if(diffDays < 0) contractCls = 'contract-expired';
+        else if(diffDays <= 30) contractCls = 'contract-soon';
+      }
       html += `<tr>
         <td><span class="team-pill ${r.team.toLowerCase()}">${r.team}팀</span></td>
         <td><span class="adv-name">${r.adv}</span></td>
         <td><span class="b-name">${r.brand}</span></td>
+        <td class="contract-cell ${contractCls}">${r.contractStr}</td>
         <td class="r">${fmtShort(r.rev)}원</td>
         <td class="r net-val">${fmtShort(r.net)}원</td>
         <td class="r"><span class="margin-val ${marginCls}">${r.margin.toFixed(1)}%</span></td>
@@ -2220,7 +2238,7 @@ function renderHQBrandTable(){
       </tr>`;
     });
     const totalMargin = totalRev ? (totalNet/totalRev*100) : 0;
-    html += `<tr style="background:#FFE5E9;border-top:2px solid #E60021"><td colspan="3"><b style="color:#E60021">합계 (${filtered.length}개 브랜드)</b></td><td class="r"><b>${fmtShort(totalRev)}원</b></td><td class="r net-val"><b>${fmtShort(totalNet)}원</b></td><td class="r"><b>${totalMargin.toFixed(1)}%</b></td><td></td></tr>`;
+    html += `<tr style="background:#FFE5E9;border-top:2px solid #E60021"><td colspan="3"><b style="color:#E60021">합계 (${filtered.length}개 브랜드)</b></td><td></td><td class="r"><b>${fmtShort(totalRev)}원</b></td><td class="r net-val"><b>${fmtShort(totalNet)}원</b></td><td class="r"><b>${totalMargin.toFixed(1)}%</b></td><td></td></tr>`;
   }
   html += '</tbody>';
   tbl.innerHTML = html;
