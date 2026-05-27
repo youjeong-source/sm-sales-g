@@ -938,9 +938,18 @@
   .hide{display:none !important}
   /* footer{} - 단일 .app-footer로 통합 */
 
-  /* role-based hide */
+  /* role-based hide (level: 0=팀원 / 1=대리·과장 / 2=팀장 / 3=본부장) */
+  /* req-senior: 대리·과장 이상 (level >= 1) */
+  body[data-level="0"] .req-senior{display:none !important}
+  /* req-tl: 팀장 이상 (level >= 2) */
   body[data-role="member"] .req-tl,
-  body[data-role="member"] .req-head{display:none !important}
+  body[data-level="0"] .req-tl,
+  body[data-level="1"] .req-tl{display:none !important}
+  /* req-head: 본부장 이상 (level >= 3) */
+  body[data-role="member"] .req-head,
+  body[data-level="0"] .req-head,
+  body[data-level="1"] .req-head,
+  body[data-level="2"] .req-head{display:none !important}
 </style>
 </head>
 <body data-role="lead">
@@ -1036,7 +1045,7 @@
     <h5>Documentation</h5>
     <div class="nav">
       <button data-tab="wf"><span class="ico"><svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polygon points="1 6 8 3 16 6 23 3 23 18 16 21 8 18 1 21 1 6"/><line x1="8" y1="3" x2="8" y2="18"/><line x1="16" y1="6" x2="16" y2="21"/></svg></span>워크플로우</button>
-      <button data-tab="role"><span class="ico"><svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="4" y="11" width="16" height="9" rx="1.5"/><path d="M8 11V7a4 4 0 018 0v4"/></svg></span>권한 매트릭스</button>
+      <button data-tab="role" class="req-head"><span class="ico"><svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="4" y="11" width="16" height="9" rx="1.5"/><path d="M8 11V7a4 4 0 018 0v4"/></svg></span>권한 매트릭스</button>
     </div>
   </aside>
 
@@ -1344,8 +1353,8 @@
         <div class="toolbar" style="margin:0">
           <select id="ops-month"></select>
           <input id="ops-search" placeholder="브랜드 검색…" style="width:180px" />
-          <button class="btn req-tl" onclick="openBrandAdd()">＋ 브랜드 추가</button>
-          <label class="btn req-tl" style="cursor:pointer">📤 엑셀 업로드<input type="file" accept=".xlsx,.xls,.csv" onchange="uploadOpsExcel(event)" style="display:none" /></label>
+          <button class="btn req-senior" onclick="openBrandAdd()">＋ 브랜드 추가</button>
+          <label class="btn req-senior" style="cursor:pointer">📤 엑셀 업로드<input type="file" accept=".xlsx,.xls,.csv" onchange="uploadOpsExcel(event)" style="display:none" /></label>
         </div>
       </div>
       <div class="brand-cards" id="brand-cards"></div>
@@ -3699,8 +3708,13 @@ function openTeamMemberAdd(){
       <option value="차장">차장</option><option value="부장">부장</option>
     </select></div>
     <div class="fm-row"><label>역할 (권한)</label><select id="fm-role">
-      <option value="member">팀원</option><option value="lead">팀장</option><option value="head">본부장</option>
-    </select></div>
+      <option value="member">팀원</option>
+      <option value="senior">대리·과장</option>
+      <option value="lead">팀장</option>
+      <option value="head">본부장</option>
+    </select>
+    <div style="font-size:10.5px;color:var(--ink3);margin-top:4px">※ '대리·과장' 선택 시 직급이 자동 보정됩니다 (사원→대리)</div>
+    </div>
     <div class="fm-row"><label>담당 브랜드 (선택, 다중)</label>
       <div id="fm-brand-list" style="display:flex;flex-wrap:wrap;gap:6px;max-height:140px;overflow-y:auto;padding:8px;border:1px solid var(--line);border-radius:7px;background:#FAFAFA">
         ${(DATA.brands||[]).filter(b=>!getMeta(b).ended).map(b=>`<label style="display:inline-flex;align-items:center;gap:4px;font-size:11.5px;background:#fff;padding:4px 9px;border-radius:5px;border:1px solid var(--line);cursor:pointer"><input type="checkbox" class="fm-brand-chk" value="${b.replace(/"/g,'&quot;')}" style="margin:0" />${b}</label>`).join('')||'<span style="color:var(--ink3);font-size:11px">담당 가능한 브랜드가 없습니다</span>'}
@@ -3712,8 +3726,13 @@ function openTeamMemberAdd(){
     const name = getFM('fm-name').trim();
     if(!name){alert('이름을 입력하세요.');return false;}
     if(TEAM_ROSTER.some(p=>p.name===name)){alert('이미 등록된 이름입니다.');return false;}
-    const role = getFM('fm-role');
-    const title = getFM('fm-position');  // fm-title은 모달 헤딩 id 와 충돌하므로 fm-position 사용
+    let role = getFM('fm-role');
+    let title = getFM('fm-position');  // fm-title은 모달 헤딩 id 와 충돌하므로 fm-position 사용
+    // 'senior' 선택 시: role은 member로 변환, title이 사원이면 대리로 자동 보정
+    if(role === 'senior'){
+      role = 'member';
+      if(title !== '대리' && title !== '과장') title = '대리';
+    }
     const pw = (getFM('fm-pw') || '').trim() || (name.slice(-2)+'2026');
     const teamId = STATE.team !== 'HQ' ? STATE.team : 'G';
     const newMember = {name, role, title, password:pw, team:teamId};
