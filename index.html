@@ -670,6 +670,9 @@
   .month-sum .sum-card.pt{border-color:var(--pt-l);background:var(--pt-ll)}
   .month-sum .sum-card.pt .val{color:var(--pt)}
 
+  /* SM본부 모드 - 마감 관리 메뉴 숨김 */
+  body.hq-mode .hide-on-hq{display:none !important}
+
   /* 월간 운영 - 상단 당월 표기 (2줄) */
   .ops-header{margin-bottom:14px}
   .ops-title{display:flex;flex-direction:column;gap:7px}
@@ -1024,8 +1027,8 @@
       <button data-tab="org"><span class="ico"><svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="4" y="3" width="16" height="18" rx="1.5"/><line x1="9" y1="7" x2="9" y2="7"/><line x1="13" y1="7" x2="13" y2="7"/><line x1="9" y1="11" x2="9" y2="11"/><line x1="13" y1="11" x2="13" y2="11"/><line x1="9" y1="15" x2="9" y2="15"/><line x1="13" y1="15" x2="13" y2="15"/></svg></span>SM본부 통합 현황</button>
     </div>
 
-    <h5>마감 관리</h5>
-    <div class="nav">
+    <h5 class="hide-on-hq">마감 관리</h5>
+    <div class="nav hide-on-hq">
       <button data-tab="approve"><span class="ico"><svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M22 11.07V12a10 10 0 11-5.93-9.14"/><polyline points="22 4 12 14.01 9 11.01"/></svg></span>월 마감 확인</button>
     </div>
 
@@ -1208,7 +1211,7 @@
         <div class="hq-new-brands" id="hq-new-brands"></div>
       </div>
       <div class="panel">
-        <h3>연간 카테고리 비중 <span class="tag">YTD 본부 전체</span></h3>
+        <h3>연간 카테고리 비중 <span class="tag">본부 전체</span></h3>
         <div class="chart-wrap sm"><canvas id="ch-hq-cat"></canvas></div>
       </div>
     </div>
@@ -1225,11 +1228,11 @@
     <!-- Row: 카테고리 비중 + 광고주별 (팀 전용) -->
     <div class="row r2 hq-hide">
       <div class="panel">
-        <h3>카테고리(업무)별 매출 비중 <span class="tag">YTD</span></h3>
+        <h3>카테고리(업무)별 매출 비중</h3>
         <div class="chart-wrap sm"><canvas id="ch-cat"></canvas></div>
       </div>
       <div class="panel">
-        <h3>광고주별 매출 분포 <span class="tag">YTD</span></h3>
+        <h3>광고주별 매출 분포</h3>
         <div class="chart-wrap sm"><canvas id="ch-adv"></canvas></div>
       </div>
     </div>
@@ -1244,7 +1247,7 @@
 
     <div class="panel">
       <div class="head-row">
-        <h3>브랜드별 매출표 <span class="tag">팀 전체 · YTD</span></h3>
+        <h3>브랜드별 매출표 <span class="tag">팀 전체</span></h3>
         <div class="toolbar" style="margin:0">
           <input id="hq-brand-search" placeholder="브랜드/광고주/팀 검색…" style="width:220px" />
           <select id="hq-brand-sort" style="padding:7px 10px;border:1px solid var(--line);border-radius:7px;font-size:12px;background:#fff;font-family:inherit">
@@ -1271,7 +1274,7 @@
     <!-- TOP 3 요약 -->
     <div class="panel">
       <div class="head-row">
-        <h3>상위 매출 브랜드 TOP 3 <span class="tag">YTD 매출 기준</span></h3>
+        <h3>상위 매출 브랜드 TOP 3 <span class="tag">매출 기준</span></h3>
         <div style="font-size:11px;color:var(--ink3)" id="brand-base-date">기준일 -</div>
       </div>
       <div class="top3" id="brand-top3"></div>
@@ -1333,7 +1336,7 @@
 
     <div class="panel">
       <div class="head-row">
-        <h3>월간 운영 입력 <span class="tag">브랜드 × 카테고리 · 1줄 가로 배치</span></h3>
+        <h3>월간 브랜드 운영</h3>
         <div class="toolbar" style="margin:0">
           <select id="ops-month"></select>
           <input id="ops-search" placeholder="브랜드 검색…" style="width:180px" />
@@ -1408,7 +1411,7 @@
   <section id="tab-org" class="hide">
     <div class="panel">
       <div class="head-row">
-        <h3>🏛 SM본부 통합 현황 <span class="tag">본부장·그룹장 권한</span></h3>
+        <h3>🏛 SM본부 통합 현황</h3>
         <div style="font-size:11px;color:var(--ink3)">G팀·D팀·U팀 통합</div>
       </div>
       <table class="role-table" id="hq-team-tbl"></table>
@@ -1771,7 +1774,10 @@ function renderKPI(){
   const brandBar = document.getElementById('k-brand-bar');
   if(brandBar) brandBar.style.width = Math.min(100, (securedCnt/(STATE.goals.brand||1))*100) + '%';
 
-  const last = months[months.length-1];
+  // 현재 일자 기준 월 라벨 (system date)
+  const _today = new Date();
+  const _curLabel = `${_today.getFullYear()%100}년 ${_today.getMonth()+1}월`;
+  const last = months.includes(_curLabel) ? _curLabel : months[months.length-1];
   const lm = mt[last]||{rev:0,exp:0};
   const planMonth = STATE.goals.rev/12;
   document.getElementById('cur-month').textContent = last;
@@ -1885,7 +1891,7 @@ function renderHQDashboard(){
   const statsEl = document.getElementById('hq-hero-stats');
   if(statsEl){
     statsEl.innerHTML = `
-      <div class="hh-stat"><div class="lab">YTD 순매출</div><div class="val"><span class="accent">${fmtShort(netTotal)}</span>원</div><div class="sub">목표 ${fmtShort(netGoal)}원</div></div>
+      <div class="hh-stat"><div class="lab">누적 순매출</div><div class="val"><span class="accent">${fmtShort(netTotal)}</span>원</div><div class="sub">목표 ${fmtShort(netGoal)}원</div></div>
       <div class="hh-stat"><div class="lab">이익률</div><div class="val">${margin.toFixed(1)}<span class="accent">%</span></div><div class="sub">목표 ${ALL_TEAMS_DATA.hq_goals.margin}%</div></div>
       <div class="hh-stat"><div class="lab">남은 매출</div><div class="val">${fmtShort(remaining)}원</div><div class="sub">잔여 ${monthsLeft}개월</div></div>
       <div class="hh-stat"><div class="lab">월 평균 필요</div><div class="val">${fmtShort(monthlyAvgNeeded)}원</div><div class="sub">현재 평균 ${fmtShort(monthlyAvg)}원</div></div>
@@ -1949,7 +1955,7 @@ function renderHQDashboard(){
       {ico:'⚡', h:'팀 효율성', body:`1인당 매출 1위 <b>${topPerCap.name}</b> (인당 ${fmtShort(topPerCap.perCapita)}원, ${topPerCap.ppl}명) · 본부 평균 <b>${fmtShort(perCapitaAvg)}원</b>. ${lowPerCap.name}은 인당 ${fmtShort(lowPerCap.perCapita)}원으로 매출 여력 있음.`},
       {ico:'👥', h:'조직 구성', body:`본부 전체 <b>${totalPeople}명</b> · ${titleSummary}. 팀별 인원: G팀 ${teamStats.G.ppl}명 / D팀 ${teamStats.D.ppl}명 / U팀 ${teamStats.U.ppl}명.`},
       {ico:'🚀', h:'인력 배치 제안', body:placeSuggestion},
-      {ico:'💰', h:'수익성', body:`YTD 순매출 <b>${fmtShort(netTotal)}원</b> · 이익률 <b>${margin.toFixed(1)}%</b> (본부 목표 ${ALL_TEAMS_DATA.hq_goals.margin}%). ${margin>=ALL_TEAMS_DATA.hq_goals.margin?'목표 상회 - 수익 구조 건강':'목표 미달 - 외주비/매체비 조정 검토'}.`},
+      {ico:'💰', h:'수익성', body:`누적 순매출 <b>${fmtShort(netTotal)}원</b> · 이익률 <b>${margin.toFixed(1)}%</b> (본부 목표 ${ALL_TEAMS_DATA.hq_goals.margin}%). ${margin>=ALL_TEAMS_DATA.hq_goals.margin?'목표 상회 - 수익 구조 건강':'목표 미달 - 외주비/매체비 조정 검토'}.`},
     ];
     // 사용자 수정 오버라이드 적용
     const editable = STATE.role === 'head';
@@ -2160,9 +2166,9 @@ function renderHQSalesSummary(){
   }
 
   const html =
-    card('top','상위 1위', top, top ? `<div>YTD 매출<b>${fmtShort(top.rev)}원</b></div><div>순매출<b>${fmtShort(top.net)}원</b></div><div>이익률<b>${top.margin.toFixed(1)}%</b></div>` : '') +
-    card('bottom','하위 1건', bottom, bottom ? `<div>YTD 매출<b>${fmtShort(bottom.rev)}원</b></div><div>순매출<b>${fmtShort(bottom.net)}원</b></div><div>이익률<b>${bottom.margin.toFixed(1)}%</b></div>` : '') +
-    card('warn','점검 필요', warn, warn ? `<div>YTD 매출<b>${fmtShort(warn.rev)}원</b></div><div>순매출<b>${fmtShort(warn.net)}원</b></div><div>이익률<b style="color:${warn.margin<0?'#E60021':warn.margin<10?'#D97706':'var(--ink)'}">${warn.margin.toFixed(1)}%</b></div>` : '');
+    card('top','상위 1위', top, top ? `<div>매출<b>${fmtShort(top.rev)}원</b></div><div>순매출<b>${fmtShort(top.net)}원</b></div><div>이익률<b>${top.margin.toFixed(1)}%</b></div>` : '') +
+    card('bottom','하위 1건', bottom, bottom ? `<div>매출<b>${fmtShort(bottom.rev)}원</b></div><div>순매출<b>${fmtShort(bottom.net)}원</b></div><div>이익률<b>${bottom.margin.toFixed(1)}%</b></div>` : '') +
+    card('warn','점검 필요', warn, warn ? `<div>매출<b>${fmtShort(warn.rev)}원</b></div><div>순매출<b>${fmtShort(warn.net)}원</b></div><div>이익률<b style="color:${warn.margin<0?'#E60021':warn.margin<10?'#D97706':'var(--ink)'}">${warn.margin.toFixed(1)}%</b></div>` : '');
 
   wrap.innerHTML = html;
 }
@@ -2709,13 +2715,12 @@ function renderBrandGrid(){
       </div>
       <div class="badges">${badges.join('')||'<span class="meta">알림 없음</span>'}</div>
       <div class="metrics">
-        <div class="m"><div class="l">YTD 매출</div><div class="v">${fmtShort(ytd.rev)}원</div></div>
-        <div class="m"><div class="l">YTD 지출</div><div class="v">${fmtShort(ytd.exp)}원</div></div>
-        <div class="m net"><div class="l">YTD 순매출 (${margin.toFixed(1)}%)</div><div class="v">${fmtShort(ytd.net)}원</div></div>
+        <div class="m"><div class="l">매출</div><div class="v">${fmtShort(ytd.rev)}원</div></div>
+        <div class="m"><div class="l">지출</div><div class="v">${fmtShort(ytd.exp)}원</div></div>
+        <div class="m net"><div class="l">순매출 (${margin.toFixed(1)}%)</div><div class="v">${fmtShort(ytd.net)}원</div></div>
       </div>
       <div class="contract">
         <span>전월 ${fmtShort(delta.prevRev)} → 당월 <b>${fmtShort(delta.curRev)}</b></span>
-        <span style="color:var(--ink3)">계약 기간은 '팀원/브랜드 배정'에서 관리</span>
       </div>
     </div>`;
   }).join('');
@@ -2809,15 +2814,15 @@ function openBrandDetail(b){
     <div class="sd-meta">
       <div><span class="lbl">담당자</span><b>${OWNERS[b]||'-'}</b></div>
       <div><span class="lbl">계약 기간</span><b>${contractInfo}</b></div>
-      <div><span class="lbl">YTD 매출</span><b>${fmtShort(totalRev)}원</b></div>
-      <div><span class="lbl">YTD 순매출</span><b style="color:#1D4ED8">${fmtShort(totalNet)}원 (${totalMargin})</b></div>
+      <div><span class="lbl">매출</span><b>${fmtShort(totalRev)}원</b></div>
+      <div><span class="lbl">순매출</span><b style="color:#1D4ED8">${fmtShort(totalNet)}원 (${totalMargin})</b></div>
       ${flags.join('')}
     </div>
     <h4>월별 매출 내역</h4>
     <table class="sd-month-tbl">
       <thead><tr><th>월</th><th class="r">매출</th><th class="r">지출</th><th class="r">순매출</th><th class="r">이익률</th></tr></thead>
       <tbody>${rows}</tbody>
-      <tfoot><tr><td>합계 (YTD)</td><td class="r">${fmtShort(totalRev)}</td><td class="r" style="color:#E60021">${fmtShort(totalExp)}</td><td class="r" style="color:#1D4ED8">${fmtShort(totalNet)}</td><td class="r">${totalMargin}</td></tr></tfoot>
+      <tfoot><tr><td>합계</td><td class="r">${fmtShort(totalRev)}</td><td class="r" style="color:#E60021">${fmtShort(totalExp)}</td><td class="r" style="color:#1D4ED8">${fmtShort(totalNet)}</td><td class="r">${totalMargin}</td></tr></tfoot>
     </table>
     <div style="margin-top:16px;display:flex;gap:8px">
       <button class="btn" onclick="renameBrand('${b.replace(/'/g,"\\'")}')">브랜드 설정 수정</button>
@@ -3366,12 +3371,15 @@ function openBrandAdd(){
     if(STATE.team !== 'HQ' && ALL_TEAMS_DATA.teams[STATE.team]){
       const t = ALL_TEAMS_DATA.teams[STATE.team];
       t.brands = DATA.brands.slice();
+      t.records = DATA.records.slice();
       t.advertiserMap = Object.assign({}, DATA.advertiserMap);
       t.owners = Object.assign({}, DATA.owners);
       t.advertiserOrder = DATA.advertiserOrder.slice();
     }
     persistTeamsData();
+    try { rebuildREC(); } catch(e){}
     refreshAll();
+    showToast(`✓ ${name} 브랜드 추가 완료`, 'success');
   });
 }
 function renameBrand(oldName){
@@ -3431,20 +3439,33 @@ function openTeamMemberAdd(){
   if(STATE.role==='member'){alert('팀원 추가는 팀장 권한입니다.');return;}
   const html = `
     <div class="fm-row"><label>이름 <span style="color:var(--pt)">*</span></label><input type="text" id="fm-name" /></div>
-    <div class="fm-row"><label>직급</label><select id="fm-title">
+    <div class="fm-row"><label>직급</label><select id="fm-position">
       <option value="사원">사원</option><option value="대리">대리</option><option value="과장">과장</option>
       <option value="차장">차장</option><option value="부장">부장</option>
     </select></div>
     <div class="fm-row"><label>역할 (권한)</label><select id="fm-role">
       <option value="member">팀원</option><option value="lead">팀장</option><option value="head">본부장</option>
     </select></div>
+    <div class="fm-row"><label>비밀번호 (선택)</label><input type="text" id="fm-pw" placeholder="비워두면 자동 생성" /></div>
   `;
   openFormModal('＋ 팀원 추가', html, ()=>{
     const name = getFM('fm-name').trim();
     if(!name){alert('이름을 입력하세요.');return false;}
     if(TEAM_ROSTER.some(p=>p.name===name)){alert('이미 등록된 이름입니다.');return false;}
-    TEAM_ROSTER.push({name, role:getFM('fm-role'), title:getFM('fm-title')});
+    const role = getFM('fm-role');
+    const title = getFM('fm-position');  // fm-title은 모달 헤딩 id 와 충돌하므로 fm-position 사용
+    const pw = (getFM('fm-pw') || '').trim() || (name.slice(-2)+'2026');
+    const teamId = STATE.team !== 'HQ' ? STATE.team : 'G';
+    const newMember = {name, role, title, password:pw, team:teamId};
+    TEAM_ROSTER.push(newMember);
+    // ALL_TEAMS_DATA.teams[team].roster에도 추가 (영구 저장 대상)
+    if(ALL_TEAMS_DATA.teams[teamId]){
+      ALL_TEAMS_DATA.teams[teamId].roster = ALL_TEAMS_DATA.teams[teamId].roster || [];
+      ALL_TEAMS_DATA.teams[teamId].roster.push({name, role, title, password:pw});
+      try { persistTeamsData(); } catch(e){}
+    }
     refreshAll();
+    showToast(`✓ ${name} (${title}) 팀원 추가 완료 · 비밀번호: ${pw}`, 'success');
   });
 }
 async function removeTeamMember(name){
@@ -4099,7 +4120,7 @@ function renderTeam(){
   const rtbl = document.getElementById('roster-tbl');
   if(rtbl){
     const currentTeam = STATE.team === 'HQ' ? null : STATE.team;
-    let rhtml = '<thead><tr><th style="width:18%">직급</th><th style="width:18%">이름</th><th style="width:14%">역할(권한)</th><th>담당 브랜드</th><th style="width:14%">YTD 매출</th><th style="width:12%">액션</th></tr></thead><tbody>';
+    let rhtml = '<thead><tr><th style="width:18%">직급</th><th style="width:18%">이름</th><th style="width:14%">역할(권한)</th><th>담당 브랜드</th><th style="width:14%">매출</th><th style="width:12%">액션</th></tr></thead><tbody>';
     const teamRoster = currentTeam ? TEAM_ROSTER.filter(p=>p.team===currentTeam) : TEAM_ROSTER;
     teamRoster.forEach(p=>{
       const myBrands = DATA.brands.filter(b=>getOwners(b).includes(p.name));
@@ -4126,7 +4147,7 @@ function renderTeam(){
   DATA.brands.forEach(b=>{
     getOwners(b).forEach(o=>{(groups[o]=groups[o]||[]).push(b);});
   });
-  let html1 = '<thead><tr><th style="width:18%">담당자</th><th style="width:52%">담당 브랜드</th><th>매출 (YTD)</th><th>순매출</th></tr></thead><tbody>';
+  let html1 = '<thead><tr><th style="width:18%">담당자</th><th style="width:52%">담당 브랜드</th><th>매출</th><th>순매출</th></tr></thead><tbody>';
   Object.entries(groups).forEach(([owner,brands])=>{
     let r=0,e=0; brands.forEach(b=>{const t=brandYTD(b);r+=t.rev;e+=t.exp;});
     html1 += `<tr><td><b>${owner}</b></td><td>${brands.map(b=>`<span style="background:var(--bg2);color:var(--ink2);font-size:10px;padding:2px 7px;border-radius:4px;margin-right:4px;margin-bottom:3px;display:inline-block">${b}</span>`).join('')}</td><td>${fmtShort(r)}원</td><td class="y">${fmtShort(r-e)}원</td></tr>`;
@@ -4229,7 +4250,7 @@ let chHQMonth = null;
 function renderOrg(){
   const tbl = document.getElementById('hq-team-tbl');
   if(!tbl) return;
-  let html = '<thead><tr><th style="width:14%">팀</th><th>매출 목표</th><th>YTD 매출</th><th>달성률</th><th>YTD 순매출</th><th>이익률</th><th>운영 브랜드</th><th>신규 브랜드</th></tr></thead><tbody>';
+  let html = '<thead><tr><th style="width:14%">팀</th><th>매출 목표</th><th>매출</th><th>달성률</th><th>순매출</th><th>이익률</th><th>운영 브랜드</th><th>신규 브랜드</th></tr></thead><tbody>';
   let totRev=0, totExp=0, totGoal=0;
   const teamSummary = [];
   Object.keys(ALL_TEAMS_DATA.teams).forEach(tid=>{
@@ -4283,7 +4304,7 @@ function renderOrg(){
 /* ================ CSV Export ================ */
 function exportCSV(){
   const months = DATA.months;
-  let csv = '광고주,브랜드(프로젝트),' + months.map(m=>`${m} 매출,${m} 원가,${m} 매출이익,${m} %`).join(',') + ',YTD 순매출\n';
+  let csv = '광고주,브랜드(프로젝트),' + months.map(m=>`${m} 매출,${m} 원가,${m} 매출이익,${m} %`).join(',') + ',순매출\n';
   ADV_ORDER.forEach(adv=>{
     const brands = brandsInScope().filter(b=>ADV_MAP[b]===adv);
     brands.forEach(b=>{
