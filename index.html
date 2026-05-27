@@ -674,6 +674,121 @@
   /* SM본부 모드 - 마감 관리 메뉴 숨김 */
   body.hq-mode .hide-on-hq{display:none !important}
 
+  /* ============ v64: SM본부 통합 상세 보고 ============ */
+  .hq-detail-grid{display:flex;flex-direction:column;gap:24px}
+  .hq-section-title{display:flex;align-items:baseline;gap:10px;margin-bottom:12px;padding-left:2px}
+  .hq-section-title h3{font-size:16px;font-weight:800;letter-spacing:-.3px;color:var(--ink)}
+  .hq-section-title .desc{font-size:11.5px;color:var(--ink3)}
+  /* Annual KPI */
+  .hq-annual{background:#fff;border:1px solid var(--line);border-radius:14px;padding:22px 24px}
+  .hq-annual-top{display:flex;justify-content:space-between;align-items:flex-start;margin-bottom:16px}
+  .hq-annual-top .lab{font-size:11px;color:var(--ink3);font-weight:700;letter-spacing:.3px;text-transform:uppercase}
+  .hq-annual-top h4{font-size:13px;font-weight:700;color:var(--ink);margin-top:2px}
+  .hq-annual-top .basis{font-size:11px;color:var(--ink3);text-align:right}
+  .hq-annual-top .basis b{color:var(--ink2)}
+  .hq-annual-stats{display:grid;grid-template-columns:repeat(4,1fr);gap:12px}
+  .hq-a-stat{background:var(--bg2);border-radius:10px;padding:14px 16px}
+  .hq-a-stat .lab{font-size:11px;color:var(--ink3);font-weight:700;letter-spacing:.3px;text-transform:uppercase;margin-bottom:6px}
+  .hq-a-stat .val{font-size:20px;font-weight:800;letter-spacing:-.5px;font-variant-numeric:tabular-nums}
+  .hq-a-stat .val .small{font-size:12px;color:var(--ink3);margin-left:3px;font-weight:600}
+  .hq-a-stat .sub{font-size:11px;color:var(--ink3);margin-top:5px}
+  .hq-a-stat .sub b{color:var(--ink2)}
+  .hq-a-stat.primary{background:linear-gradient(135deg,#FFF5F7 0%,#FFE5E9 100%);border:1px solid #FBDCE1}
+  .hq-a-stat.primary .val{color:#E60021}
+  .hq-a-stat .progress{height:5px;background:#fff;border-radius:3px;margin-top:8px;overflow:hidden}
+  .hq-a-stat .progress > i{display:block;height:100%;background:linear-gradient(90deg,#E60021,#B8001A);border-radius:3px;transition:width .4s}
+
+  /* Monthly list */
+  .hq-monthly-list{background:#fff;border:1px solid var(--line);border-radius:12px;overflow:hidden}
+  .hq-ml-row{display:grid;grid-template-columns:130px repeat(5,1fr);padding:13px 20px;border-bottom:1px solid var(--line2);align-items:center;gap:8px}
+  .hq-ml-row.head{background:#F1F5F9;color:var(--ink2);font-size:10.5px;font-weight:800;text-transform:uppercase;letter-spacing:.4px;padding:10px 20px}
+  .hq-ml-row:last-child{border-bottom:none}
+  .hq-ml-row.cur{background:linear-gradient(90deg,#FFF5F7 0%,rgba(255,245,247,.4) 100%)}
+  .hq-ml-month{font-size:14px;font-weight:800;letter-spacing:-.3px;display:flex;align-items:center;gap:7px}
+  .hq-ml-row.cur .hq-ml-month{color:#E60021;font-weight:900}
+  .hq-ml-month .pill{font-size:9.5px;font-weight:800;padding:2px 6px;border-radius:4px;letter-spacing:.3px}
+  .hq-ml-row.prev .pill{background:var(--bg2);color:var(--ink3)}
+  .hq-ml-row.cur .pill{background:#E60021;color:#fff}
+  .hq-ml-row.next .pill{background:#EFF6FF;color:#1D4ED8}
+  .hq-ml-cell{font-size:14px;font-weight:800;letter-spacing:-.3px;font-variant-numeric:tabular-nums;text-align:right}
+  .hq-ml-cell.muted{color:var(--ink3);font-weight:700}
+  .hq-ml-cell.net{color:#1D4ED8}
+  .hq-ml-cell.pct{color:var(--ink2);font-weight:700}
+  .hq-ml-cell.pct.good{color:#16A34A}
+  .hq-ml-cell.pct.warn{color:#D97706}
+
+  /* Group section */
+  .hq-grp-section{display:flex;flex-direction:column;gap:20px}
+  .hq-grp-card{background:#fff;border:1px solid var(--line);border-radius:14px;padding:22px 26px;display:flex;flex-direction:column;gap:18px}
+  .hq-grp-card.g1{border-top:4px solid #E60021}
+  .hq-grp-card.g2{border-top:4px solid #1D4ED8}
+  .hq-grp-head{display:flex;justify-content:space-between;align-items:center;border-bottom:1px solid var(--line2);padding-bottom:18px;gap:16px;flex-wrap:wrap}
+  .hq-grp-head .grp-name{display:flex;align-items:center;gap:14px}
+  .hq-grp-head .grp-badge{font-size:20px;font-weight:900;padding:9px 20px;border-radius:9px;letter-spacing:-.4px;line-height:1}
+  .hq-grp-card.g1 .grp-badge{background:linear-gradient(135deg,#FFE5E9,#FFB3C0);color:#B8001A;border:1px solid #FBA5B3}
+  .hq-grp-card.g2 .grp-badge{background:linear-gradient(135deg,#DBEAFE,#93C5FD);color:#1E3A8A;border:1px solid #93C5FD}
+  .hq-grp-head h4{font-size:18px;font-weight:800;letter-spacing:-.4px;color:var(--ink)}
+  .hq-grp-target{font-size:11px;color:var(--ink3);font-weight:600;text-align:right;line-height:1.7}
+  .hq-grp-target b{color:var(--ink);font-weight:800}
+  .hq-grp-summary{display:grid;grid-template-columns:repeat(4,1fr);gap:12px}
+  .hq-grp-stat{background:var(--bg2);border-radius:9px;padding:14px 16px}
+  .hq-grp-stat .lab{font-size:10.5px;color:var(--ink3);font-weight:700;letter-spacing:.3px;text-transform:uppercase;margin-bottom:5px}
+  .hq-grp-stat .val{font-size:18px;font-weight:800;letter-spacing:-.4px;font-variant-numeric:tabular-nums}
+  .hq-grp-stat .val .goal{font-size:11px;color:var(--ink3);font-weight:600;margin-left:3px}
+  .hq-grp-stat .pct-row{display:flex;justify-content:space-between;align-items:baseline;font-size:10.5px;margin-top:7px;color:var(--ink3);font-weight:600}
+  .hq-grp-stat .pct-row b{color:var(--ink);font-size:12px;font-weight:800}
+  .hq-grp-stat .pbar{height:5px;background:#fff;border-radius:3px;margin-top:4px;overflow:hidden}
+  .hq-grp-card.g1 .hq-grp-stat .pbar > i{background:linear-gradient(90deg,#E60021,#B8001A)}
+  .hq-grp-card.g2 .hq-grp-stat .pbar > i{background:linear-gradient(90deg,#1D4ED8,#1E3A8A)}
+  .hq-grp-stat .pbar > i{display:block;height:100%;border-radius:3px;transition:width .4s}
+  .hq-grp-subtitle{font-size:12.5px;font-weight:800;color:var(--ink);letter-spacing:-.2px;display:flex;align-items:center;gap:6px;margin-bottom:7px}
+  .hq-grp-subtitle .sub-desc{font-size:10.5px;color:var(--ink3);font-weight:600;letter-spacing:0}
+  /* Group 3-month list */
+  .hq-grp-3mo{background:#fff;border:1px solid var(--line);border-radius:9px;overflow:hidden}
+  .hq-g3-row{display:grid;grid-template-columns:130px 1fr 1.1fr 2fr;padding:12px 16px;border-bottom:1px solid var(--line2);align-items:center;gap:10px}
+  .hq-g3-row.head{background:#F1F5F9;color:var(--ink2);font-size:10.5px;font-weight:800;text-transform:uppercase;letter-spacing:.4px;padding:10px 16px}
+  .hq-g3-row:last-child{border-bottom:none}
+  .hq-g3-row.cur{background:linear-gradient(90deg,#FFF5F7 0%,rgba(255,245,247,.4) 100%)}
+  .hq-g3-month{font-size:13px;font-weight:800;letter-spacing:-.3px;display:flex;align-items:center;gap:7px}
+  .hq-g3-row.cur .hq-g3-month{color:#E60021;font-weight:900}
+  .hq-g3-month .pill{font-size:9.5px;font-weight:800;padding:2px 6px;border-radius:4px;letter-spacing:.3px}
+  .hq-g3-row.prev .pill{background:var(--bg2);color:var(--ink3)}
+  .hq-g3-row.cur .pill{background:#E60021;color:#fff}
+  .hq-g3-amt{font-size:14.5px;font-weight:900;letter-spacing:-.4px;font-variant-numeric:tabular-nums;text-align:right}
+  .hq-g3-delta{font-size:11.5px;font-weight:700;text-align:right;display:flex;align-items:center;justify-content:flex-end;gap:4px}
+  .hq-g3-delta .arrow{font-size:12px}
+  .hq-g3-delta.up{color:#16A34A}
+  .hq-g3-delta.down{color:#E60021}
+  .hq-g3-delta.flat{color:var(--ink3)}
+  .hq-g3-detail{font-size:11px;color:var(--ink3);line-height:1.55;text-align:left}
+  /* Issues */
+  .hq-iss-block{display:flex;flex-direction:column;gap:9px}
+  .hq-iss-head{display:flex;justify-content:space-between;align-items:center}
+  .hq-iss-head .ttl{font-size:12.5px;font-weight:800;color:var(--ink);display:flex;align-items:center;gap:6px}
+  .hq-iss-head .add-btn{background:#fff;border:1px solid var(--line);color:var(--ink2);font-size:11px;font-weight:700;padding:5px 11px;border-radius:6px;cursor:pointer;font-family:inherit;display:inline-flex;align-items:center;gap:4px}
+  .hq-iss-head .add-btn:hover{border-color:var(--ink);color:var(--ink)}
+  .hq-iss-list{display:flex;flex-direction:column;gap:7px}
+  .hq-iss-item{border-radius:8px;padding:11px 14px;display:flex;align-items:flex-start;gap:10px}
+  .hq-iss-item.auto{background:#FFF5F7;border:1px solid #FBDCE1}
+  .hq-iss-item.manual{background:#F0F9FF;border:1px solid #BAE6FD}
+  .hq-iss-item .iss-ico{flex:none;width:26px;height:26px;border-radius:6px;display:flex;align-items:center;justify-content:center;font-size:13px;color:#fff;font-weight:800}
+  .hq-iss-item.auto .iss-ico{background:#E60021}
+  .hq-iss-item.manual .iss-ico{background:#0EA5E9}
+  .hq-iss-item .iss-body{flex:1;min-width:0}
+  .hq-iss-item .iss-title{font-size:12px;font-weight:800;color:var(--ink);letter-spacing:-.1px;margin-bottom:3px;display:flex;align-items:center;gap:6px;flex-wrap:wrap}
+  .hq-iss-item .iss-desc{font-size:11.5px;color:var(--ink2);line-height:1.55}
+  .hq-iss-item .iss-desc b{color:var(--ink)}
+  .hq-iss-item .iss-team-pill{display:inline-block;font-size:9.5px;font-weight:800;padding:2px 6px;border-radius:4px;letter-spacing:.3px;background:#fff;border:1px solid var(--line);margin-right:4px}
+  .hq-iss-item .iss-team-pill.g{color:#E60021;border-color:#FBDCE1}
+  .hq-iss-item .iss-team-pill.d{color:#1D4ED8;border-color:#BFDBFE}
+  .hq-iss-item .iss-team-pill.u{color:#D97706;border-color:#FCD34D}
+  .hq-iss-item .iss-team-pill.e{color:#7C3AED;border-color:#DDD6FE}
+  .hq-iss-item .iss-team-pill.i{color:#0891B2;border-color:#A5F3FC}
+  .hq-iss-item .iss-team-pill.r{color:#16A34A;border-color:#BBF7D0}
+  .hq-iss-item .iss-meta{font-size:10px;color:var(--ink3);margin-top:4px;font-weight:600;display:flex;justify-content:space-between;align-items:center;gap:8px}
+  .hq-iss-item .iss-del{background:none;border:none;color:var(--ink3);font-size:11px;cursor:pointer;font-family:inherit;padding:2px 6px;border-radius:4px}
+  .hq-iss-item .iss-del:hover{color:#B8001A;background:#FEE2E2}
+
   /* 월간 운영 - 상단 당월 표기 (2줄) */
   .ops-header{margin-bottom:14px}
   .ops-title{display:flex;flex-direction:column;gap:7px}
@@ -1441,7 +1556,7 @@
     </div>
   </section>
 
-  <!-- =============== SM본부 통합 현황 (Head/Lead) =============== -->
+  <!-- =============== SM본부 통합 현황 (Head/Lead) - v64 상세 보고 =============== -->
   <section id="tab-org" class="hide">
     <div class="panel">
       <div class="head-row">
@@ -1449,7 +1564,43 @@
       </div>
       <table class="role-table" id="hq-team-tbl"></table>
     </div>
-    <div class="panel">
+    <!-- v64: 상세 보고 영역 -->
+    <div class="hq-detail-grid">
+      <!-- 1. 연간 달성 누적 -->
+      <div>
+        <div class="hq-section-title">
+          <h3>📊 SM본부 연간 달성 누적</h3>
+          <span class="desc" id="hq-annual-desc">본부 통합 KPI</span>
+        </div>
+        <div class="hq-annual">
+          <div class="hq-annual-top">
+            <div>
+              <div class="lab">2026 SM본부 통합</div>
+              <h4>연간 누적 달성 현황</h4>
+            </div>
+            <div class="basis" id="hq-annual-basis">기준일 <b>-</b><br/>입력 완료 월 <b>-</b></div>
+          </div>
+          <div class="hq-annual-stats" id="hq-annual-stats">
+            <!-- JS로 채움 -->
+          </div>
+        </div>
+      </div>
+      <!-- 2. 월별 매출 현황 -->
+      <div>
+        <div class="hq-section-title">
+          <h3>📅 SM본부 월별 매출 현황</h3>
+          <span class="desc">당월 기준 ±1개월</span>
+        </div>
+        <div class="hq-monthly-list" id="hq-monthly-list">
+          <!-- JS로 채움 -->
+        </div>
+      </div>
+      <!-- 3. 그룹별 매출 보고 -->
+      <div class="hq-grp-section" id="hq-grp-section">
+        <!-- JS로 그룹 1, 2 카드 채움 -->
+      </div>
+    </div>
+    <div class="panel" style="margin-top:24px">
       <h3>본부 통합 매출 추이</h3>
       <div class="chart-wrap"><canvas id="ch-hq-month"></canvas></div>
     </div>
@@ -1719,7 +1870,8 @@ function getRoleLabel(level){
 const STATE = {
   role: 'lead',
   level: 2,
-  team: 'G',  // 현재 활성 팀 (G/D/U/HQ)
+  team: 'G',
+  groupIssues: { g1: [], g2: [] },  // v64: 그룹별 수동 이슈 (g1: G·D·U, g2: E·I·R)
   goals: ALL_TEAMS_DATA.teams.G.goals,  // 현재 팀 목표 - applyTeamData에서 갱신
   edit: { brand: null, all: false },
   goalEditKey: null,
@@ -4425,6 +4577,7 @@ function persistTeamsData(silent){
       teams: {},
       months: ALL_TEAMS_DATA.months,
       monthlyHidden: MONTHLY_HIDDEN,
+      groupIssues: STATE.groupIssues || {g1:[], g2:[]},
       hq_goals: ALL_TEAMS_DATA.hq_goals,
       hqInsightOverrides: STATE.hqInsightOverrides || {},
       qualGrowth: STATE.qualGrowth || {},
@@ -4546,6 +4699,13 @@ function restoreTeamsData(){
     if(snapshot.taxInvoice) Object.assign(TAX_INVOICE, snapshot.taxInvoice);
     if(snapshot.monthlyHidden){
       Object.keys(snapshot.monthlyHidden).forEach(k=>{ MONTHLY_HIDDEN[k] = snapshot.monthlyHidden[k]; });
+    }
+    // v64: 그룹 이슈 복원
+    if(snapshot.groupIssues){
+      STATE.groupIssues = {
+        g1: Array.isArray(snapshot.groupIssues.g1) ? snapshot.groupIssues.g1.slice() : [],
+        g2: Array.isArray(snapshot.groupIssues.g2) ? snapshot.groupIssues.g2.slice() : []
+      };
     }
     // v58 마이그레이션: 기존 글로벌 snapshot.brandMeta가 있으면 각 팀 brands 기준으로 분배
     if(snapshot.brandMeta){
@@ -4847,6 +5007,420 @@ function approveItem(brand, month, ok){
   renderApprove();
 }
 
+/* ================ v64: SM본부 상세 보고 영역 ================ */
+const GROUP_DEF = {
+  g1: {label:'1그룹', teams:['G','D','U'], teamLabel:'G·D·U팀', targetRev: 14_000_000_000, targetNet: 3_400_000_000},
+  g2: {label:'2그룹', teams:['E','I','R'], teamLabel:'E·I·R팀', targetRev: 16_000_000_000, targetNet: 3_600_000_000}
+};
+function getGroupAgg(gid){
+  const g = GROUP_DEF[gid];
+  if(!g) return null;
+  let rev=0, exp=0, ppl=0, brands=0;
+  g.teams.forEach(tid=>{
+    const t = ALL_TEAMS_DATA.teams[tid];
+    if(!t) return;
+    (t.records||[]).forEach(r=>{ rev += r.revenue||0; exp += r.expense||0; });
+    ppl += (t.roster||[]).length;
+    brands += (t.brands||[]).filter(b=>{
+      const meta = (t.brandMeta||{})[b];
+      return !meta || !meta.ended;
+    }).length;
+  });
+  return {rev, exp, net:rev-exp, ppl, brands, targetRev:g.targetRev, targetNet:g.targetNet, label:g.label, teamLabel:g.teamLabel, teams:g.teams};
+}
+function getGroupMonthly(gid, month){
+  const g = GROUP_DEF[gid];
+  if(!g) return {rev:0, exp:0};
+  let rev=0, exp=0;
+  g.teams.forEach(tid=>{
+    const t = ALL_TEAMS_DATA.teams[tid];
+    if(!t) return;
+    (t.records||[]).forEach(r=>{ if(r.month===month){ rev += r.revenue||0; exp += r.expense||0; } });
+  });
+  return {rev, exp, net:rev-exp};
+}
+function getRecentMonths(n){
+  // 현재 일자 기준 ±N개월 → 정확히 prev/cur/next 3개
+  const today = new Date();
+  const yy = today.getFullYear()%100;
+  const mm = today.getMonth()+1;
+  const curLabel = `${yy}년 ${mm}월`;
+  const prevMM = mm===1 ? 12 : mm-1;
+  const prevYY = mm===1 ? yy-1 : yy;
+  const nextMM = mm===12 ? 1 : mm+1;
+  const nextYY = mm===12 ? yy+1 : yy;
+  return [`${prevYY}년 ${prevMM}월`, curLabel, `${nextYY}년 ${nextMM}월`];
+}
+function fmtEokWon(v){
+  if(Math.abs(v) >= 1e8) return (v/1e8).toFixed(1)+'억원';
+  if(Math.abs(v) >= 1e4) return Math.round(v/1e4).toLocaleString('ko-KR')+'만원';
+  return v.toLocaleString('ko-KR')+'원';
+}
+function fmtMoney(v){ return fmtEokWon(v); }
+
+function renderHQDetail(){
+  if(STATE.team !== 'HQ') return;
+  // 1) 연간 KPI
+  let totRev=0, totExp=0;
+  Object.values(ALL_TEAMS_DATA.teams).forEach(t=>{
+    (t.records||[]).forEach(r=>{ totRev += r.revenue||0; totExp += r.expense||0; });
+  });
+  const totNet = totRev - totExp;
+  const goalRev = ALL_TEAMS_DATA.hq_goals.rev || 30_000_000_000;
+  const goalNet = ALL_TEAMS_DATA.hq_goals.net || 7_000_000_000;
+  const goalMargin = ALL_TEAMS_DATA.hq_goals.margin || 24;
+  const margin = totRev ? (totNet/totRev*100) : 0;
+  const revPct = goalRev ? (totRev/goalRev*100) : 0;
+  const netPct = goalNet ? (totNet/goalNet*100) : 0;
+  const remaining = Math.max(0, goalRev - totRev);
+  // 입력 완료 월 수 계산
+  const months = ALL_TEAMS_DATA.months || [];
+  let lastDataIdx = -1;
+  for(let i=months.length-1; i>=0; i--){
+    let s=0;
+    Object.values(ALL_TEAMS_DATA.teams).forEach(t=>{
+      (t.records||[]).forEach(r=>{ if(r.month===months[i]) s+=r.revenue||0; });
+    });
+    if(s>0){ lastDataIdx = i; break; }
+  }
+  const monthsDone = lastDataIdx + 1;
+  const monthsLeft = 12 - monthsDone;
+  const monthlyNeeded = monthsLeft>0 ? remaining/monthsLeft : 0;
+
+  // 기준일/입력월 표시
+  const today = new Date();
+  const todayStr = `${today.getFullYear()}.${String(today.getMonth()+1).padStart(2,'0')}.${String(today.getDate()).padStart(2,'0')} (${'일월화수목금토'[today.getDay()]})`;
+  const basisEl = document.getElementById('hq-annual-basis');
+  if(basisEl){
+    basisEl.innerHTML = `기준일 <b>${todayStr}</b><br/>입력 완료 월 <b>${monthsDone>0?(months[0]+'~'+months[lastDataIdx]+' ('+monthsDone+'개월)'):'-'}</b>`;
+  }
+  const descEl = document.getElementById('hq-annual-desc');
+  if(descEl) descEl.textContent = `2026년 본부 통합 KPI · 누적 ${monthsDone}개월`;
+
+  // 연간 KPI 4카드
+  const annualStatsEl = document.getElementById('hq-annual-stats');
+  if(annualStatsEl){
+    annualStatsEl.innerHTML = `
+      <div class="hq-a-stat primary">
+        <div class="lab">연 매출 누적</div>
+        <div class="val">${fmtMoney(totRev)}</div>
+        <div class="sub">목표 <b>${fmtMoney(goalRev)}</b> · 달성률 <b>${revPct.toFixed(1)}%</b></div>
+        <div class="progress"><i style="width:${Math.min(100,revPct)}%"></i></div>
+      </div>
+      <div class="hq-a-stat">
+        <div class="lab">순매출 누적</div>
+        <div class="val">${fmtMoney(totNet)}</div>
+        <div class="sub">목표 <b>${fmtMoney(goalNet)}</b> · 달성률 <b>${netPct.toFixed(1)}%</b></div>
+        <div class="progress"><i style="width:${Math.min(100,netPct)}%;background:linear-gradient(90deg,#1D4ED8,#1E3A8A)"></i></div>
+      </div>
+      <div class="hq-a-stat">
+        <div class="lab">이익률</div>
+        <div class="val">${margin.toFixed(1)}<span class="small">%</span></div>
+        <div class="sub">목표 <b>${goalMargin}%</b> · 차이 <b style="color:${margin>=goalMargin?'#16A34A':'#D97706'}">${(margin-goalMargin>=0?'+':'')+(margin-goalMargin).toFixed(1)}%p</b></div>
+        <div class="progress"><i style="width:${Math.min(100,margin/goalMargin*100)}%;background:linear-gradient(90deg,#D97706,#B45309)"></i></div>
+      </div>
+      <div class="hq-a-stat">
+        <div class="lab">잔여 매출 · 페이스</div>
+        <div class="val">${fmtMoney(remaining)}</div>
+        <div class="sub">잔여 <b>${monthsLeft}개월</b> · 월 평균 필요 <b>${fmtMoney(monthlyNeeded)}</b></div>
+        <div class="progress"><i style="width:${Math.min(100,monthsDone/12*100)}%;background:linear-gradient(90deg,#16A34A,#15803D)"></i></div>
+      </div>
+    `;
+  }
+
+  // 2) 월별 매출 리스트 (3개월)
+  const monthlyList = document.getElementById('hq-monthly-list');
+  if(monthlyList){
+    const [prevM, curM, nextM] = getRecentMonths(1);
+    function rowForMonth(month, type){
+      let rev=0, exp=0;
+      Object.values(ALL_TEAMS_DATA.teams).forEach(t=>{
+        (t.records||[]).forEach(r=>{ if(r.month===month){ rev += r.revenue||0; exp += r.expense||0; } });
+      });
+      const net = rev - exp;
+      const margin = rev ? (net/rev*100) : 0;
+      const monthGoal = goalRev/12;
+      const goalPct = monthGoal ? (rev/monthGoal*100) : 0;
+      const pill = type==='prev' ? '완료' : type==='cur' ? '진행 중' : '계획';
+      const marginCls = margin>=goalMargin?'good':margin>0?'warn':'';
+      const goalCls = goalPct>=100?'good':goalPct>=70?'':'warn';
+      return `<div class="hq-ml-row ${type}">
+        <div class="hq-ml-month">${month} <span class="pill">${pill}</span></div>
+        <div class="hq-ml-cell">${fmtMoney(rev)}</div>
+        <div class="hq-ml-cell muted">${fmtMoney(exp)}</div>
+        <div class="hq-ml-cell net">${fmtMoney(net)}</div>
+        <div class="hq-ml-cell pct ${marginCls}">${margin.toFixed(1)}%</div>
+        <div class="hq-ml-cell pct ${goalCls}">${goalPct.toFixed(0)}%</div>
+      </div>`;
+    }
+    monthlyList.innerHTML = `
+      <div class="hq-ml-row head">
+        <div>월</div>
+        <div class="hq-ml-cell">매출</div>
+        <div class="hq-ml-cell">지출</div>
+        <div class="hq-ml-cell">순매출</div>
+        <div class="hq-ml-cell">이익률</div>
+        <div class="hq-ml-cell">목표 달성</div>
+      </div>
+      ${rowForMonth(prevM, 'prev')}
+      ${rowForMonth(curM, 'cur')}
+      ${rowForMonth(nextM, 'next')}
+    `;
+  }
+
+  // 3) 그룹별 보고
+  const grpSection = document.getElementById('hq-grp-section');
+  if(grpSection){
+    grpSection.innerHTML = ['g1','g2'].map(gid => renderGroupCard(gid)).join('');
+    // 이슈 추가/삭제 이벤트 위임
+    grpSection.querySelectorAll('button[data-grp-add-issue]').forEach(btn=>{
+      btn.addEventListener('click', ()=>openGroupIssueAdd(btn.getAttribute('data-grp-add-issue')));
+    });
+    grpSection.querySelectorAll('button[data-grp-del-issue]').forEach(btn=>{
+      btn.addEventListener('click', ()=>{
+        const gid = btn.getAttribute('data-grp-del-issue');
+        const id = btn.getAttribute('data-iss-id');
+        deleteGroupIssue(gid, id);
+      });
+    });
+  }
+}
+
+function renderGroupCard(gid){
+  const g = getGroupAgg(gid);
+  if(!g) return '';
+  const revPct = g.targetRev ? (g.rev/g.targetRev*100) : 0;
+  const netPct = g.targetNet ? (g.net/g.targetNet*100) : 0;
+  const margin = g.rev ? (g.net/g.rev*100) : 0;
+  const goalMargin = ALL_TEAMS_DATA.hq_goals.margin || 24;
+  const remaining = Math.max(0, g.targetRev - g.rev);
+  const today = new Date();
+  const yy = today.getFullYear()%100;
+  const mm = today.getMonth()+1;
+  const monthsLeft = 12 - mm + 1;
+  const monthlyNeeded = monthsLeft>0 ? remaining/monthsLeft : 0;
+
+  // 최근 3개월 - 전주 변동은 CHANGE_LOG 기반 (간단히 텍스트 처리)
+  const [prevM, curM, nextM] = getRecentMonths(1);
+  function grpMonthRow(month, type){
+    const data = getGroupMonthly(gid, month);
+    const pill = type==='prev' ? '완료' : type==='cur' ? '진행 중' : '계획';
+    // 전주 변동 (대략: CHANGE_LOG에서 그룹 팀의 해당 월 변동분 누적)
+    let delta = 0;
+    let detailParts = [];
+    try {
+      if(typeof CHANGE_LOG !== 'undefined'){
+        const cutoff = Date.now() - 7*24*60*60*1000;
+        const perCat = {};
+        CHANGE_LOG.forEach(e=>{
+          if(e.ts < cutoff) return;
+          if(e.field !== 'revenue') return;
+          if(!g.teams.includes(e.team)) return;
+          if(e.month !== month) return;
+          const ck = `${e.brand}|${e.category||''}`;
+          if(!perCat[ck]) perCat[ck] = {brand:e.brand, firstPrev:e.prev, lastNext:e.next, team:e.team};
+          else perCat[ck].lastNext = e.next;
+        });
+        Object.values(perCat).forEach(pc=>{
+          delta += (pc.lastNext - pc.firstPrev);
+          if(Math.abs(pc.lastNext - pc.firstPrev) >= 5_000_000){
+            const d = pc.lastNext - pc.firstPrev;
+            detailParts.push(`${pc.team}팀 ${pc.brand} ${d>0?'+':''}${fmtMoney(Math.abs(d))}`);
+          }
+        });
+      }
+    } catch(e){}
+    const delta_cls = delta > 0 ? 'up' : delta < 0 ? 'down' : 'flat';
+    const arrow = delta > 0 ? '▲' : delta < 0 ? '▼' : '─';
+    const pctChange = data.rev>0 && delta!==0 ? (delta/(data.rev-delta)*100).toFixed(1) : '0.0';
+    const deltaTxt = delta !== 0 ? `${arrow} ${delta>0?'+':''}${fmtMoney(Math.abs(delta))} (${delta>0?'+':''}${pctChange}%)` : `${arrow} 변동 없음`;
+    const detailTxt = detailParts.length ? detailParts.slice(0,3).join(', ') : '-';
+    return `<div class="hq-g3-row ${type}">
+      <div class="hq-g3-month">${month} <span class="pill">${pill}</span></div>
+      <div class="hq-g3-amt">${fmtMoney(data.rev)}</div>
+      <div class="hq-g3-delta ${delta_cls}">${deltaTxt}</div>
+      <div class="hq-g3-detail">${detailTxt}</div>
+    </div>`;
+  }
+
+  // 팀별 매출 변동사항 (자동)
+  const autoIssues = [];
+  try {
+    if(typeof CHANGE_LOG !== 'undefined'){
+      const cutoff = Date.now() - 10*24*60*60*1000;
+      const perCat = {};
+      CHANGE_LOG.forEach(e=>{
+        if(e.ts < cutoff) return;
+        if(e.field !== 'revenue') return;
+        if(!g.teams.includes(e.team)) return;
+        const ck = `${e.brand}|${e.month}|${e.category||''}`;
+        if(!perCat[ck]) perCat[ck] = {brand:e.brand, month:e.month, team:e.team, firstPrev:e.prev, lastNext:e.next, ts:e.ts};
+        else { perCat[ck].lastNext = e.next; perCat[ck].ts = Math.max(perCat[ck].ts, e.ts); }
+      });
+      // brand+month 합산
+      const grouped = {};
+      Object.values(perCat).forEach(pc=>{
+        const k = pc.team+'|'+pc.brand+'|'+pc.month;
+        if(!grouped[k]) grouped[k] = {team:pc.team, brand:pc.brand, month:pc.month, delta:0, latestTs:0};
+        grouped[k].delta += (pc.lastNext - pc.firstPrev);
+        if(pc.ts > grouped[k].latestTs) grouped[k].latestTs = pc.ts;
+      });
+      Object.values(grouped).forEach(x=>{
+        if(Math.abs(x.delta) < 5_000_000) return;
+        autoIssues.push(x);
+      });
+      autoIssues.sort((a,b)=>Math.abs(b.delta)-Math.abs(a.delta));
+    }
+  } catch(e){}
+
+  const autoIssuesHtml = autoIssues.slice(0,5).map(x=>{
+    const dir = x.delta > 0 ? '급증' : '급감';
+    const sign = x.delta > 0 ? '+' : '';
+    const pctColor = x.delta > 0 ? '#16A34A' : '#E60021';
+    // 10일 전 = current - delta
+    const data = getGroupMonthly(gid, x.month);
+    // approximate brand-specific - we don't have exact, use placeholder
+    return `<div class="hq-iss-item auto">
+      <div class="iss-ico">!</div>
+      <div class="iss-body">
+        <div class="iss-title"><span class="iss-team-pill ${x.team.toLowerCase()}">${x.team}팀</span>${x.brand} 매출 ${dir} (${sign}${fmtMoney(Math.abs(x.delta))}) · ${x.month}</div>
+        <div class="iss-desc">10일 내 변동: <b style="color:${pctColor}">${sign}${fmtMoney(Math.abs(x.delta))}</b></div>
+      </div>
+    </div>`;
+  }).join('') || '<div style="font-size:11.5px;color:var(--ink3);padding:14px;text-align:center;background:#FAFAFA;border-radius:8px">최근 10일 내 매출 변동 없음</div>';
+
+  // 수동 이슈
+  const manualList = (STATE.groupIssues && STATE.groupIssues[gid]) || [];
+  const canEdit = getCurrentLevel() >= 2; // 팀장 이상
+  const manualHtml = manualList.length ? manualList.map(iss=>{
+    const teamCls = (iss.team||'').toLowerCase();
+    return `<div class="hq-iss-item manual">
+      <div class="iss-ico">📝</div>
+      <div class="iss-body">
+        <div class="iss-title">${iss.team?`<span class="iss-team-pill ${teamCls}">${iss.team}팀</span>`:''}${(iss.title||'').replace(/</g,'&lt;')}</div>
+        <div class="iss-desc">${(iss.desc||'').replace(/</g,'&lt;')}</div>
+        <div class="iss-meta">
+          <span>${iss.author||'-'} · ${iss.date||'-'}</span>
+          ${canEdit?`<button class="iss-del" data-grp-del-issue="${gid}" data-iss-id="${iss.id}">삭제</button>`:''}
+        </div>
+      </div>
+    </div>`;
+  }).join('') : '<div style="font-size:11.5px;color:var(--ink3);padding:14px;text-align:center;background:#FAFAFA;border-radius:8px">등록된 이슈가 없습니다. 우측 상단 "+ 이슈 추가" 로 등록하세요.</div>';
+
+  return `<div>
+    <div class="hq-section-title">
+      <h3>👥 ${g.label} 매출 보고</h3>
+      <span class="desc">${g.teamLabel} · 요약 + 최근 3개월 매출 + 이슈</span>
+    </div>
+    <div class="hq-grp-card ${gid}">
+      <div class="hq-grp-head">
+        <div class="grp-name">
+          <span class="grp-badge">${g.label}</span>
+          <h4>${g.teamLabel}</h4>
+        </div>
+        <div class="hq-grp-target">목표 매출 <b>${fmtMoney(g.targetRev)}</b> · 순매출 <b>${fmtMoney(g.targetNet)}</b><br/>인원 <b>${g.ppl}명</b> · 운영 브랜드 <b>${g.brands}건</b></div>
+      </div>
+      <div>
+        <div class="hq-grp-subtitle">📊 요약 대시보드 <span class="sub-desc">· 누적</span></div>
+        <div class="hq-grp-summary">
+          <div class="hq-grp-stat">
+            <div class="lab">매출 누적</div>
+            <div class="val">${fmtMoney(g.rev)}<span class="goal">/ ${fmtMoney(g.targetRev)}</span></div>
+            <div class="pct-row"><span>달성률</span><b>${revPct.toFixed(1)}%</b></div>
+            <div class="pbar"><i style="width:${Math.min(100,revPct)}%"></i></div>
+          </div>
+          <div class="hq-grp-stat">
+            <div class="lab">순매출 누적</div>
+            <div class="val">${fmtMoney(g.net)}<span class="goal">/ ${fmtMoney(g.targetNet)}</span></div>
+            <div class="pct-row"><span>달성률</span><b>${netPct.toFixed(1)}%</b></div>
+            <div class="pbar"><i style="width:${Math.min(100,netPct)}%"></i></div>
+          </div>
+          <div class="hq-grp-stat">
+            <div class="lab">이익률</div>
+            <div class="val">${margin.toFixed(1)}<span class="goal">/ ${goalMargin}%</span></div>
+            <div class="pct-row"><span>차이</span><b style="color:${margin>=goalMargin?'#16A34A':'#D97706'}">${(margin-goalMargin>=0?'+':'')+(margin-goalMargin).toFixed(1)}%p</b></div>
+            <div class="pbar"><i style="width:${Math.min(100,margin/goalMargin*100)}%"></i></div>
+          </div>
+          <div class="hq-grp-stat">
+            <div class="lab">잔여 매출 · 페이스</div>
+            <div class="val">${fmtMoney(remaining)}</div>
+            <div class="pct-row"><span>월 필요</span><b>${fmtMoney(monthlyNeeded)}</b></div>
+            <div class="pbar"><i style="width:${Math.min(100,(g.rev/g.targetRev)*100)}%"></i></div>
+          </div>
+        </div>
+      </div>
+      <div>
+        <div class="hq-grp-subtitle">💰 월별 매출 (최근 3개월) <span class="sub-desc">· 전주 대비 변동 포함</span></div>
+        <div class="hq-grp-3mo">
+          <div class="hq-g3-row head">
+            <div>월</div>
+            <div class="hq-g3-amt">매출</div>
+            <div class="hq-g3-delta">전주 대비 변동</div>
+            <div class="hq-g3-detail">변동 상세</div>
+          </div>
+          ${grpMonthRow(prevM, 'prev')}
+          ${grpMonthRow(curM, 'cur')}
+          ${grpMonthRow(nextM, 'next')}
+        </div>
+      </div>
+      <div class="hq-iss-block">
+        <div class="hq-iss-head">
+          <div class="ttl">📈 팀별 매출 변동사항 <span style="font-size:10.5px;color:var(--ink3);font-weight:600;letter-spacing:0">· 자동 감지 (10일 내)</span></div>
+        </div>
+        <div class="hq-iss-list">${autoIssuesHtml}</div>
+      </div>
+      <div class="hq-iss-block">
+        <div class="hq-iss-head">
+          <div class="ttl">📝 이슈 <span style="font-size:10.5px;color:var(--ink3);font-weight:600;letter-spacing:0">· 수동 입력</span></div>
+          ${canEdit?`<button class="add-btn" data-grp-add-issue="${gid}">＋ 이슈 추가</button>`:''}
+        </div>
+        <div class="hq-iss-list">${manualHtml}</div>
+      </div>
+    </div>
+  </div>`;
+}
+
+function openGroupIssueAdd(gid){
+  if(getCurrentLevel() < 2){ showToast('이슈 등록은 팀장 이상 권한입니다.', 'warn'); return; }
+  const teams = (GROUP_DEF[gid]||{}).teams || [];
+  const teamOpts = ['<option value="">팀 선택 안 함 (그룹 공통)</option>']
+    .concat(teams.map(t=>`<option value="${t}">${t}팀</option>`))
+    .join('');
+  const html = `
+    <div class="fm-row"><label>대상 팀 (선택)</label><select id="fm-grp-team">${teamOpts}</select></div>
+    <div class="fm-row"><label>제목 <span style="color:var(--pt)">*</span></label><input type="text" id="fm-grp-title" placeholder="예: 신규 클라이언트 발굴 지연" /></div>
+    <div class="fm-row"><label>상세 내용</label><textarea id="fm-grp-desc" rows="4" style="padding:9px 11px;border:1px solid var(--line);border-radius:7px;font-size:13px;background:#fff;font-family:inherit;resize:vertical;line-height:1.55" placeholder="이슈 상세 설명 / 액션 플랜 등"></textarea></div>
+  `;
+  openFormModal(`＋ ${GROUP_DEF[gid].label} 이슈 추가`, html, ()=>{
+    const title = (getFM('fm-grp-title')||'').trim();
+    if(!title){ alert('제목을 입력하세요.'); return false; }
+    const team = (getFM('fm-grp-team')||'').trim();
+    const desc = (getFM('fm-grp-desc')||'').trim();
+    const me = STATE.memberUser || '미상';
+    const today = new Date();
+    const dateStr = `${today.getFullYear()%100}.${String(today.getMonth()+1).padStart(2,'0')}.${String(today.getDate()).padStart(2,'0')}`;
+    STATE.groupIssues = STATE.groupIssues || {g1:[], g2:[]};
+    STATE.groupIssues[gid] = STATE.groupIssues[gid] || [];
+    STATE.groupIssues[gid].unshift({
+      id: 'gi_'+Date.now()+'_'+Math.random().toString(36).slice(2,7),
+      team: team || null,
+      title, desc, author: me, date: dateStr, ts: Date.now()
+    });
+    try { persistTeamsData(); } catch(e){}
+    renderHQDetail();
+    showToast(`✓ ${GROUP_DEF[gid].label} 이슈가 추가되었습니다`, 'success');
+  });
+}
+async function deleteGroupIssue(gid, id){
+  const ok = await confirmUI('이 이슈를 삭제하시겠습니까?', '이슈 삭제', {danger:true, yesLabel:'삭제'});
+  if(!ok) return;
+  STATE.groupIssues = STATE.groupIssues || {g1:[], g2:[]};
+  STATE.groupIssues[gid] = (STATE.groupIssues[gid]||[]).filter(x=>x.id !== id);
+  try { persistTeamsData(); } catch(e){}
+  renderHQDetail();
+  showToast('이슈가 삭제되었습니다', 'info');
+}
+
 /* ================ SM본부 통합 (HQ 뷰) ================ */
 let chHQMonth = null;
 function renderOrg(){
@@ -4887,6 +5461,8 @@ function renderOrg(){
     });
     return {label:t.name, data, backgroundColor:teamColors[tid]||'#71717A', borderRadius:6};
   });
+  // v64: 상세 보고 영역 렌더
+  try { renderHQDetail(); } catch(e){ console.warn('renderHQDetail 실패', e); }
   if(chHQMonth) try{chHQMonth.destroy();}catch(e){}
   const canvas = document.getElementById('ch-hq-month');
   if(canvas){
