@@ -730,8 +730,11 @@
   .b-card .totals .t .lab{font-size:10px;color:var(--ink3);font-weight:600}
   .b-card .totals .t .v{font-size:16px;font-weight:700;color:var(--ink);margin-top:2px}
   .b-card .totals .t.net .v{color:var(--pt)}
-  .b-card table.cat{width:100%;border-collapse:collapse;font-size:11.5px}
-  .b-card table.cat th{text-align:center;font-weight:600;color:var(--ink3);padding:5px 4px;border-bottom:1px solid var(--line2);font-size:10px;text-transform:uppercase;letter-spacing:.3px}
+  .b-card table.cat{width:100%;border-collapse:collapse;font-size:11.5px;border-radius:6px;overflow:hidden}
+  /* 헤더 행 - 라이트 그레이 배경으로 구분 */
+  .b-card table.cat thead th{text-align:center;font-weight:700;color:var(--ink2);padding:9px 6px;border-bottom:1px solid #E2E4E7;font-size:10.5px;text-transform:uppercase;letter-spacing:.4px;background:#F1F5F9}
+  .b-card table.cat thead th:first-child{border-top-left-radius:6px}
+  .b-card table.cat thead th:last-child{border-top-right-radius:6px}
   .b-card table.cat td{padding:6px 4px;border-bottom:1px solid var(--line2);vertical-align:middle;text-align:center}
   .b-card table.cat td.r{text-align:center;font-variant-numeric:tabular-nums}
   .b-card table.cat td input{
@@ -745,8 +748,10 @@
   }
   .b-card.editing .edit-toggle{background:var(--pt);color:#fff}
   .b-card .cat-name{font-size:11px;color:var(--ink2);font-weight:600;text-align:center;display:inline-block}
-  /* 합계 row - 깔끔한 블랙 톤 (레드 제거) */
-  .b-card table.cat tfoot td{font-weight:700;border-top:1px solid #CFCFD2;border-bottom:0;padding-top:10px;color:#0F0F10;background:transparent;text-align:center}
+  /* 합계 row - 라이트 톤 배경으로 강조 + 블랙 텍스트 */
+  .b-card table.cat tfoot td{font-weight:800;border-top:1.5px solid #CFCFD2;border-bottom:0;padding:11px 6px;color:#0F0F10;background:#FAFAFA;text-align:center;font-size:12px}
+  .b-card table.cat tfoot td:first-child{border-bottom-left-radius:6px;color:var(--ink2);font-weight:700;letter-spacing:.4px;text-transform:uppercase;font-size:11px}
+  .b-card table.cat tfoot td:last-child{border-bottom-right-radius:6px}
   .b-card table.cat tfoot td.net{color:#0F0F10}
 
   /* ============ NEW Alerts UI ============ */
