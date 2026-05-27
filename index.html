@@ -1376,16 +1376,12 @@
       <table class="role-table" id="roster-tbl"></table>
     </div>
     <div class="panel">
-      <h3>담당자별 브랜드 배정 현황</h3>
-      <table class="role-table" id="team-tbl"></table>
-    </div>
-    <div class="panel">
       <div class="head-row">
-        <h3>📅 브랜드별 계약 기간 · 메타 관리 <span class="tag">팀장 권한</span></h3>
+        <h3>📦 브랜드 관리 <span class="tag">팀장 권한</span></h3>
         <button class="btn req-tl" onclick="openBrandAdd()">＋ 브랜드 추가</button>
       </div>
       <table class="role-table contract-tbl" id="contract-tbl"></table>
-      <div style="margin-top:8px;font-size:11px;color:var(--ink3)">※ 매출 변동 알림은 <b>작성일 기준 최근 7일 내 변경된 데이터</b>를 비교합니다 (500만원 이상 변동 시 표시). 계약 종료일이 30일 이내인 브랜드도 자동 표시됩니다.</div>
+      <div style="margin-top:8px;font-size:11px;color:var(--ink3)">※ 2026년에 운영했던 브랜드는 종료 후에도 누적 노출됩니다. 매출 변동 알림은 <b>작성일 기준 최근 7일 내 변경된 데이터</b>를 비교합니다 (500만원 이상 변동 시).</div>
     </div>
   </section>
 
@@ -3446,6 +3442,11 @@ function openTeamMemberAdd(){
     <div class="fm-row"><label>역할 (권한)</label><select id="fm-role">
       <option value="member">팀원</option><option value="lead">팀장</option><option value="head">본부장</option>
     </select></div>
+    <div class="fm-row"><label>담당 브랜드 (선택, 다중)</label>
+      <div id="fm-brand-list" style="display:flex;flex-wrap:wrap;gap:6px;max-height:140px;overflow-y:auto;padding:8px;border:1px solid var(--line);border-radius:7px;background:#FAFAFA">
+        ${(DATA.brands||[]).filter(b=>!getMeta(b).ended).map(b=>`<label style="display:inline-flex;align-items:center;gap:4px;font-size:11.5px;background:#fff;padding:4px 9px;border-radius:5px;border:1px solid var(--line);cursor:pointer"><input type="checkbox" class="fm-brand-chk" value="${b.replace(/"/g,'&quot;')}" style="margin:0" />${b}</label>`).join('')||'<span style="color:var(--ink3);font-size:11px">담당 가능한 브랜드가 없습니다</span>'}
+      </div>
+    </div>
     <div class="fm-row"><label>비밀번호 (선택)</label><input type="text" id="fm-pw" placeholder="비워두면 자동 생성" /></div>
   `;
   openFormModal('＋ 팀원 추가', html, ()=>{
@@ -3458,14 +3459,23 @@ function openTeamMemberAdd(){
     const teamId = STATE.team !== 'HQ' ? STATE.team : 'G';
     const newMember = {name, role, title, password:pw, team:teamId};
     TEAM_ROSTER.push(newMember);
-    // ALL_TEAMS_DATA.teams[team].roster에도 추가 (영구 저장 대상)
+    // 선택된 담당 브랜드 추출
+    const selectedBrands = [];
+    document.querySelectorAll('.fm-brand-chk:checked').forEach(chk=>{ selectedBrands.push(chk.value); });
     if(ALL_TEAMS_DATA.teams[teamId]){
       ALL_TEAMS_DATA.teams[teamId].roster = ALL_TEAMS_DATA.teams[teamId].roster || [];
       ALL_TEAMS_DATA.teams[teamId].roster.push({name, role, title, password:pw});
+      selectedBrands.forEach(b=>{
+        const cur = (DATA.owners[b]||'').split(',').map(s=>s.trim()).filter(Boolean);
+        if(!cur.includes(name)){ cur.push(name); DATA.owners[b] = cur.join(', '); }
+      });
+      const t = ALL_TEAMS_DATA.teams[teamId];
+      t.owners = Object.assign({}, DATA.owners);
       try { persistTeamsData(); } catch(e){}
     }
     refreshAll();
-    showToast(`✓ ${name} (${title}) 팀원 추가 완료 · 비밀번호: ${pw}`, 'success');
+    const brandMsg = selectedBrands.length ? ` · 담당 브랜드 ${selectedBrands.length}건` : '';
+    showToast(`✓ ${name} (${title}) 팀원 추가 완료 · 비밀번호: ${pw}${brandMsg}`, 'success');
   });
 }
 async function removeTeamMember(name){
@@ -4114,64 +4124,85 @@ function saveGoals(){
 
 /* ================ Team Tab ================ */
 function renderTeam(){
-  const canEdit = STATE.role==='lead';
+  const canEdit = STATE.role==='lead' || STATE.role==='head';
 
-  // 0) 팀원 명단 (roster-tbl) - 현재 팀 인원만 표시
+  // 0) 통합 팀원 표 - 이름·직급·역할·담당브랜드·매출·순매출
   const rtbl = document.getElementById('roster-tbl');
   if(rtbl){
     const currentTeam = STATE.team === 'HQ' ? null : STATE.team;
-    let rhtml = '<thead><tr><th style="width:18%">직급</th><th style="width:18%">이름</th><th style="width:14%">역할(권한)</th><th>담당 브랜드</th><th style="width:14%">매출</th><th style="width:12%">액션</th></tr></thead><tbody>';
+    let rhtml = '<thead><tr>'
+      + '<th style="width:13%">이름</th>'
+      + '<th style="width:11%">직급</th>'
+      + '<th style="width:13%">역할(권한)</th>'
+      + '<th>담당 브랜드</th>'
+      + '<th style="width:12%">매출</th>'
+      + '<th style="width:12%">순매출</th>'
+      + '<th style="width:10%">액션</th>'
+      + '</tr></thead><tbody>';
     const teamRoster = currentTeam ? TEAM_ROSTER.filter(p=>p.team===currentTeam) : TEAM_ROSTER;
     teamRoster.forEach(p=>{
       const myBrands = DATA.brands.filter(b=>getOwners(b).includes(p.name));
-      let r=0; myBrands.forEach(b=>{r+=brandYTD(b).rev;});
+      let r=0,e=0; myBrands.forEach(b=>{const t=brandYTD(b);r+=t.rev;e+=t.exp;});
       const roleLabel = {member:'팀원',lead:'팀장',head:'본부장'}[p.role]||p.role;
       const brandsHTML = myBrands.length
         ? myBrands.map(b=>`<span style="background:var(--bg2);color:var(--ink2);font-size:10px;padding:2px 7px;border-radius:4px;margin-right:4px;margin-bottom:3px;display:inline-block">${b}</span>`).join('')
         : '<span style="color:var(--ink3);font-size:11px">담당 없음</span>';
+      const escName = (p.name||'').replace(/'/g, "\\'");
       rhtml += `<tr>
-        <td><b>${p.title}</b></td>
-        <td>${p.name}</td>
-        <td><span style="background:${p.role==='lead'?'#FFE5E9':p.role==='head'?'#0F0F10':'var(--bg2)'};color:${p.role==='lead'?'var(--pt)':p.role==='head'?'#fff':'var(--ink2)'};font-size:11px;padding:3px 8px;border-radius:5px;font-weight:700">${roleLabel}</span></td>
+        <td><b>${p.name}</b></td>
+        <td>${p.title||'-'}</td>
+        <td><span style="background:${p.role==='lead'?'#FFE5E9':p.role==='head'?'#0F0F10':'var(--bg2)'};color:${p.role==='lead'?'var(--pt)':p.role==='head'?'#fff':'var(--ink2)'};font-size:11px;padding:3px 9px;border-radius:5px;font-weight:600">${roleLabel}</span></td>
         <td>${brandsHTML}</td>
         <td>${fmtShort(r)}원</td>
-        <td>${canEdit ? `<button class="expand-btn" onclick="removeTeamMember('${p.name.replace(/'/g,"\\'")}')" style="color:#B8001A">삭제</button>` : '<span style="color:var(--ink3);font-size:11px">-</span>'}</td>
+        <td style="color:${r-e>=0?'var(--ink)':'#E60021'};font-weight:600">${fmtShort(r-e)}원</td>
+        <td>${canEdit ? `<button class="expand-btn" onclick="removeTeamMember('${escName}')" style="color:#B8001A">삭제</button>` : '<span style="color:var(--ink3);font-size:11px">-</span>'}</td>
       </tr>`;
     });
     rhtml += '</tbody>';
     rtbl.innerHTML = rhtml;
   }
 
-  // 1) 담당자별 묶음 (다중 담당자도 각 담당자별로 합산)
-  const groups = {};
-  DATA.brands.forEach(b=>{
-    getOwners(b).forEach(o=>{(groups[o]=groups[o]||[]).push(b);});
-  });
-  let html1 = '<thead><tr><th style="width:18%">담당자</th><th style="width:52%">담당 브랜드</th><th>매출</th><th>순매출</th></tr></thead><tbody>';
-  Object.entries(groups).forEach(([owner,brands])=>{
-    let r=0,e=0; brands.forEach(b=>{const t=brandYTD(b);r+=t.rev;e+=t.exp;});
-    html1 += `<tr><td><b>${owner}</b></td><td>${brands.map(b=>`<span style="background:var(--bg2);color:var(--ink2);font-size:10px;padding:2px 7px;border-radius:4px;margin-right:4px;margin-bottom:3px;display:inline-block">${b}</span>`).join('')}</td><td>${fmtShort(r)}원</td><td class="y">${fmtShort(r-e)}원</td></tr>`;
-  });
-  html1 += '</tbody>';
-  document.getElementById('team-tbl').innerHTML = html1;
-
-  // 2) 브랜드별 계약 기간 / 담당자 / 광고주 매핑 표 (팀장만 편집 가능)
+  // 1) 브랜드 관리 표 - 2026년 운영했던 모든 브랜드 누적 (종료 포함)
   const cTbl = document.getElementById('contract-tbl');
   if(!cTbl) return;
-  let html2 = '<thead><tr><th style="width:14%">광고주</th><th style="width:16%">브랜드</th><th style="width:12%">담당자</th><th>계약 시작</th><th>계약 종료</th><th>신규</th><th>종료</th><th>액션</th></tr></thead><tbody>';
-  DATA.brands.forEach(b=>{
+  const has2026Records = new Set();
+  (DATA.records||[]).forEach(rec=>{
+    if(rec.month && rec.month.startsWith('26년') && rec.brand) has2026Records.add(rec.brand);
+  });
+  const allBrandsCum = [];
+  (DATA.brands||[]).forEach(b=>{ if(!allBrandsCum.includes(b)) allBrandsCum.push(b); });
+  has2026Records.forEach(b=>{ if(!allBrandsCum.includes(b)) allBrandsCum.push(b); });
+  allBrandsCum.sort((a,b)=>{
+    const ea = (getMeta(a).ended)?1:0;
+    const eb = (getMeta(b).ended)?1:0;
+    if(ea!==eb) return ea-eb;
+    return 0;
+  });
+  let html2 = '<thead><tr>'
+    + '<th style="width:12%">광고주</th>'
+    + '<th style="width:14%">브랜드</th>'
+    + '<th style="width:11%">담당자</th>'
+    + '<th>계약 시작</th><th>계약 종료</th>'
+    + '<th style="width:6%">신규</th>'
+    + '<th style="width:6%">종료</th>'
+    + '<th style="width:13%">관리</th>'
+    + '</tr></thead><tbody>';
+  allBrandsCum.forEach(b=>{
     const meta = getMeta(b);
     const adv = ADV_MAP[b]||'';
     const own = OWNERS[b]||'';
-    html2 += `<tr>
+    const endedAttr = meta.ended ? 'style="opacity:.55;background:#FAFAFA"' : '';
+    const endedTag = meta.ended ? '<span style="background:#FEE2E2;color:#B91C1C;font-size:9px;padding:2px 5px;border-radius:3px;margin-left:4px;font-weight:700">종료</span>' : '';
+    const escB = (b||'').replace(/'/g, "\\'");
+    html2 += `<tr ${endedAttr}>
       <td><input data-b="${b.replace(/"/g,'&quot;')}" data-f="adv" type="text" value="${adv}" ${canEdit?'':'disabled'} class="ct-in" /></td>
-      <td><b>${b}</b></td>
+      <td><b>${b}</b>${endedTag}</td>
       <td><input data-b="${b.replace(/"/g,'&quot;')}" data-f="owner" type="text" value="${own}" ${canEdit?'':'disabled'} class="ct-in" /></td>
       <td><input data-b="${b.replace(/"/g,'&quot;')}" data-f="cs" type="date" value="${meta.contractStart||''}" ${canEdit?'':'disabled'} class="ct-in" /></td>
       <td><input data-b="${b.replace(/"/g,'&quot;')}" data-f="ce" type="date" value="${meta.contractEnd||''}" ${canEdit?'':'disabled'} class="ct-in" /></td>
       <td style="text-align:center"><input data-b="${b.replace(/"/g,'&quot;')}" data-f="new" type="checkbox" ${meta.newBrand?'checked':''} ${canEdit?'':'disabled'} class="ct-in" /></td>
       <td style="text-align:center"><input data-b="${b.replace(/"/g,'&quot;')}" data-f="end" type="checkbox" ${meta.ended?'checked':''} ${canEdit?'':'disabled'} class="ct-in" /></td>
-      <td>${canEdit ? `<button class="expand-btn" onclick="renameBrand('${b.replace(/'/g,"\\'")}')">이름</button> <button class="expand-btn" onclick="deleteBrand('${b.replace(/'/g,"\\'")}')" style="color:#B8001A">삭제</button>` : '<span style="color:var(--ink3);font-size:11px">열람만</span>'}</td>
+      <td>${canEdit ? `<button class="expand-btn" onclick="renameBrand('${escB}')">수정</button> <button class="expand-btn" onclick="deleteBrand('${escB}')" style="color:#B8001A">삭제</button>` : '<span style="color:var(--ink3);font-size:11px">-</span>'}</td>
     </tr>`;
   });
   html2 += '</tbody>';
@@ -4189,12 +4220,17 @@ function renderTeam(){
         else if(f==='end') meta.ended = inp.checked;
         else if(f==='adv'){
           const v = (inp.value||'').trim();
-          ADV_MAP[b] = v;
-          if(v && !ADV_ORDER.includes(v)) ADV_ORDER.push(v);
+          DATA.advertiserMap[b] = v;
+          if(v && !DATA.advertiserOrder.includes(v)) DATA.advertiserOrder.push(v);
         }
-        else if(f==='owner'){ OWNERS[b] = (inp.value||'').trim(); }
-        // 다른 화면도 자동 반영
-        renderProgList(); renderBrandTbl(); renderKPI();
+        else if(f==='owner'){ DATA.owners[b] = (inp.value||'').trim(); }
+        if(STATE.team !== 'HQ' && ALL_TEAMS_DATA.teams[STATE.team]){
+          const t = ALL_TEAMS_DATA.teams[STATE.team];
+          t.advertiserMap = Object.assign({}, DATA.advertiserMap);
+          t.owners = Object.assign({}, DATA.owners);
+        }
+        try { persistTeamsData(); } catch(err){}
+        renderProgList(); renderBrandTbl(); renderKPI(); renderTeam();
       });
     });
   }
@@ -4273,9 +4309,9 @@ function renderOrg(){
   html += `<tr style="background:#0F0F10;color:#fff"><td><b style="color:#fff">SM본부 합계</b></td><td>${fmtShort(totGoal)}원</td><td>${fmtShort(totRev)}원</td><td><b style="color:#fff">${hqPct.toFixed(1)}%</b></td><td>${fmtShort(totRev-totExp)}원</td><td>${hqMargin.toFixed(1)}%</td><td>-</td><td>-</td></tr>`;
   html += '</tbody>';
   tbl.innerHTML = html;
-  // 통합 매출 추이 차트
+  // 통합 매출 추이 차트 - 6팀 컬러
   const months = ALL_TEAMS_DATA.months;
-  const teamColors = {G:'#E60021', D:'#1D4ED8', U:'#D97706'};
+  const teamColors = {G:'#E60021', D:'#1D4ED8', U:'#D97706', E:'#7C3AED', I:'#0891B2', R:'#16A34A'};
   const datasets = Object.keys(ALL_TEAMS_DATA.teams).map(tid=>{
     const t = ALL_TEAMS_DATA.teams[tid];
     const data = months.map(m=>{
@@ -4283,7 +4319,7 @@ function renderOrg(){
       t.records.forEach(rec=>{ if(rec.month===m) rev+=rec.revenue||0; });
       return rev;
     });
-    return {label:t.name, data, backgroundColor:teamColors[tid], borderRadius:6};
+    return {label:t.name, data, backgroundColor:teamColors[tid]||'#71717A', borderRadius:6};
   });
   if(chHQMonth) try{chHQMonth.destroy();}catch(e){}
   const canvas = document.getElementById('ch-hq-month');
