@@ -4511,45 +4511,28 @@ function restoreTeamsData(){
       if(ALL_TEAMS_DATA.teams[tid]){
         const stored = snapshot.teams[tid];
         const cur = ALL_TEAMS_DATA.teams[tid];
-        // brands: stored 우선 + 신규 배포 브랜드 보존 (union)
-        if(Array.isArray(stored.brands) && stored.brands.length){
-          const merged = stored.brands.slice();
-          (cur.brands||[]).forEach(b=>{ if(!merged.includes(b)) merged.push(b); });
-          cur.brands = merged;
+        // v63: stored(사용자 저장본)를 권위적 소스로 사용 - 삭제/이름변경 등 사용자 액션 영구 반영
+        // 기존 union 병합은 삭제된 브랜드를 시드에서 부활시키던 버그 → 제거
+        if(Array.isArray(stored.brands)){
+          cur.brands = stored.brands.slice();
         }
-        // records: 키(brand|month|category) 기준 병합 - stored가 사용자 편집본이므로 우선
         if(Array.isArray(stored.records)){
-          const keyOf = r => `${r.brand}|${r.month}|${r.category||''}`;
-          const storedKeys = new Set(stored.records.map(keyOf));
-          const merged = stored.records.slice();
-          // 신규 배포에만 있는 records (신규 브랜드/월) 추가
-          (cur.records||[]).forEach(r=>{
-            if(!storedKeys.has(keyOf(r))) merged.push(r);
-          });
-          cur.records = merged;
+          cur.records = stored.records.slice();
         }
-        // notes: 동일하게 키 기반 병합
         if(Array.isArray(stored.notes)){
-          const keyN = n => `${n.brand}|${n.month}|${n.category||''}`;
-          const storedNKeys = new Set(stored.notes.map(keyN));
-          const merged = stored.notes.slice();
-          (cur.notes||[]).forEach(n=>{
-            if(!storedNKeys.has(keyN(n))) merged.push(n);
-          });
-          cur.notes = merged;
+          cur.notes = stored.notes.slice();
         }
-        if(stored.advertiserMap) cur.advertiserMap = Object.assign({}, cur.advertiserMap||{}, stored.advertiserMap);
-        if(stored.owners) cur.owners = Object.assign({}, cur.owners||{}, stored.owners);
-        if(stored.advertiserOrder){
-          const merged = stored.advertiserOrder.slice();
-          (cur.advertiserOrder||[]).forEach(a=>{ if(!merged.includes(a)) merged.push(a); });
-          cur.advertiserOrder = merged;
+        // advertiserMap/owners: stored가 권위 (사용자가 삭제한 항목 영구 반영)
+        if(stored.advertiserMap) cur.advertiserMap = Object.assign({}, stored.advertiserMap);
+        if(stored.owners) cur.owners = Object.assign({}, stored.owners);
+        if(Array.isArray(stored.advertiserOrder)){
+          cur.advertiserOrder = stored.advertiserOrder.slice();
         }
         if(stored.goals) cur.goals = Object.assign({}, cur.goals||{}, stored.goals);
         if(stored.roster) cur.roster = stored.roster;
-        // v58: 팀별 brandMeta/taxInvoice 복원
-        if(stored.brandMeta) cur.brandMeta = Object.assign(cur.brandMeta||{}, stored.brandMeta);
-        if(stored.taxInvoice) cur.taxInvoice = Object.assign(cur.taxInvoice||{}, stored.taxInvoice);
+        // brandMeta/taxInvoice: stored 권위 (삭제된 브랜드 메타가 부활하지 않도록)
+        if(stored.brandMeta) cur.brandMeta = Object.assign({}, stored.brandMeta);
+        if(stored.taxInvoice) cur.taxInvoice = Object.assign({}, stored.taxInvoice);
       }
     });
     // 저장된 월 목록 복원 (기존 + 신규 자동 생성 월)
