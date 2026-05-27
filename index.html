@@ -1020,9 +1020,9 @@
     <h5>매출 관리</h5>
     <div class="nav" id="nav-main">
       <button data-tab="dash" class="active"><span class="ico"><svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="9"/><circle cx="12" cy="12" r="5"/><circle cx="12" cy="12" r="1.6" fill="currentColor"/></svg></span>연간 KPI 목표</button>
-      <button data-tab="hq-sales" class="hq-menu-only"><span class="ico"><svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 3v18h18"/><path d="M7 14l4-4 4 4 5-6"/></svg></span>브랜드별 매출표</button>
-      <button data-tab="brand"><span class="ico"><svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="4" y1="20" x2="20" y2="20"/><rect x="5" y="11" width="3" height="8"/><rect x="11" y="6" width="3" height="13"/><rect x="17" y="14" width="3" height="5"/></svg></span>브랜드별 매출표</button>
-      <button data-tab="ops"><span class="ico"><svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M14 4l6 6L8 22H2v-6z"/><path d="M14 4l6 6"/></svg></span>월간 운영</button>
+      <button data-tab="hq-sales" class="hq-menu-only"><span class="ico"><svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 3v18h18"/><path d="M7 14l4-4 4 4 5-6"/></svg></span>브랜드별 운영 실적</button>
+      <button data-tab="brand"><span class="ico"><svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="4" y1="20" x2="20" y2="20"/><rect x="5" y="11" width="3" height="8"/><rect x="11" y="6" width="3" height="13"/><rect x="17" y="14" width="3" height="5"/></svg></span>브랜드별 운영 실적</button>
+      <button data-tab="ops"><span class="ico"><svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M14 4l6 6L8 22H2v-6z"/><path d="M14 4l6 6"/></svg></span>월간 매출 현황</button>
       <button data-tab="alerts"><span class="ico"><svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M18 16v-5a6 6 0 10-12 0v5l-2 2v1h16v-1z"/><path d="M10 21h4"/></svg></span>변동 알림<span class="nav-badge" id="nav-alert-badge" style="display:none">0</span></button>
     </div>
 
@@ -1172,7 +1172,7 @@
     <div class="row r2-32 hq-hide">
       <div class="panel">
         <div class="head-row">
-          <h3>브랜드별 매출 진행 현황 <span class="tag pt">TOP 5</span></h3>
+          <h3>브랜드 매출 성과 <span class="tag pt">TOP 5</span></h3>
           <button class="btn" onclick="goTab('brand')" style="padding:6px 12px;border:1px solid var(--line);background:#fff;border-radius:6px;font-size:11px;cursor:pointer;color:var(--ink2)">전체 보기 →</button>
         </div>
         <div class="prog-list" id="prog-list"></div>
@@ -1260,7 +1260,7 @@
 
     <div class="panel">
       <div class="head-row">
-        <h3>브랜드별 매출표 <span class="tag">팀 전체</span></h3>
+        <h3>브랜드별 운영 실적 <span class="tag">팀 전체</span></h3>
         <div class="toolbar" style="margin:0">
           <input id="hq-brand-search" placeholder="브랜드/광고주/팀 검색…" style="width:220px" />
           <select id="hq-brand-sort" style="padding:7px 10px;border:1px solid var(--line);border-radius:7px;font-size:12px;background:#fff;font-family:inherit">
@@ -1349,12 +1349,17 @@
 
     <div class="panel">
       <div class="head-row">
-        <h3>월간 브랜드 운영</h3>
+        <h3>월간 매출 현황</h3>
         <div class="toolbar" style="margin:0">
           <select id="ops-month"></select>
+          <select id="ops-sort" style="padding:7px 9px;border:1px solid var(--line);border-radius:6px;font-size:12px;background:#fff">
+            <option value="rev_desc">매출 높은 순</option>
+            <option value="rev_asc">매출 낮은 순</option>
+            <option value="name">가나다 순</option>
+          </select>
           <input id="ops-search" placeholder="브랜드 검색…" style="width:180px" />
           <button class="btn req-senior" onclick="openBrandAdd()">＋ 브랜드 추가</button>
-          <label class="btn req-senior" style="cursor:pointer">📤 엑셀 업로드<input type="file" accept=".xlsx,.xls,.csv" onchange="uploadOpsExcel(event)" style="display:none" /></label>
+          <label class="btn req-senior" style="cursor:pointer">엑셀 업로드<input type="file" accept=".xlsx,.xls,.csv" onchange="uploadOpsExcel(event)" style="display:none" /></label>
         </div>
       </div>
       <div class="brand-cards" id="brand-cards"></div>
@@ -1421,7 +1426,6 @@
     <div class="panel">
       <div class="head-row">
         <h3>🏛 SM본부 통합 현황</h3>
-        <div style="font-size:11px;color:var(--ink3)">G팀·D팀·U팀 통합</div>
       </div>
       <table class="role-table" id="hq-team-tbl"></table>
     </div>
@@ -2484,6 +2488,7 @@ document.addEventListener('input', e=>{
 });
 document.addEventListener('change', e=>{
   if(e.target.id === 'hq-brand-sort') renderHQBrandTable();
+  if(e.target.id === 'ops-sort') renderOps();
 });
 
 // 컬럼 헤더 클릭으로 정렬 토글 (높은순 → 낮은순 → 높은순)
@@ -3102,19 +3107,27 @@ function renderProgList(){
   const scope = brandsInScope();
   const list = scope.map(b=>{const t=brandYTD(b);return {b,...t};})
     .filter(x=>x.rev>0).sort((a,b)=>b.rev-a.rev).slice(0,5);
-  const max = STATE.goals.rev/16;
-  const html = list.map(x=>{
-    const pct = Math.min(100, x.rev/max*100);
-    const badge = x.rev > max ? '<span class="badge k">초과달성</span>' : (x.rev > max*0.7 ? '<span class="badge r">진행중</span>' : '<span class="badge n">시작</span>');
-    return `<div class="prog">
-      ${badge}
-      <div class="info"><b>${x.b}</b><span>${ADV_MAP[x.b]||'-'} · 담당 ${OWNERS[x.b]||'-'} · 순매출 ${fmtShort(x.net)}원</span></div>
-      <div class="bar"><i style="width:${pct}%"></i></div>
-      <div class="pct">${fmtShort(x.rev)}</div>
-      <button class="more" onclick="goTab('brand')">상세</button>
-    </div>`;
+  const top = list[0]?.rev || 1;
+  const html = list.map((x,idx)=>{
+    const pct = Math.min(100, x.rev/top*100);
+    const rank = idx + 1;
+    const rankStyle = rank===1 ? 'background:#FFE5E9;color:#E60021' : rank===2 ? 'background:#FFF5E1;color:#D97706' : rank===3 ? 'background:#E6F4FF;color:#1D4ED8' : 'background:var(--bg2);color:var(--ink2)';
+    const badge = '<span class="badge" style="'+rankStyle+';font-weight:800">'+rank+'위</span>';
+    return '<div class="prog">'
+      + badge
+      + '<div class="info"><b>'+x.b+'</b><span>'+(ADV_MAP[x.b]||'-')+' · 담당 '+(OWNERS[x.b]||'-')+' · 순매출 '+fmtShort(x.net)+'원</span></div>'
+      + '<div class="bar"><i style="width:'+pct+'%"></i></div>'
+      + '<div class="pct">'+fmtShort(x.rev)+'</div>'
+      + '<button class="more" onclick="goTab(\'brand\')">상세</button>'
+      + '</div>';
   }).join('');
-  document.getElementById('prog-list').innerHTML = html || '<div style="color:var(--ink3);font-size:12px;padding:14px">담당 브랜드 데이터가 없습니다.</div>';
+  const wrapEl = document.getElementById('prog-list');
+  if(!wrapEl) return;
+  if(list.length === 0){
+    wrapEl.innerHTML = '<div style="color:var(--ink3);font-size:12px;padding:14px">담당 브랜드 데이터가 없습니다.</div>';
+    return;
+  }
+  wrapEl.innerHTML = html + '<div style="margin-top:8px;font-size:10.5px;color:var(--ink3);padding:6px 8px;background:var(--bg2);border-radius:5px;line-height:1.55">※ 누적 매출 기준 상위 5개 브랜드 · 바 길이는 1위 대비 매출 비율</div>';
 }
 
 /* ================ Alerts (side panel + new feed) ================ */
@@ -3300,11 +3313,19 @@ function renderOps(){
   let scope = brandsInScope()
     .filter(b=>!search || b.includes(search) || (ADV_MAP[b]||'').includes(search))
     .filter(b=>shouldShowInMonth(b, m));
-  // 종료 브랜드는 항상 하단으로
+  const sortMode = (document.getElementById('ops-sort')?.value) || 'rev_desc';
   scope.sort((a,b)=>{
     const ea = getMeta(a).ended, eb = getMeta(b).ended;
     if(ea!==eb) return ea?1:-1;
-    return brandYTD(b).rev - brandYTD(a).rev;
+    if(sortMode === 'name') return a.localeCompare(b, 'ko');
+    if(sortMode === 'rev_asc'){
+      const av = brandMonth(a, m).rev || 0;
+      const bv = brandMonth(b, m).rev || 0;
+      return av - bv;
+    }
+    const av = brandMonth(a, m).rev || 0;
+    const bv = brandMonth(b, m).rev || 0;
+    return bv - av;
   });
 
   let sr=0,se=0; scope.forEach(b=>{const bm=brandMonth(b,m);sr+=bm.rev;se+=bm.exp;});
@@ -3371,6 +3392,7 @@ function renderOps(){
     const endToggle = (canEdit && editing) ? `<label class="end-toggle"><input type="checkbox" ${meta.ended?'checked':''} onchange="toggleBrandEnded('${b.replace(/'/g,"\\'")}', this.checked)" />브랜드 종료</label>` : '';
     const removeMonthBtn = (canEdit && editing && !isHiddenInMonth(b, m)) ? '<button class="expand-btn" data-remove-month-brand="' + encodeURIComponent(b) + '" data-month="' + m + '" style="color:#D97706">이 달에서 제외</button>' : '';
     const editToggleBtn = canEdit ? `<button class="expand-btn ${editing?'pri':''}" onclick="toggleEditBrand('${b.replace(/'/g,"\\'")}')">${editing?'저장':'수정'}</button>` : '';
+    const cancelEditBtn = (canEdit && editing) ? '<button class="expand-btn" data-cancel-edit="' + encodeURIComponent(b) + '" style="color:var(--ink3)">닫기</button>' : '';
     const renameBtn = (canEdit && STATE.role==='lead') ? `<button class="expand-btn" onclick="renameBrand('${b.replace(/'/g,"\\'")}')">설정</button>` : '';
     const deleteBtn = (canEdit && STATE.role==='lead') ? `<button class="expand-btn" onclick="deleteBrand('${b.replace(/'/g,"\\'")}')" style="color:#B8001A">삭제</button>` : '';
     const expandBtn = `<button class="expand-btn" onclick="toggleCardExpand('${b.replace(/'/g,"\\'")}')">상세 ▾</button>`;
@@ -3383,6 +3405,7 @@ function renderOps(){
           ${removeMonthBtn}
           ${expandBtn}
           ${editToggleBtn}
+          ${cancelEditBtn}
           ${renameBtn}
           ${deleteBtn}
         </div>
@@ -3390,7 +3413,7 @@ function renderOps(){
       <table class="cat">
         <thead><tr><th style="width:18%">카테고리</th><th class="r" style="width:16%">매출</th><th class="r" style="width:16%">지출</th><th class="r" style="width:14%">순이익률</th><th style="width:36%">비고 (전주 대비)</th></tr></thead>
         <tbody>${rows}</tbody>
-        <tfoot><tr><td>합계</td><td class="r">${fmtShort(bm.rev)}</td><td class="r">${fmtShort(bm.exp)}</td><td class="r net">${bm.rev?((bm.net/bm.rev*100).toFixed(1)+'%'):'-'}</td><td class="r net" style="text-align:right">${fmtShort(bm.net)}원 (순매출)</td></tr></tfoot>
+        <tfoot><tr><td>합계</td><td class="r"><b>${fmt(bm.rev)}</b></td><td class="r"><b>${fmt(bm.exp)}</b></td><td class="r net">${bm.rev?((bm.net/bm.rev*100).toFixed(1)+'%'):'-'}</td><td class="r net" style="text-align:right"><b>${fmt(bm.net)}원</b> (순매출)</td></tr></tfoot>
       </table>
     </div>`;
   }).join('');
@@ -3403,8 +3426,16 @@ function renderOps(){
       if(b && mm) removeBrandFromMonth(b, mm);
     });
   });
+  // 편집 닫기 버튼 이벤트 위임
+  wrap.querySelectorAll('button[data-cancel-edit]').forEach(btn=>{
+    btn.addEventListener('click',()=>{
+      const b = decodeURIComponent(btn.getAttribute('data-cancel-edit')||'');
+      if(b) cancelEditBrand(b);
+    });
+  });
   wrap.querySelectorAll('input').forEach(inp=>{
-    inp.addEventListener('change',()=>{
+    const evtName = (inp.dataset.f === 'revenue' || inp.dataset.f === 'expense') ? 'input' : 'change';
+    inp.addEventListener(evtName,()=>{
       const b=inp.dataset.b, c=inp.dataset.c, f=inp.dataset.f;
       const month = document.getElementById('ops-month').value;
       const k = keyR(b,month,c);
@@ -3463,13 +3494,13 @@ function renderOps(){
             if(netB) netB.textContent = fmtShort(bm.net);
             if(margB) margB.textContent = bm.rev?((bm.net/bm.rev*100).toFixed(1)+'%'):'-';
           }
-          // tfoot 합계
+          // tfoot 합계 - 풀 숫자
           const tfCells = card.querySelectorAll('tfoot tr td');
           if(tfCells && tfCells.length >= 5){
-            tfCells[1].textContent = fmtShort(bm.rev);
-            tfCells[2].textContent = fmtShort(bm.exp);
+            tfCells[1].innerHTML = '<b>'+fmt(bm.rev)+'</b>';
+            tfCells[2].innerHTML = '<b>'+fmt(bm.exp)+'</b>';
             tfCells[3].innerHTML = bm.rev?((bm.net/bm.rev*100).toFixed(1)+'%'):'-';
-            tfCells[4].textContent = fmtShort(bm.net)+'원 (순매출)';
+            tfCells[4].innerHTML = '<b>'+fmt(bm.net)+'원</b> (순매출)';
           }
           // row 이익률 셀 - 카테고리별
           const rowMargin = (cRev, cExp) => cRev ? (((cRev-cExp)/cRev)*100) : null;
@@ -3497,6 +3528,11 @@ function renderOps(){
 function toggleEditBrand(b){
   STATE.edit.brand = (STATE.edit.brand===b) ? null : b;
   renderOps();
+}
+function cancelEditBrand(b){
+  STATE.edit.brand = null;
+  renderOps();
+  showToast('편집을 종료했습니다', 'info');
 }
 function toggleBrandEnded(b, ended){
   const meta = getMeta(b);

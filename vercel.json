@@ -1,19 +1,68 @@
 {
   "rewrites": [
-    { "source": "/g", "destination": "/" },
-    { "source": "/d", "destination": "/" },
-    { "source": "/u", "destination": "/" },
-    { "source": "/e", "destination": "/" },
-    { "source": "/i", "destination": "/" },
-    { "source": "/r", "destination": "/" },
-    { "source": "/hq", "destination": "/" },
-    { "source": "/G", "destination": "/" },
-    { "source": "/D", "destination": "/" },
-    { "source": "/U", "destination": "/" },
-    { "source": "/E", "destination": "/" },
-    { "source": "/I", "destination": "/" },
-    { "source": "/R", "destination": "/" },
-    { "source": "/HQ", "destination": "/" },
-    { "source": "/demo", "destination": "/demo.html" }
+    {
+      "source": "/g",
+      "destination": "/"
+    },
+    {
+      "source": "/d",
+      "destination": "/"
+    },
+    {
+      "source": "/u",
+      "destination": "/"
+    },
+    {
+      "source": "/e",
+      "destination": "/"
+    },
+    {
+      "source": "/i",
+      "destination": "/"
+    },
+    {
+      "source": "/r",
+      "destination": "/"
+    },
+    {
+      "source": "/hq",
+      "destination": "/"
+    },
+    {
+      "source": "/G",
+      "destination": "/"
+    },
+    {
+      "source": "/D",
+      "destination": "/"
+    },
+    {
+      "source": "/U",
+      "destination": "/"
+    },
+    {
+      "source": "/E",
+      "destination": "/"
+    },
+    {
+      "source": "/I",
+      "destination": "/"
+    },
+    {
+      "source": "/R",
+      "destination": "/"
+    },
+    {
+      "source": "/HQ",
+      "destination": "/"
+    },
+    {
+      "source": "/demo",
+      "destination": "/demo.html"
+    },
+    {
+      "source": "/demo-edit",
+      "destination": "/demo-edit.html"
+    }
   ]
 }
