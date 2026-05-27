@@ -3057,7 +3057,10 @@ function renderOps(){
   const sel = document.getElementById('ops-month');
   if(!sel.options.length){
     DATA.months.forEach(m=>{const o=document.createElement('option');o.value=m;o.textContent=m;sel.appendChild(o);});
-    sel.value = DATA.months[DATA.months.length-1];
+    // 현재 일자 기준 월을 기본 선택 (없으면 가장 최신 월)
+    const _today = new Date();
+    const _curLabel = `${_today.getFullYear()%100}년 ${_today.getMonth()+1}월`;
+    sel.value = DATA.months.includes(_curLabel) ? _curLabel : DATA.months[DATA.months.length-1];
   }
   const m = sel.value;
   const search = (document.getElementById('ops-search').value||'').trim();
@@ -3804,6 +3807,7 @@ function persistTeamsData(){
   try {
     const snapshot = {
       teams: {},
+      months: ALL_TEAMS_DATA.months,
       hq_goals: ALL_TEAMS_DATA.hq_goals,
       hqInsightOverrides: STATE.hqInsightOverrides || {},
       qualGrowth: STATE.qualGrowth || {},
@@ -3855,6 +3859,11 @@ function restoreTeamsData(){
         if(stored.roster) cur.roster = stored.roster;
       }
     });
+    // 저장된 월 목록 복원 (기존 + 신규 자동 생성 월)
+    if(Array.isArray(snapshot.months) && snapshot.months.length){
+      // 기존 월 중 사라진 것은 유지하고 신규만 추가 (병합)
+      snapshot.months.forEach(m=>{ if(!ALL_TEAMS_DATA.months.includes(m)) ALL_TEAMS_DATA.months.push(m); });
+    }
     if(snapshot.hq_goals) ALL_TEAMS_DATA.hq_goals = snapshot.hq_goals;
     if(snapshot.hqInsightOverrides) STATE.hqInsightOverrides = snapshot.hqInsightOverrides;
     if(snapshot.qualGrowth) Object.assign(STATE.qualGrowth, snapshot.qualGrowth);
@@ -4298,10 +4307,67 @@ document.addEventListener('click', e=>{
   }
 });
 
+/* ================ 매월 초 자동 다음달 시트 생성 ================ */
+const AUTO_GEN_KEY = 'sm_last_seen_month_v1';
+function autoGenNextMonth(){
+  try {
+    const today = new Date();
+    const yy = today.getFullYear()%100;
+    const mm = today.getMonth()+1;
+    const curLabel = `${yy}년 ${mm}월`;
+    const lastSeen = localStorage.getItem(AUTO_GEN_KEY) || '';
+    // 이번 달은 이미 처리됨
+    if(lastSeen === curLabel){
+      return false;
+    }
+    // 다음달 라벨 계산
+    const nextMM = mm === 12 ? 1 : mm+1;
+    const nextYY = mm === 12 ? yy+1 : yy;
+    const nextLabel = `${nextYY}년 ${nextMM}월`;
+
+    let created = false;
+    if(!ALL_TEAMS_DATA.months.includes(nextLabel)){
+      ALL_TEAMS_DATA.months.push(nextLabel);
+      // 각 팀의 브랜드 × 카테고리 구조를 next month로 복사 (rev/exp = 0)
+      Object.keys(ALL_TEAMS_DATA.teams).forEach(tid=>{
+        const t = ALL_TEAMS_DATA.teams[tid];
+        if(!t.brands || !t.records) return;
+        const cats = new Set();
+        // 현재 월 또는 가장 최근 월의 카테고리 추출
+        t.records.forEach(r=>{ if(r.category) cats.add(r.category); });
+        t.brands.forEach(b=>{
+          cats.forEach(c=>{
+            // 이미 존재하는지 확인
+            const exists = t.records.some(r=>r.brand===b && r.month===nextLabel && r.category===c);
+            if(!exists){
+              t.records.push({brand:b, month:nextLabel, category:c, revenue:0, expense:0, note:''});
+            }
+          });
+        });
+      });
+      created = true;
+    }
+    localStorage.setItem(AUTO_GEN_KEY, curLabel);
+    if(created){
+      try { persistTeamsData(); } catch(e){}
+      // 토스트는 init() 이후 안전하게
+      setTimeout(()=>{
+        try { showToast(`📅 ${nextLabel} 월간 운영 시트가 자동으로 생성되었습니다 (기존 브랜드 구조 복사)`, 'info'); } catch(e){}
+      }, 1200);
+    }
+    return created;
+  } catch(e){
+    console.warn('autoGenNextMonth 실패', e);
+    return false;
+  }
+}
+
 /* ================ Init - 세션 복원 또는 로그인 게이트 ================ */
 (function init(){
   // 저장된 팀 데이터 복원 (다른 탭의 변경사항 포함)
   restoreTeamsData();
+  // 매월 초 자동 다음달 시트 생성
+  autoGenNextMonth();
   recomputeHQGoals();
   // 5시간 세션 복원 시도
   const restored = restoreSession();
