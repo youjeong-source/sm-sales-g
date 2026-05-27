@@ -4738,34 +4738,73 @@ function renderTeam(){
   html2 += '</tbody>';
   cTbl.innerHTML = html2;
 
-  // bind change events
+  // bind change events - v62: change/input/blur 3중 이벤트로 누락 방지
   if(canEdit){
-    cTbl.querySelectorAll('.ct-in').forEach(inp=>{
-      inp.addEventListener('change',()=>{
-        const b = inp.dataset.b, f = inp.dataset.f;
-        const meta = getMeta(b);
-        if(f==='cs') meta.contractStart = inp.value;
-        else if(f==='ce') meta.contractEnd = inp.value;
-        else if(f==='new') meta.newBrand = inp.checked;
-        else if(f==='end') meta.ended = inp.checked;
-        else if(f==='adv'){
-          const v = (inp.value||'').trim();
+    // 공통 저장 핸들러
+    function saveCtInChange(inp){
+      const b = inp.dataset.b, f = inp.dataset.f;
+      if(!b || !f) return;
+      const meta = getMeta(b);
+      let changed = false;
+      if(f==='cs'){
+        if(meta.contractStart !== inp.value){ meta.contractStart = inp.value; changed = true; }
+      } else if(f==='ce'){
+        if(meta.contractEnd !== inp.value){ meta.contractEnd = inp.value; changed = true; }
+      } else if(f==='new'){
+        if(meta.newBrand !== inp.checked){ meta.newBrand = inp.checked; changed = true; }
+      } else if(f==='end'){
+        if(meta.ended !== inp.checked){ meta.ended = inp.checked; changed = true; }
+      } else if(f==='adv'){
+        const v = (inp.value||'').trim();
+        if((DATA.advertiserMap[b]||'') !== v){
           DATA.advertiserMap[b] = v;
           if(v && !DATA.advertiserOrder.includes(v)) DATA.advertiserOrder.push(v);
+          changed = true;
         }
-        else if(f==='owner'){ DATA.owners[b] = (inp.value||'').trim(); }
-        if(STATE.team !== 'HQ' && ALL_TEAMS_DATA.teams[STATE.team]){
-          const t = ALL_TEAMS_DATA.teams[STATE.team];
-          t.advertiserMap = Object.assign({}, DATA.advertiserMap);
-          t.owners = Object.assign({}, DATA.owners);
-          t.advertiserOrder = (DATA.advertiserOrder||[]).slice();  // v60: 추가
-          // brandMeta/taxInvoice는 reference이지만 명시 보장
-          t.brandMeta = DATA.brandMeta;
-          t.taxInvoice = DATA.taxInvoice;
-        }
-        try { persistTeamsData(); } catch(err){}
-        // v60: 모든 페이지 강제 갱신 (renderTeam은 안에 포함됨)
-        refreshAfterBrandChange();
+      } else if(f==='owner'){
+        const v = (inp.value||'').trim();
+        if((DATA.owners[b]||'') !== v){ DATA.owners[b] = v; changed = true; }
+      }
+      if(!changed) return;
+      // 모든 팀 필드 명시 동기화 (DATA → t)
+      if(STATE.team !== 'HQ' && ALL_TEAMS_DATA.teams[STATE.team]){
+        const t = ALL_TEAMS_DATA.teams[STATE.team];
+        t.brands = DATA.brands.slice();
+        t.records = DATA.records.slice();
+        t.notes = (DATA.notes||[]).slice();
+        t.advertiserMap = Object.assign({}, DATA.advertiserMap);
+        t.owners = Object.assign({}, DATA.owners);
+        t.advertiserOrder = (DATA.advertiserOrder||[]).slice();
+        t.brandMeta = DATA.brandMeta;
+        t.taxInvoice = DATA.taxInvoice;
+      }
+      try { persistTeamsData(); } catch(err){}
+      // 모든 페이지 강제 갱신
+      refreshAfterBrandChange();
+      // 사용자 피드백 토스트 (체크박스/날짜 변경 시 명확)
+      try { showToast(`✓ ${b} 정보 저장됨 (${f})`, 'success'); } catch(e){}
+    }
+    cTbl.querySelectorAll('.ct-in').forEach(inp=>{
+      // change: 표준 이벤트
+      inp.addEventListener('change', ()=>saveCtInChange(inp));
+      // input: 텍스트 입력 실시간 (text/date)
+      if(inp.type === 'text' || inp.type === 'date'){
+        let lastVal = inp.value;
+        inp.addEventListener('input', ()=>{
+          // 디바운스 - 300ms 정지 후 저장
+          clearTimeout(inp._saveTimer);
+          inp._saveTimer = setTimeout(()=>{
+            if(inp.value !== lastVal){
+              lastVal = inp.value;
+              saveCtInChange(inp);
+            }
+          }, 300);
+        });
+      }
+      // blur: 포커스 잃을 때 최종 저장 (safety net)
+      inp.addEventListener('blur', ()=>{
+        clearTimeout(inp._saveTimer);
+        saveCtInChange(inp);
       });
     });
   }
