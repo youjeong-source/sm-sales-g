@@ -3653,7 +3653,82 @@ function openBrandAdd(){
   openFormModal('＋ 브랜드 추가', html, ()=>{
     const name = getFM('fm-brand').trim();
     if(!name){alert('브랜드명을 입력하세요.');return false;}
-    if(DATA.brands.includes(name)){alert('이미 존재하는 브랜드입니다.');return false;}
+    // 동일 이름 브랜드가 이미 존재하면 → 현재 월 재노출 처리 옵션 제공
+    if(DATA.brands.includes(name)){
+      const curMonth = (document.getElementById('ops-month')?.value) || '';
+      const m = getMeta(name);
+      const hidden = curMonth ? isHiddenInMonth(name, curMonth) : false;
+      const endedBefore = curMonth ? isEndedBeforeMonth(name, curMonth) : false;
+      const beforeStart = curMonth ? isBeforeStart(name, curMonth) : false;
+      const visibleNow = !hidden && !endedBefore && !beforeStart;
+      if(visibleNow){
+        alert('해당 브랜드는 이미 ' + (curMonth||'현재 월') + ' 에 노출 중입니다.');
+        return false;
+      }
+      // 노출 불가 상태 → 사용자에게 안내 + 자동 재노출 옵션
+      const reasons = [];
+      if(hidden) reasons.push('· 이 달에서 제외됨');
+      if(endedBefore) reasons.push('· 계약 종료 (' + (m.contractEnd||'-') + ')');
+      if(beforeStart) reasons.push('· 계약 시작 전 (' + (m.contractStart||'-') + ')');
+      closeFormModal();
+      confirmUI(
+        '<b>' + name + '</b> 은(는) 이미 등록된 브랜드입니다.<br/>'
+          + '<b>' + (curMonth||'현재 월') + '</b> 에 노출되지 않은 이유:<br/>'
+          + reasons.join('<br/>')
+          + '<br/><br/>이 달에 다시 노출할까요?<br/>(필요한 경우 종료 해제 / 계약기간 자동 조정)',
+        '기존 브랜드 다시 노출',
+        {yesLabel:'다시 노출'}
+      ).then(ok=>{
+        if(!ok) return;
+        // 숨김 해제
+        if(hidden) setHiddenInMonth(name, curMonth, false);
+        // 종료 플래그 해제
+        if(m.ended) m.ended = false;
+        // 계약 기간 자동 조정
+        if(curMonth){
+          const mm = curMonth.match(/(\d+)년\s*(\d+)월/);
+          if(mm){
+            const yy = 2000 + parseInt(mm[1],10);
+            const mn = parseInt(mm[2],10);
+            const monthStart = new Date(yy, mn-1, 1);
+            const monthEnd = new Date(yy, mn, 0);
+            if(endedBefore){
+              // contractEnd 가 현재 월보다 이전이면 → 현재 월 말일로 연장
+              const e = new Date(m.contractEnd);
+              if(!isNaN(e.getTime()) && e < monthStart){
+                const newEnd = monthEnd.toISOString().slice(0,10);
+                m.contractEnd = newEnd;
+              }
+            }
+            if(beforeStart){
+              // contractStart 가 현재 월 이후면 → 현재 월 1일로 당김
+              const s = new Date(m.contractStart);
+              if(!isNaN(s.getTime()) && s > monthEnd){
+                m.contractStart = monthStart.toISOString().slice(0,10);
+              }
+            }
+          }
+        }
+        // 누락된 records 생성 (카테고리별 0)
+        if(curMonth){
+          const hasRec = DATA.records.some(r=>r.brand===name && r.month===curMonth);
+          if(!hasRec && typeof CATS !== 'undefined' && CATS.length){
+            CATS.forEach(c=>{
+              DATA.records.push({brand:name, month:curMonth, category:c, revenue:0, expense:0, note:''});
+            });
+            // ALL_TEAMS_DATA 동기화
+            if(STATE.team !== 'HQ' && ALL_TEAMS_DATA.teams[STATE.team]){
+              ALL_TEAMS_DATA.teams[STATE.team].records = DATA.records.slice();
+            }
+          }
+        }
+        try { persistTeamsData(); } catch(e){}
+        try { rebuildREC(); } catch(e){}
+        refreshAll();
+        showToast('✓ ' + name + ' 을(를) ' + (curMonth||'현재 월') + ' 에 다시 노출했습니다', 'success');
+      });
+      return false;
+    }
     const adv = getFM('fm-adv').trim() || '직접입력';
     const owner = getFM('fm-owner').trim() || '미지정';
     DATA.brands.push(name);
