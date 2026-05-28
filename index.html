@@ -1388,15 +1388,13 @@
   .modal .actions button.pri:hover{background:var(--pt-d)}
 
   /* ============ Workflow / Docs ============ */
-  /* v97: 워크플로우 페이지 리뉴얼 */
-  .wf-hero{background:linear-gradient(135deg,#FFF5F7 0%,#FFE5E9 60%,#FFF 100%);border:1px solid #FBDCE1;border-radius:14px;padding:28px 32px;margin-bottom:18px}
-  .wf-hero .wf-emoji{font-size:36px;margin-bottom:8px;display:inline-block}
-  .wf-hero h2{font-size:22px;font-weight:900;letter-spacing:-.5px;color:var(--ink);margin-bottom:8px}
-  .wf-hero p{font-size:13.5px;color:var(--ink2);font-weight:500;line-height:1.65;max-width:720px}
-  .wf-hero p b{color:#E60021;font-weight:700}
-  .wf-hero .wf-tags{display:flex;gap:8px;margin-top:14px;flex-wrap:wrap}
-  .wf-hero .wf-tag{display:inline-flex;align-items:center;gap:4px;background:#fff;border:1px solid #FBDCE1;color:#B8001A;padding:5px 12px;border-radius:20px;font-size:11.5px;font-weight:700}
-  .wf-hero .wf-tag .ico{font-size:13px}
+  /* v98: 워크플로우 페이지 - Hero 제거 + 화이트 배경 */
+  /* 페이지 화이트 배경 */
+  body:has(#tab-wf:not(.hide)) main{background:#fff}
+  #tab-wf{background:#fff;padding:0}
+  .wf-intro{padding:8px 4px 22px;border-bottom:1px solid var(--line2);margin-bottom:22px}
+  .wf-intro h2{font-size:20px;font-weight:900;letter-spacing:-.5px;color:var(--ink);margin-bottom:8px}
+  .wf-intro p{font-size:13.5px;color:var(--ink2);font-weight:500;line-height:1.65;max-width:720px}
 
   .wf-section-title{display:flex;align-items:center;gap:9px;margin:24px 0 14px;font-size:18px;font-weight:800;color:var(--ink);letter-spacing:-.3px}
   .wf-section-title .ico{font-size:22px}
@@ -2009,16 +2007,10 @@
 
   <!-- =============== Workflow =============== -->
   <section id="tab-wf" class="hide">
-    <!-- Hero: 시스템 개요 -->
-    <div class="wf-hero">
-      <div class="wf-emoji">📊</div>
-      <h2>GOLDENAX · SM본부 매출관리 시스템</h2>
-      <p>연간 KPI 목표 설정부터 월별 실적 입력, 주간 변동 알림, 본부 통합 현황까지 매출 데이터를 통합 관리하는 도구입니다. 데이터는 <b>팀 → 본부</b> 단위로 집계되며, 권한(팀원 / 대리·과장 / 팀장 / 본부장·그룹장)에 따라 열람·수정 범위가 달라집니다.</p>
-      <div class="wf-tags">
-        <span class="wf-tag"><span class="ico">🔐</span>이름 + 개인 비밀번호 로그인</span>
-        <span class="wf-tag"><span class="ico">👥</span>4단계 권한 체계</span>
-        <span class="wf-tag"><span class="ico">📈</span>본부 통합 대시보드</span>
-      </div>
+    <!-- v98: 심플 인트로 (Hero 박스 제거) -->
+    <div class="wf-intro">
+      <h2>SM본부 매출관리 시스템</h2>
+      <p>연간 KPI 목표 설정부터 월별 실적 입력, 주간 변동 알림 등 매출 데이터를 통합 관리하는 도구입니다.</p>
     </div>
 
     <!-- 워크플로우 5단계 -->
