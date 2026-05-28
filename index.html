@@ -816,18 +816,16 @@
 
   /* ============ v88: 박스 부제 + 그룹 누적 표 ============ */
   .v88-box-sub{font-size:15px;font-weight:700;color:var(--ink);letter-spacing:-.3px;margin:0 0 12px;padding-bottom:0}
-  .v88-box-sub.divider{margin-top:24px;padding-top:20px;border-top:1px solid var(--line2)}
+  .v88-box-sub.divider{margin-top:28px;padding-top:0;border-top:none}
   .v88-grp-sum-tbl{width:100%;border-collapse:collapse;font-size:13px;border:1px solid var(--line);border-radius:8px;overflow:hidden;background:#fff}
-  .v88-grp-sum-tbl thead th{background:#F8FAFC;color:var(--ink3);font-size:13px;font-weight:700;letter-spacing:-.2px;padding:11px 14px;text-align:center;border-bottom:1px solid var(--line2);border-right:1px solid var(--line2)}
-  .v88-grp-sum-tbl thead th:last-child{border-right:none}
-  .v88-grp-sum-tbl thead th.r{text-align:center}
+  .v88-grp-sum-tbl thead th{background:#F8FAFC;color:var(--ink3);font-size:12.5px;font-weight:700;letter-spacing:-.2px;padding:11px 16px;text-align:left;border-bottom:1px solid var(--line2)}
+  .v88-grp-sum-tbl thead th.r{text-align:right}
   .v88-grp-sum-tbl thead th .dot{display:inline-block;width:6px;height:6px;border-radius:50%;margin-right:5px;vertical-align:middle}
   .v88-grp-sum-tbl thead th .dot.rev{background:#E60021}
   .v88-grp-sum-tbl thead th .dot.net{background:#1D4ED8}
-  .v88-grp-sum-tbl tbody td{padding:13px 14px;border-bottom:1px solid var(--line2);font-variant-numeric:tabular-nums;font-weight:700;color:var(--ink2);background:#FEFEFE;text-align:center;border-right:1px solid var(--line2)}
-  .v88-grp-sum-tbl tbody td:last-child{border-right:none}
-  .v88-grp-sum-tbl tbody td.lbl{font-size:13px;font-weight:600;color:var(--ink3);text-align:center}
-  .v88-grp-sum-tbl tbody td.r{text-align:center;font-size:13.5px}
+  .v88-grp-sum-tbl tbody td{padding:13px 16px;border-bottom:1px solid var(--line2);font-variant-numeric:tabular-nums;font-weight:700;color:var(--ink2);background:#fff;text-align:left}
+  .v88-grp-sum-tbl tbody td.lbl{font-size:13px;font-weight:600;color:var(--ink3);text-align:left}
+  .v88-grp-sum-tbl tbody td.r{text-align:right;font-size:13.5px}
   .v88-grp-sum-tbl tbody td.r.big{font-size:16px;font-weight:800;color:var(--ink)}
   .v88-grp-sum-tbl tbody td.r.big.rev{color:#E60021}
   .v88-grp-sum-tbl tbody td.r.big.net{color:#1D4ED8}
@@ -849,25 +847,25 @@
   .v85-grp-info b{color:var(--ink);font-weight:800}
   /* 월별 펼치기 (collapsible) */
   .v85-mx-tbl{width:100%;border-collapse:collapse;font-size:13px;border:1px solid var(--line);border-radius:8px;overflow:hidden}
-  .v85-mx-tbl thead th{background:#F8FAFC;color:var(--ink3);font-size:13px;font-weight:700;letter-spacing:-.2px;padding:11px 14px;text-align:center;border-bottom:1px solid var(--line2);text-transform:none;border-right:1px solid var(--line2)}
-  .v85-mx-tbl thead th:last-child{border-right:none}
-  .v85-mx-tbl thead th.r{text-align:center}
-  .v85-mx-tbl tbody td{padding:13px 14px;border-bottom:1px solid var(--line2);font-variant-numeric:tabular-nums;font-weight:700;font-size:13px;color:var(--ink2);background:#FEFEFE;text-align:center;border-right:1px solid var(--line2)}
-  .v85-mx-tbl tbody td:last-child{border-right:none}
-  .v85-mx-tbl tbody td.r{text-align:center;font-weight:700}
+  .v85-mx-tbl thead th{background:#F8FAFC;color:var(--ink3);font-size:12.5px;font-weight:700;letter-spacing:-.2px;padding:11px 16px;text-align:left;border-bottom:1px solid var(--line2);text-transform:none}
+  .v85-mx-tbl thead th.r{text-align:right}
+  .v85-mx-tbl tbody td{padding:13px 16px;border-bottom:1px solid var(--line2);font-variant-numeric:tabular-nums;font-weight:700;font-size:13px;color:var(--ink2);background:#fff;text-align:left}
+  .v85-mx-tbl tbody td.r{text-align:right;font-weight:700}
   .v85-mx-tbl tbody td.muted{color:var(--ink3);font-weight:700}
   .v85-mx-tbl tbody td.pct.good{color:#16A34A}
   .v85-mx-tbl tbody td.pct.warn{color:#D97706}
   .v85-mx-tbl tbody tr:last-child td{border-bottom:none}
   /* 월 헤더 row - 클릭 가능 */
   .v85-mx-tbl .mo-row{transition:background .12s}
-  .v85-mx-tbl .mo-row td{padding:11px 14px;font-weight:900;font-size:13px}
+  .v85-mx-tbl .mo-row td{padding:12px 16px;font-weight:800;font-size:13.5px;background:#fff;color:var(--ink)}
   .v85-mx-tbl .mo-row:hover td{background:#FEFEFE}
-  .v85-mx-tbl .mo-row.cur .mo-name{color:#E60021}
-  .v85-mx-tbl .mo-row.cur td{background:#fff;color:var(--ink)}
-  .v85-mx-tbl .mo-row.cur td.r{color:#E60021;font-weight:800}
+  .v85-mx-tbl .mo-row.cur td{background:#FFFAFB}
+  .v85-mx-tbl .mo-row.cur td:first-child{color:#E60021;font-weight:900}
+  .v85-mx-tbl .mo-row.cur td.r{font-weight:800}
+  .v85-mx-tbl .team-row.cur td{background:#FFFAFB}
   .v85-mx-tbl .mo-row.cur:hover td{background:#FFEFF3}
   .v85-mx-tbl .mo-row.next td{color:var(--ink3)}
+  .v85-mx-tbl .team-row.next td{color:var(--ink3)}
   .v85-mx-tbl .mo-row .mo-name{font-weight:900;display:inline-flex;align-items:center;gap:8px}
   .v85-mx-tbl .mo-row .caret{display:none}
   .v85-mx-tbl .mo-row.expanded .caret{transform:rotate(90deg)}
@@ -877,8 +875,8 @@
   .v85-mx-tbl .mo-row.next .pill{background:#EFF6FF;color:#1D4ED8}
   /* 팀별 세부 row - 기본 hidden */
   .v85-mx-tbl .team-row{display:table-row}
-  .v85-mx-tbl .team-row td{font-size:12.5px;background:#FAFAFA}
-  .v85-mx-tbl .team-row td.tname{padding-left:14px;color:var(--ink2);font-weight:700;text-align:center}
+  .v85-mx-tbl .team-row td{font-size:12.5px;background:#FAFBFC;color:var(--ink2)}
+  .v85-mx-tbl .team-row td.tname{padding-left:36px;color:var(--ink2);font-weight:600;text-align:left;font-size:12.5px}
   .v85-mx-tbl .team-row.cur td{background:#FFFAFB}
   /* 합계는 펼쳐졌을 때만 보이거나, 항상 보일 수 있음 - 합계는 mo-row 그 자체임 */
 
@@ -939,7 +937,7 @@
   .v82-mo-row{display:grid;grid-template-columns:1fr 1fr 1fr 1fr 1fr;padding:13px 0;border-bottom:1px solid var(--line2);align-items:center;gap:0;background:#FEFEFE}
   .v82-mo-row.head{background:#F8FAFC;color:var(--ink3);font-size:13px;font-weight:700;letter-spacing:-.2px;padding:11px 0;text-transform:none}
   .v82-mo-row:last-child{border-bottom:none}
-  .v82-mo-row > *{padding:0 14px;border-right:1px solid var(--line2)}
+  .v82-mo-row > *{padding:0 14px;border-right:1px solid var(--line2);text-align:center;display:flex;align-items:center;justify-content:center}
   .v82-mo-row > *:last-child{border-right:none}
   .v82-mo-name{font-size:13px;font-weight:700;letter-spacing:-.3px;display:flex;align-items:center;justify-content:center;gap:6px;color:var(--ink2)}
   .v82-mo-name .pill{font-size:9.5px;font-weight:700;padding:2px 6px;border-radius:4px;letter-spacing:.2px}
@@ -5580,7 +5578,7 @@ function fmtEokWon(v){
   return v.toLocaleString('ko-KR')+'원';
 }
 function fmtMoney(v){ return fmtEokWon(v); }
-function fmtFull(v){ return (v|0).toLocaleString('ko-KR')+'원'; }
+function fmtFull(v){ return Math.round(Number(v)||0).toLocaleString('ko-KR')+'원'; }
 
 function renderHQAnnual(){
   if(STATE.team !== 'HQ') return;
