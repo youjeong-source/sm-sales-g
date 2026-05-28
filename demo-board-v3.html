@@ -1,0 +1,403 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8">
+<title>보드 레이아웃 제안 v3 | GOLDENAX</title>
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="robots" content="noindex,nofollow">
+<style>
+  *{box-sizing:border-box;margin:0;padding:0}
+  :root{
+    --ink:#0F0F10; --ink2:#475569; --ink3:#94A3B8;
+    --line:#E5E5E5; --line2:#EFEFEF;
+    --bg:#FAFAFA; --bg2:#F4F4F5;
+    --pt:#E60021; --pt-d:#B8001A;
+  }
+  body{font-family:'Pretendard','Apple SD Gothic Neo',-apple-system,sans-serif;background:var(--bg);color:var(--ink);padding:24px;line-height:1.5;font-size:13px}
+  .demo-nav{position:sticky;top:0;background:#fff;border:1px solid var(--line);border-radius:10px;padding:14px 20px;margin-bottom:20px;display:flex;align-items:center;gap:14px;z-index:100;box-shadow:0 1px 4px rgba(0,0,0,.03);flex-wrap:wrap}
+  .demo-nav h1{font-size:16px;font-weight:900;letter-spacing:-.4px;color:var(--ink);flex:none}
+  .demo-nav .group{display:flex;gap:6px;flex-wrap:wrap}
+  .demo-nav .group-label{font-size:10.5px;color:var(--ink3);font-weight:700;letter-spacing:.3px;text-transform:uppercase;margin-right:4px;align-self:center}
+  .demo-nav .tabs button{background:#fff;border:1px solid var(--line);color:var(--ink2);font-size:11.5px;font-weight:700;padding:6px 12px;border-radius:6px;cursor:pointer;font-family:inherit;letter-spacing:-.1px}
+  .demo-nav .tabs button.active{background:var(--ink);color:#fff;border-color:var(--ink)}
+  .demo-section{display:none;margin-bottom:30px}
+  .demo-section.active{display:block}
+  .opt-label{display:inline-flex;align-items:center;gap:8px;font-size:12px;font-weight:800;color:var(--ink);background:#fff;border:1px solid var(--line);padding:7px 13px;border-radius:6px;margin-bottom:12px;letter-spacing:-.2px}
+  .opt-label .num{background:var(--pt);color:#fff;width:18px;height:18px;border-radius:50%;display:inline-flex;align-items:center;justify-content:center;font-size:10.5px;font-weight:900}
+  .opt-label .tip{color:var(--ink3);font-weight:600;font-size:10.5px}
+  .page-title{font-size:17px;font-weight:800;letter-spacing:-.4px;color:var(--ink);margin:0 0 8px 2px}
+  .box-sub{font-size:15px;font-weight:700;color:var(--ink);letter-spacing:-.3px;margin:0 0 12px}
+
+  /* =====================================================================
+     안 A: 카드 + 비교 막대 (visual progress comparison)
+     ===================================================================== */
+  .a-box{background:#fff;border:1px solid var(--line);border-radius:12px;padding:20px 22px}
+  .a-grid{display:grid;grid-template-columns:1fr 1fr;gap:18px}
+  .a-card{background:#fff;border:1px solid var(--line);border-radius:10px;padding:18px 20px}
+  .a-card.rev{border-color:#FBDCE1;background:linear-gradient(180deg,#FFF9FA 0%,#fff 30%)}
+  .a-card.net{border-color:#BFDBFE;background:linear-gradient(180deg,#F0F7FF 0%,#fff 30%)}
+  .a-card .title{font-size:14px;font-weight:800;color:var(--ink);margin-bottom:14px;display:flex;align-items:center;gap:7px;letter-spacing:-.2px}
+  .a-card .title .dot{width:8px;height:8px;border-radius:50%;background:var(--pt)}
+  .a-card.net .title .dot{background:#1D4ED8}
+  .a-card .big-pct{font-size:34px;font-weight:900;letter-spacing:-1px;line-height:1;color:var(--pt);font-variant-numeric:tabular-nums}
+  .a-card.net .big-pct{color:#1D4ED8}
+  .a-card .pct-sub{font-size:11px;color:var(--ink3);font-weight:700;letter-spacing:.3px;text-transform:uppercase;margin-top:4px;margin-bottom:14px}
+  .a-card .bar{height:9px;background:var(--bg2);border-radius:4px;overflow:hidden;margin-bottom:14px}
+  .a-card .bar i{display:block;height:100%;border-radius:4px;background:var(--pt);transition:width .5s}
+  .a-card.net .bar i{background:#1D4ED8}
+  .a-card .stats{display:flex;flex-direction:column;gap:9px}
+  .a-card .stat{display:flex;justify-content:space-between;align-items:baseline;font-variant-numeric:tabular-nums}
+  .a-card .stat .k{font-size:12px;color:var(--ink3);font-weight:600}
+  .a-card .stat .v{font-size:14px;color:var(--ink);font-weight:800;letter-spacing:-.3px}
+
+  /* =====================================================================
+     안 B: 표 + 미니 막대 통합 (1 row per metric)
+     ===================================================================== */
+  .b-box{background:#fff;border:1px solid var(--line);border-radius:12px;padding:20px 22px}
+  .b-tbl{width:100%;border-collapse:collapse;font-size:13px;font-variant-numeric:tabular-nums}
+  .b-tbl thead th{background:#F8FAFC;color:var(--ink3);font-size:12px;font-weight:700;letter-spacing:-.2px;padding:11px 14px;text-align:left;border-bottom:1px solid var(--line2)}
+  .b-tbl thead th.r{text-align:right}
+  .b-tbl thead th.c{text-align:center}
+  .b-tbl tbody td{padding:14px;border-bottom:1px solid var(--line2);font-weight:700;color:var(--ink2)}
+  .b-tbl tbody tr:last-child td{border-bottom:none}
+  .b-tbl tbody td.r{text-align:right}
+  .b-tbl tbody td.c{text-align:center}
+  .b-tbl .label{display:flex;align-items:center;gap:8px;font-weight:800;color:var(--ink);font-size:13.5px}
+  .b-tbl .label .dot{width:8px;height:8px;border-radius:50%}
+  .b-tbl .label .dot.rev{background:var(--pt)}
+  .b-tbl .label .dot.net{background:#1D4ED8}
+  .b-tbl .big{font-size:15px;font-weight:800;color:var(--ink)}
+  .b-tbl .big.rev{color:var(--pt)}
+  .b-tbl .big.net{color:#1D4ED8}
+  .b-tbl .mini-bar{display:flex;align-items:center;gap:8px}
+  .b-tbl .mini-bar .bar{flex:1;height:8px;background:var(--bg2);border-radius:4px;overflow:hidden;min-width:120px;max-width:200px}
+  .b-tbl .mini-bar .bar i{display:block;height:100%;border-radius:4px;background:var(--pt)}
+  .b-tbl .mini-bar .bar i.net{background:#1D4ED8}
+  .b-tbl .mini-bar .pct{font-size:14px;font-weight:900;color:var(--pt);min-width:50px;text-align:right}
+  .b-tbl .mini-bar .pct.net{color:#1D4ED8}
+
+  /* =====================================================================
+     안 C: 좌측 도넛 + 우측 상세 (호리즌탈 통합 카드)
+     ===================================================================== */
+  .c-box{background:#fff;border:1px solid var(--line);border-radius:12px;padding:24px 26px}
+  .c-row{display:flex;align-items:center;gap:24px;padding:14px 0;border-bottom:1px solid var(--line2)}
+  .c-row:last-child{border-bottom:none}
+  .c-row .donut-w{flex:none;width:108px;height:108px;position:relative}
+  .c-row .donut-w svg{width:100%;height:100%;transform:rotate(-90deg)}
+  .c-row .donut-w .track{stroke:#F1F5F9}
+  .c-row .donut-w .fill{stroke:var(--pt);transition:stroke-dashoffset .5s}
+  .c-row.net .donut-w .fill{stroke:#1D4ED8}
+  .c-row .donut-w .ctr{position:absolute;inset:0;display:flex;flex-direction:column;align-items:center;justify-content:center}
+  .c-row .donut-w .ctr .pct{font-size:22px;font-weight:900;color:var(--pt);letter-spacing:-.5px;line-height:1;font-variant-numeric:tabular-nums}
+  .c-row.net .donut-w .ctr .pct{color:#1D4ED8}
+  .c-row .donut-w .ctr .lab{font-size:9px;color:var(--ink3);font-weight:700;letter-spacing:.3px;margin-top:3px;text-transform:uppercase}
+  .c-row .info{flex:1;display:grid;grid-template-columns:auto 1fr auto 1fr;gap:14px 30px;align-items:baseline}
+  .c-row .info .title{grid-column:1 / -1;font-size:14px;font-weight:800;color:var(--ink);margin-bottom:6px;display:flex;align-items:center;gap:7px}
+  .c-row .info .title .dot{width:8px;height:8px;border-radius:50%;background:var(--pt)}
+  .c-row.net .info .title .dot{background:#1D4ED8}
+  .c-row .info .k{font-size:12px;color:var(--ink3);font-weight:600}
+  .c-row .info .v{font-size:15px;font-weight:800;color:var(--ink);font-variant-numeric:tabular-nums;letter-spacing:-.3px}
+  .c-row .info .v.big{font-size:17px}
+  .c-row .info .v.big.rev{color:var(--pt)}
+  .c-row .info .v.big.net{color:#1D4ED8}
+
+  /* =====================================================================
+     그룹 누적 - 안 D: 카드 그리드 (no table)
+     ===================================================================== */
+  .d-grid{display:grid;grid-template-columns:1fr 1fr;gap:12px}
+  .d-card{background:#fff;border:1px solid var(--line);border-radius:10px;padding:16px 18px}
+  .d-card.rev{border-left:3px solid var(--pt)}
+  .d-card.net{border-left:3px solid #1D4ED8}
+  .d-card .title{font-size:12px;font-weight:700;color:var(--ink3);letter-spacing:.3px;text-transform:uppercase;margin-bottom:10px}
+  .d-card .row{display:flex;justify-content:space-between;align-items:baseline;padding:6px 0;border-bottom:1px dashed var(--line2);font-variant-numeric:tabular-nums}
+  .d-card .row:last-child{border-bottom:none;padding-top:10px}
+  .d-card .row .k{font-size:12px;color:var(--ink3);font-weight:600}
+  .d-card .row .v{font-size:13px;color:var(--ink);font-weight:800;letter-spacing:-.2px}
+  .d-card .row.highlight .v{font-size:16px}
+  .d-card.rev .row.highlight .v{color:var(--pt)}
+  .d-card.net .row.highlight .v{color:#1D4ED8}
+
+  /* =====================================================================
+     그룹 누적 - 안 E: 한 줄 가로형 (compact strip)
+     ===================================================================== */
+  .e-strip{background:#fff;border:1px solid var(--line);border-radius:10px;padding:16px 20px;display:flex;align-items:center;gap:20px;font-variant-numeric:tabular-nums}
+  .e-strip .seg{display:flex;flex-direction:column;gap:3px;padding:0 14px}
+  .e-strip .seg:not(:last-child){border-right:1px solid var(--line2)}
+  .e-strip .seg.head{padding:0;font-size:13px;font-weight:800}
+  .e-strip .seg.head .l{font-size:11px;color:var(--ink3);font-weight:600;text-transform:uppercase;letter-spacing:.3px}
+  .e-strip .seg.head .v{font-size:14px;color:var(--ink);font-weight:900}
+  .e-strip .seg .l{font-size:10.5px;color:var(--ink3);font-weight:700;letter-spacing:.2px;text-transform:uppercase}
+  .e-strip .seg .v{font-size:14.5px;color:var(--ink);font-weight:800;letter-spacing:-.3px}
+  .e-strip .seg .v.rev{color:var(--pt)}
+  .e-strip .seg .v.net{color:#1D4ED8}
+  .e-strip .dot{width:8px;height:8px;border-radius:50%;background:var(--pt);display:inline-block;margin-right:5px;vertical-align:middle}
+  .e-strip .dot.net{background:#1D4ED8}
+
+  /* =====================================================================
+     그룹 누적 - 안 F: 진행률 막대 통합 표 (compact bars)
+     ===================================================================== */
+  .f-box{background:#fff;border:1px solid var(--line);border-radius:10px;padding:18px 22px}
+  .f-row{display:grid;grid-template-columns:130px 1fr 80px;gap:20px;align-items:center;padding:12px 0;border-bottom:1px solid var(--line2);font-variant-numeric:tabular-nums}
+  .f-row:last-child{border-bottom:none}
+  .f-row .label{display:flex;flex-direction:column;gap:2px}
+  .f-row .label .title{font-size:13.5px;font-weight:800;color:var(--ink);display:flex;align-items:center;gap:6px}
+  .f-row .label .title .dot{width:8px;height:8px;border-radius:50%;background:var(--pt)}
+  .f-row.net .label .title .dot{background:#1D4ED8}
+  .f-row .label .nums{font-size:11px;color:var(--ink3);font-weight:600}
+  .f-row .label .nums b{color:var(--ink2);font-weight:700}
+  .f-row .bar-wrap{display:flex;flex-direction:column;gap:5px}
+  .f-row .bar{height:10px;background:var(--bg2);border-radius:5px;overflow:hidden;position:relative}
+  .f-row .bar i{display:block;height:100%;border-radius:5px;background:var(--pt);transition:width .5s}
+  .f-row.net .bar i{background:#1D4ED8}
+  .f-row .bar-marks{display:flex;justify-content:space-between;font-size:9.5px;color:var(--ink3);font-weight:600}
+  .f-row .pct{font-size:20px;font-weight:900;color:var(--pt);text-align:right;letter-spacing:-.5px}
+  .f-row.net .pct{color:#1D4ED8}
+
+  /* 월별 매출 - column proportion 조정 데모 */
+  .m-list{background:#fff;border:1px solid var(--line);border-radius:8px;overflow:hidden;margin-top:14px}
+  .m-row{display:grid;grid-template-columns:14% 24% 24% 18% 20%;padding:13px 0;border-bottom:1px solid var(--line2);align-items:center}
+  .m-row.head{background:#F8FAFC;color:var(--ink3);font-size:12.5px;font-weight:700;letter-spacing:-.2px}
+  .m-row > *{padding:0 14px;text-align:center}
+  .m-row:last-child{border-bottom:none}
+  .m-cell{font-size:13.5px;font-weight:700;font-variant-numeric:tabular-nums;color:var(--ink2)}
+  .m-cell.muted{color:var(--ink3)}
+  .m-cell.pct.good{color:#16A34A}
+  .m-cell.pct.warn{color:#D97706}
+  .m-name{font-size:13px;font-weight:700;color:var(--ink2);display:flex;align-items:center;justify-content:center;gap:6px}
+  .m-name .pill{font-size:9.5px;font-weight:700;padding:2px 6px;border-radius:4px}
+  .m-row.cur .pill{background:var(--pt);color:#fff;font-weight:800}
+  .m-row.cur .m-name{color:var(--pt);font-weight:900}
+  .m-row.cur .m-cell{color:var(--ink);font-weight:800}
+  .m-row.prev .pill{background:var(--bg2);color:var(--ink3)}
+  .m-row.next .pill{background:#F1F5F9;color:#64748B}
+
+</style>
+</head>
+<body>
+
+<div class="demo-nav">
+  <h1>보드 레이아웃 제안 v3</h1>
+  <div class="group-label">연간 달성</div>
+  <div class="tabs group">
+    <button class="active" data-tab="a">안 A · 카드+막대</button>
+    <button data-tab="b">안 B · 표+미니막대</button>
+    <button data-tab="c">안 C · 좌도넛+우상세</button>
+  </div>
+  <div class="group-label">그룹 누적</div>
+  <div class="tabs group">
+    <button data-tab="d">안 D · 카드 그리드</button>
+    <button data-tab="e">안 E · 한줄 가로형</button>
+    <button data-tab="f">안 F · 막대 통합표</button>
+  </div>
+</div>
+
+<!-- ============ 연간 달성 - 안 A: 카드+막대 ============ -->
+<div class="demo-section active" id="sec-a">
+  <div class="opt-label"><span class="num">A</span>연간 달성 — 카드 + 막대 (좌우 분리, 큰 % 강조)</div>
+  <h1 class="page-title">SM본부 연간 달성 현황</h1>
+  <div class="a-box">
+    <div class="box-sub">연간 달성 현황</div>
+    <div class="a-grid">
+      <div class="a-card rev">
+        <div class="title"><span class="dot"></span>매출 누적</div>
+        <div class="big-pct">22.4%</div>
+        <div class="pct-sub">달성률</div>
+        <div class="bar"><i style="width:22.4%"></i></div>
+        <div class="stats">
+          <div class="stat"><span class="k">목표</span><span class="v">30,000,000,000원</span></div>
+          <div class="stat"><span class="k">달성 매출</span><span class="v">6,720,182,448원</span></div>
+        </div>
+      </div>
+      <div class="a-card net">
+        <div class="title"><span class="dot"></span>순매출 누적</div>
+        <div class="big-pct">26.3%</div>
+        <div class="pct-sub">달성률</div>
+        <div class="bar"><i style="width:26.3%"></i></div>
+        <div class="stats">
+          <div class="stat"><span class="k">목표</span><span class="v">7,000,000,000원</span></div>
+          <div class="stat"><span class="k">달성 매출</span><span class="v">1,838,338,505원</span></div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ============ 연간 달성 - 안 B: 표+미니막대 ============ -->
+<div class="demo-section" id="sec-b">
+  <div class="opt-label"><span class="num">B</span>연간 달성 — 표 + 미니막대 (한눈에 비교 용이)</div>
+  <h1 class="page-title">SM본부 연간 달성 현황</h1>
+  <div class="b-box">
+    <div class="box-sub">연간 달성 현황</div>
+    <table class="b-tbl">
+      <thead><tr>
+        <th style="width:18%">항목</th>
+        <th class="r" style="width:22%">목표</th>
+        <th class="r" style="width:22%">달성 매출</th>
+        <th class="c" style="width:38%">달성률</th>
+      </tr></thead>
+      <tbody>
+        <tr>
+          <td><div class="label"><span class="dot rev"></span>매출 누적</div></td>
+          <td class="r">30,000,000,000원</td>
+          <td class="r big rev">6,720,182,448원</td>
+          <td class="c"><div class="mini-bar"><span class="bar"><i style="width:22.4%"></i></span><span class="pct">22.4%</span></div></td>
+        </tr>
+        <tr>
+          <td><div class="label"><span class="dot net"></span>순매출 누적</div></td>
+          <td class="r">7,000,000,000원</td>
+          <td class="r big net">1,838,338,505원</td>
+          <td class="c"><div class="mini-bar"><span class="bar"><i class="net" style="width:26.3%"></i></span><span class="pct net">26.3%</span></div></td>
+        </tr>
+      </tbody>
+    </table>
+  </div>
+</div>
+
+<!-- ============ 연간 달성 - 안 C: 좌도넛+우상세 ============ -->
+<div class="demo-section" id="sec-c">
+  <div class="opt-label"><span class="num">C</span>연간 달성 — 좌측 도넛 + 우측 상세 (각 항목 1행)</div>
+  <h1 class="page-title">SM본부 연간 달성 현황</h1>
+  <div class="c-box">
+    <div class="box-sub">연간 달성 현황</div>
+    <div class="c-row">
+      <div class="donut-w">
+        <svg viewBox="0 0 80 80"><circle class="track" cx="40" cy="40" r="32" fill="none" stroke-width="8"/><circle class="fill" cx="40" cy="40" r="32" fill="none" stroke-width="8" stroke-dasharray="201.06" stroke-dashoffset="156.02"/></svg>
+        <div class="ctr"><div class="pct">22.4%</div><div class="lab">달성률</div></div>
+      </div>
+      <div class="info">
+        <div class="title"><span class="dot"></span>매출 누적</div>
+        <span class="k">목표</span><span class="v">30,000,000,000원</span>
+        <span class="k">달성 매출</span><span class="v big rev">6,720,182,448원</span>
+      </div>
+    </div>
+    <div class="c-row net">
+      <div class="donut-w">
+        <svg viewBox="0 0 80 80"><circle class="track" cx="40" cy="40" r="32" fill="none" stroke-width="8"/><circle class="fill" cx="40" cy="40" r="32" fill="none" stroke-width="8" stroke-dasharray="201.06" stroke-dashoffset="148.18"/></svg>
+        <div class="ctr"><div class="pct">26.3%</div><div class="lab">달성률</div></div>
+      </div>
+      <div class="info">
+        <div class="title"><span class="dot"></span>순매출 누적</div>
+        <span class="k">목표</span><span class="v">7,000,000,000원</span>
+        <span class="k">달성 매출</span><span class="v big net">1,838,338,505원</span>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ============ 그룹 누적 - 안 D: 카드 그리드 ============ -->
+<div class="demo-section" id="sec-d">
+  <div class="opt-label"><span class="num">D</span>그룹 누적 — 카드 그리드 (좌측 표시 라인 컬러)</div>
+  <div class="d-grid">
+    <div class="d-card rev">
+      <div class="title">매출 누적</div>
+      <div class="row"><span class="k">목표</span><span class="v">14,000,000,000원</span></div>
+      <div class="row"><span class="k">누적 달성 매출</span><span class="v">3,360,000,000원</span></div>
+      <div class="row highlight"><span class="k">달성률</span><span class="v">24.0%</span></div>
+    </div>
+    <div class="d-card net">
+      <div class="title">순매출 누적</div>
+      <div class="row"><span class="k">목표</span><span class="v">3,400,000,000원</span></div>
+      <div class="row"><span class="k">누적 달성 매출</span><span class="v">990,000,000원</span></div>
+      <div class="row highlight"><span class="k">달성률</span><span class="v">29.1%</span></div>
+    </div>
+  </div>
+</div>
+
+<!-- ============ 그룹 누적 - 안 E: 한줄 가로형 ============ -->
+<div class="demo-section" id="sec-e">
+  <div class="opt-label"><span class="num">E</span>그룹 누적 — 한줄 가로형 (compact strip)</div>
+  <div style="display:flex;flex-direction:column;gap:10px">
+    <div class="e-strip">
+      <div class="seg head"><div class="l"><span class="dot"></span>매출 누적</div></div>
+      <div class="seg"><div class="l">목표</div><div class="v">14,000,000,000원</div></div>
+      <div class="seg"><div class="l">달성 매출</div><div class="v">3,360,000,000원</div></div>
+      <div class="seg"><div class="l">달성률</div><div class="v rev">24.0%</div></div>
+    </div>
+    <div class="e-strip">
+      <div class="seg head"><div class="l"><span class="dot net"></span>순매출 누적</div></div>
+      <div class="seg"><div class="l">목표</div><div class="v">3,400,000,000원</div></div>
+      <div class="seg"><div class="l">달성 매출</div><div class="v">990,000,000원</div></div>
+      <div class="seg"><div class="l">달성률</div><div class="v net">29.1%</div></div>
+    </div>
+  </div>
+</div>
+
+<!-- ============ 그룹 누적 - 안 F: 막대 통합표 ============ -->
+<div class="demo-section" id="sec-f">
+  <div class="opt-label"><span class="num">F</span>그룹 누적 — 막대 통합표 (진행률 직관)</div>
+  <div class="f-box">
+    <div class="f-row">
+      <div class="label">
+        <div class="title"><span class="dot"></span>매출 누적</div>
+        <div class="nums">목표 <b>14,000,000,000원</b><br/>달성 <b>3,360,000,000원</b></div>
+      </div>
+      <div class="bar-wrap">
+        <div class="bar"><i style="width:24%"></i></div>
+        <div class="bar-marks"><span>0</span><span>25%</span><span>50%</span><span>75%</span><span>100%</span></div>
+      </div>
+      <div class="pct">24.0%</div>
+    </div>
+    <div class="f-row net">
+      <div class="label">
+        <div class="title"><span class="dot"></span>순매출 누적</div>
+        <div class="nums">목표 <b>3,400,000,000원</b><br/>달성 <b>990,000,000원</b></div>
+      </div>
+      <div class="bar-wrap">
+        <div class="bar"><i style="width:29.1%"></i></div>
+        <div class="bar-marks"><span>0</span><span>25%</span><span>50%</span><span>75%</span><span>100%</span></div>
+      </div>
+      <div class="pct">29.1%</div>
+    </div>
+  </div>
+</div>
+
+<!-- 월별 매출 - 컬럼 폭 조정 (공통 노출) -->
+<h1 class="page-title" style="margin-top:30px">월별 매출 현황 — 컬럼 폭 조정 (14% / 24% / 24% / 18% / 20%)</h1>
+<div class="m-list">
+  <div class="m-row head">
+    <div>월</div>
+    <div>목표 계획 매출</div>
+    <div>실제 달성 매출</div>
+    <div>달성률</div>
+    <div>이익률</div>
+  </div>
+  <div class="m-row prev">
+    <div class="m-name">26년 4월 <span class="pill">완료</span></div>
+    <div class="m-cell muted">2,500,000,000원</div>
+    <div class="m-cell">830,000,000원</div>
+    <div class="m-cell pct warn">33%</div>
+    <div class="m-cell pct good">33.9%</div>
+  </div>
+  <div class="m-row cur">
+    <div class="m-name">26년 5월 <span class="pill">진행 중</span></div>
+    <div class="m-cell muted">2,500,000,000원</div>
+    <div class="m-cell">1,370,000,000원</div>
+    <div class="m-cell pct warn">55%</div>
+    <div class="m-cell pct good">30.5%</div>
+  </div>
+  <div class="m-row next">
+    <div class="m-name">26년 6월 <span class="pill">계획</span></div>
+    <div class="m-cell muted">2,500,000,000원</div>
+    <div class="m-cell">1,530,000,000원</div>
+    <div class="m-cell pct warn">61%</div>
+    <div class="m-cell pct good">25.8%</div>
+  </div>
+</div>
+
+<script>
+document.querySelectorAll('.demo-nav .tabs button').forEach(btn=>{
+  btn.addEventListener('click', ()=>{
+    // 같은 group 안에서 다른 버튼 active 해제
+    const grp = btn.closest('.tabs');
+    grp.querySelectorAll('button').forEach(b=>b.classList.remove('active'));
+    btn.classList.add('active');
+    const tab = btn.dataset.tab;
+    document.querySelectorAll('.demo-section').forEach(sec=>sec.classList.remove('active'));
+    document.getElementById('sec-'+tab).classList.add('active');
+    window.scrollTo({top:0, behavior:'smooth'});
+  });
+});
+</script>
+
+</body>
+</html>
