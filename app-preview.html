@@ -674,6 +674,16 @@
   /* SM본부 모드 - 마감 관리 메뉴 숨김 */
   body.hq-mode .hide-on-hq{display:none !important}
 
+  /* v75: 계약 종료 임박 컴팩트 알림 바 */
+  #contract-expire-panel{padding:10px 14px;background:linear-gradient(135deg,#FFFAF0,#FFF7E6);border-color:#FCD34D}
+  .ce-alert-bar{display:flex;align-items:center;gap:10px;flex-wrap:wrap;font-size:12px}
+  .ce-alert-bar .ce-lbl{font-size:11px;font-weight:800;color:#92400E;background:#FBBF24;color:#fff;padding:3px 9px;border-radius:5px;letter-spacing:.3px;flex:none}
+  .ce-alert-bar .ce-items{display:flex;gap:6px;flex-wrap:wrap;flex:1}
+  .ce-alert-bar .ce-item{display:inline-flex;align-items:center;gap:5px;background:#fff;border:1px solid #FCD34D;border-radius:5px;padding:4px 9px;font-size:11.5px}
+  .ce-alert-bar .ce-item b{color:#92400E;font-weight:800}
+  .ce-alert-bar .ce-item .days{color:#D97706;font-weight:800;margin-left:3px}
+  .ce-alert-bar .ce-item .days.urgent{color:#E60021}
+
   /* ============ v64: SM본부 통합 상세 보고 ============ */
   .hq-detail-grid{display:flex;flex-direction:column;gap:24px}
   .hq-section-title{display:flex;align-items:baseline;gap:10px;margin-bottom:12px;padding-left:2px}
@@ -717,17 +727,19 @@
   .hq-ml-cell.pct.good{color:#16A34A}
   .hq-ml-cell.pct.warn{color:#D97706}
 
-  /* Group section */
+  /* v75: 통합 박스 (연간 누적 + 월별 매출) */
+  .hq-unified-box{padding:24px 28px}
+  .hq-unified-box .hq-section-title{margin-bottom:14px;margin-top:0;padding-left:0}
+  .hq-unified-box .hq-section-title h3{font-size:16px;font-weight:800;letter-spacing:-.3px;color:var(--ink)}
+  .hq-unified-box .hq-section-title:not(:first-of-type){margin-top:0}
+  .hq-divider{height:1px;background:var(--line);margin:24px 0}
+  /* v75: Group section */
   .hq-grp-section{display:flex;flex-direction:column;gap:20px}
   .hq-grp-card{background:#fff;border:1px solid var(--line);border-radius:14px;padding:22px 26px;display:flex;flex-direction:column;gap:18px}
-  .hq-grp-card.g1{border-top:4px solid #E60021}
-  .hq-grp-card.g2{border-top:4px solid #1D4ED8}
+  /* v75: 상단 빨강/파랑 라인 제거 */
   .hq-grp-head{display:flex;justify-content:space-between;align-items:center;border-bottom:1px solid var(--line2);padding-bottom:18px;gap:16px;flex-wrap:wrap}
   .hq-grp-head .grp-name{display:flex;align-items:center;gap:14px}
-  .hq-grp-head .grp-badge{font-size:20px;font-weight:900;padding:9px 20px;border-radius:9px;letter-spacing:-.4px;line-height:1}
-  .hq-grp-card.g1 .grp-badge{background:linear-gradient(135deg,#FFE5E9,#FFB3C0);color:#B8001A;border:1px solid #FBA5B3}
-  .hq-grp-card.g2 .grp-badge{background:linear-gradient(135deg,#DBEAFE,#93C5FD);color:#1E3A8A;border:1px solid #93C5FD}
-  .hq-grp-head h4{font-size:18px;font-weight:800;letter-spacing:-.4px;color:var(--ink)}
+  .hq-grp-head h4{font-size:20px;font-weight:900;letter-spacing:-.4px;color:var(--ink)}
   .hq-grp-target{font-size:11px;color:var(--ink3);font-weight:600;text-align:right;line-height:1.7}
   .hq-grp-target b{color:var(--ink);font-weight:800}
   .hq-grp-summary{display:grid;grid-template-columns:repeat(4,1fr);gap:12px}
@@ -745,7 +757,12 @@
   .hq-grp-subtitle .sub-desc{font-size:10.5px;color:var(--ink3);font-weight:600;letter-spacing:0}
   /* Group 3-month list */
   .hq-grp-3mo{background:#fff;border:1px solid var(--line);border-radius:9px;overflow:hidden}
-  .hq-g3-row{display:grid;grid-template-columns:130px 1fr 1.1fr 2fr;padding:12px 16px;border-bottom:1px solid var(--line2);align-items:center;gap:10px}
+  .hq-g3-row{display:grid;grid-template-columns:130px 1fr 1fr 1fr 1.1fr 1.5fr;padding:12px 16px;border-bottom:1px solid var(--line2);align-items:center;gap:10px}
+  .hq-g3-amt.net{color:#1D4ED8}
+  .hq-g3-amt.pct{font-weight:800}
+  .hq-g3-amt.pct.good{color:#16A34A}
+  .hq-g3-amt.pct.warn{color:#D97706}
+  .hq-g3-amt.pct.bad{color:#E60021}
   .hq-g3-row.head{background:#F1F5F9;color:var(--ink2);font-size:10.5px;font-weight:800;text-transform:uppercase;letter-spacing:.4px;padding:10px 16px}
   .hq-g3-row:last-child{border-bottom:none}
   .hq-g3-row.cur{background:linear-gradient(90deg,#FFF5F7 0%,rgba(255,245,247,.4) 100%)}
@@ -771,6 +788,16 @@
   .hq-iss-item{border-radius:8px;padding:11px 14px;display:flex;align-items:flex-start;gap:10px}
   .hq-iss-item.auto{background:#FFF5F7;border:1px solid #FBDCE1}
   .hq-iss-item.manual{background:#F0F9FF;border:1px solid #BAE6FD}
+  /* v75: 아이콘 박스 제거 모드 */
+  .hq-iss-item.no-ico .iss-ico{display:none}
+  .hq-iss-item.no-ico{padding:9px 14px;display:flex;align-items:center;justify-content:space-between;gap:10px}
+  .hq-iss-item.no-ico .iss-body{display:flex;align-items:center;justify-content:space-between;gap:10px;width:100%}
+  .hq-iss-item.no-ico .iss-title{font-size:12.5px;font-weight:600;color:var(--ink);letter-spacing:-.1px;margin-bottom:0;flex:1;line-height:1.55}
+  .hq-iss-item .iss-del-mini{background:none;border:none;color:var(--ink3);font-size:18px;cursor:pointer;font-family:inherit;padding:0 4px;line-height:1;border-radius:4px;width:24px;height:24px;display:flex;align-items:center;justify-content:center}
+  .hq-iss-item .iss-del-mini:hover{color:#B8001A;background:#FEE2E2}
+  /* 분석 요약 라인 */
+  .hq-analysis-summary{padding:9px 14px;background:#F1F5F9;border:1px solid #CBD5E1;border-radius:6px;font-size:11.5px;color:var(--ink2);font-weight:600;letter-spacing:-.1px;margin-bottom:8px;line-height:1.5}
+  /* hq-iss-item .iss-ico 기존 스타일 유지 */
   .hq-iss-item .iss-ico{flex:none;width:26px;height:26px;border-radius:6px;display:flex;align-items:center;justify-content:center;font-size:13px;color:#fff;font-weight:800}
   .hq-iss-item.auto .iss-ico{background:#E60021}
   .hq-iss-item.manual .iss-ico{background:#0EA5E9}
@@ -1231,7 +1258,7 @@
     <h5>매출 관리</h5>
     <div class="nav" id="nav-main">
       <button data-tab="dash" class="active"><span class="ico"><svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="9"/><circle cx="12" cy="12" r="5"/><circle cx="12" cy="12" r="1.6" fill="currentColor"/></svg></span>연간 KPI 목표</button>
-      <button data-tab="hq-detail" class="hq-menu-only"><span class="ico"><svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 3v18h18"/><path d="M7 14l4-4 4 4 5-6"/><circle cx="7" cy="14" r="1.5"/><circle cx="11" cy="10" r="1.5"/><circle cx="15" cy="14" r="1.5"/><circle cx="20" cy="8" r="1.5"/></svg></span>월별·그룹 상세 보고</button>
+      <button data-tab="hq-detail" class="hq-menu-only"><span class="ico"><svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 3v18h18"/><path d="M7 14l4-4 4 4 5-6"/><circle cx="7" cy="14" r="1.5"/><circle cx="11" cy="10" r="1.5"/><circle cx="15" cy="14" r="1.5"/><circle cx="20" cy="8" r="1.5"/></svg></span>SM본부 상세 보고</button>
       <button data-tab="hq-sales" class="hq-menu-only"><span class="ico"><svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 3v18h18"/><path d="M7 14l4-4 4 4 5-6"/></svg></span>브랜드별 운영 실적</button>
       <button data-tab="brand"><span class="ico"><svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="4" y1="20" x2="20" y2="20"/><rect x="5" y="11" width="3" height="8"/><rect x="11" y="6" width="3" height="13"/><rect x="17" y="14" width="3" height="5"/></svg></span>브랜드별 운영 실적</button>
       <button data-tab="ops"><span class="ico"><svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M14 4l6 6L8 22H2v-6z"/><path d="M14 4l6 6"/></svg></span>월간 매출 현황</button>
@@ -1511,11 +1538,27 @@
       <div class="brand-alerts" id="brand-alerts"></div>
     </div>
 
+    <!-- v75: 계약 종료 임박 컴팩트 알림 (브랜드 실적 위) -->
+    <div class="panel" id="contract-expire-panel" style="display:none">
+      <div class="ce-alert-bar" id="contract-expire-bar"></div>
+    </div>
+
     <!-- 브랜드별 매출 현황 카드 -->
     <div class="panel">
       <div class="head-row">
         <h3>브랜드별 매출 현황 <span class="tag" id="brand-list-count">-</span></h3>
         <div class="toolbar" style="margin:0">
+          <select id="brand-sort" style="padding:7px 9px;border:1px solid var(--line);border-radius:6px;font-size:12px;background:#fff;font-family:inherit">
+            <option value="rev_desc">매출 높은 순</option>
+            <option value="rev_asc">매출 낮은 순</option>
+            <option value="net_desc">순매출 높은 순</option>
+            <option value="net_asc">순매출 낮은 순</option>
+            <option value="margin_desc">이익률 높은 순</option>
+            <option value="margin_asc">이익률 낮은 순</option>
+            <option value="adv_desc">광고주 (내림차순)</option>
+            <option value="name_desc">브랜드 (내림차순)</option>
+            <option value="contract_desc">계약기간 (만료 빠른 순)</option>
+          </select>
           <input id="brand-search" placeholder="브랜드/광고주 검색…" style="width:200px" />
           <button class="btn" onclick="exportCSV()">CSV 다운로드</button>
         </div>
@@ -1647,16 +1690,16 @@
     </div>
   </section>
 
-  <!-- =============== v66: 월별·그룹 상세 보고 (매출 관리 메뉴) - 연간 KPI 포함 =============== -->
+  <!-- =============== v75: SM본부 상세 보고 - 통합 박스 + 그룹 보고 =============== -->
   <section id="tab-hq-detail" class="hide">
     <div class="hq-detail-grid">
-      <!-- 연간 달성 누적 (v66: 이동) -->
-      <div>
+      <!-- 연간 누적 + 월별 매출 통합 박스 -->
+      <div class="panel hq-unified-box">
         <div class="hq-section-title">
-          <h3>📊 SM본부 연간 달성 누적</h3>
-          <span class="desc" id="hq-annual-desc">본부 통합 KPI</span>
+          <h3>SM본부 연간 달성 누적</h3>
+          <span class="desc" id="hq-annual-desc"></span>
         </div>
-        <div class="hq-annual">
+        <div class="hq-annual" style="border:none;padding:0;background:transparent">
           <div class="hq-annual-top">
             <div>
               <div class="lab">2026 SM본부 통합</div>
@@ -1666,11 +1709,9 @@
           </div>
           <div class="hq-annual-stats" id="hq-annual-stats"></div>
         </div>
-      </div>
-      <!-- 월별 매출 현황 -->
-      <div>
+        <div class="hq-divider"></div>
         <div class="hq-section-title">
-          <h3>📅 SM본부 월별 매출 현황</h3>
+          <h3>SM본부 월별 매출 현황</h3>
           <span class="desc">당월 기준 ±1개월</span>
         </div>
         <div class="hq-monthly-list" id="hq-monthly-list"></div>
@@ -2805,6 +2846,7 @@ document.addEventListener('input', e=>{
 document.addEventListener('change', e=>{
   if(e.target.id === 'hq-brand-sort') renderHQBrandTable();
   if(e.target.id === 'ops-sort') renderOps();
+  if(e.target.id === 'brand-sort') renderBrandGrid();
 });
 
 // 컬럼 헤더 클릭으로 정렬 토글 (높은순 → 낮은순 → 높은순)
@@ -3124,21 +3166,41 @@ function renderCharts(){
   const plans = labels.map((_,i)=>STATE.goals.rev/12 * (0.6 + i*0.12));
   let acc=0; const cumRev = revs.map(v=>{acc+=v;return acc;});
 
+  // v75: 월 매출 달성률 기준 컬러 - >=100% 녹, 70-99% 빨강, <70% 회색
+  const revColors = revs.map((v, i) => {
+    const plan = plans[i] || 0;
+    if(!v) return '#E5E5E5';
+    if(!plan) return '#E60021';
+    const r = v/plan;
+    if(r >= 1.0) return '#16A34A';   // 목표 초과 - 녹색
+    if(r >= 0.7) return '#E60021';   // 양호 - 빨강
+    return '#94A3B8';                // 미달 - 회색
+  });
   if(chMonth) chMonth.destroy();
   chMonth = new Chart(document.getElementById('ch-month'),{
     data:{labels,datasets:[
-      {type:'bar',label:'월 계획',data:plans,backgroundColor:'#E5E5E5',borderRadius:6,order:3,barPercentage:.7,categoryPercentage:.65},
-      {type:'bar',label:'월 매출',data:revs,backgroundColor:'#E60021',borderRadius:6,order:2,barPercentage:.7,categoryPercentage:.65},
-      {type:'bar',label:'월 순매출',data:nets,backgroundColor:'#0F0F10',borderRadius:6,order:1,barPercentage:.7,categoryPercentage:.65},
+      {type:'bar',label:'월 계획',data:plans,backgroundColor:'#E5E5E5',borderRadius:6,order:3,barPercentage:.8,categoryPercentage:1.0},
+      {type:'bar',label:'월 매출',data:revs,backgroundColor:revColors,borderRadius:6,order:2,barPercentage:.8,categoryPercentage:1.0},
+      {type:'bar',label:'월 순매출',data:nets,backgroundColor:'#0F0F10',borderRadius:6,order:1,barPercentage:.8,categoryPercentage:1.0},
       {type:'line',label:'누적 매출',data:cumRev,borderColor:'#E60021',backgroundColor:'rgba(230,0,33,.08)',fill:true,borderWidth:2.5,tension:.3,yAxisID:'y1',order:0,pointRadius:4,pointBackgroundColor:'#E60021'}
     ]},
     options:{
       maintainAspectRatio:false,
-      plugins:{legend:{position:'bottom',labels:{boxWidth:10,font:{size:11}}}},
+      plugins:{
+        legend:{position:'bottom',labels:{boxWidth:10,font:{size:11}}},
+        tooltip:{callbacks:{label:(ctx)=>{
+          if(ctx.dataset.label === '월 매출'){
+            const plan = plans[ctx.dataIndex] || 0;
+            const pct = plan ? (ctx.parsed.y/plan*100).toFixed(0) : 0;
+            return `월 매출: ${fmtShort(ctx.parsed.y)} (목표 ${pct}%)`;
+          }
+          return `${ctx.dataset.label}: ${fmtShort(ctx.parsed.y)}`;
+        }}}
+      },
       scales:{
         y:{ticks:{callback:v=>fmtShort(v),font:{size:10}},grid:{color:'#F4F4F5'}},
         y1:{position:'right',ticks:{callback:v=>fmtShort(v),font:{size:10}},grid:{display:false}},
-        x:{grid:{display:false},ticks:{font:{size:11}}}
+        x:{grid:{display:false},ticks:{font:{size:11},autoSkip:false,maxRotation:0,minRotation:0}}
       }
     }
   });
@@ -3237,11 +3299,48 @@ function renderBrandGrid(){
   if(f.search) list = list.filter(x=>x.b.includes(f.search) || (ADV_MAP[x.b]||'').includes(f.search));
   if(f.onlyNew) list = list.filter(x=>x.meta.newBrand);
   if(f.onlyEnding) list = list.filter(x=>!x.meta.ended && x.dEnd<=45 && x.dEnd>=-1);
-  // 종료 브랜드는 항상 하단
+  // v75: 정렬 옵션 적용 (종료 브랜드는 항상 하단)
+  const sortMode = (document.getElementById('brand-sort')?.value) || 'rev_desc';
   list.sort((a,b)=>{
     if(a.meta.ended !== b.meta.ended) return a.meta.ended?1:-1;
+    if(sortMode === 'rev_asc') return a.ytd.rev - b.ytd.rev;
+    if(sortMode === 'net_desc') return b.ytd.net - a.ytd.net;
+    if(sortMode === 'net_asc') return a.ytd.net - b.ytd.net;
+    if(sortMode === 'margin_desc') return (b.ytd.rev?b.ytd.net/b.ytd.rev:0) - (a.ytd.rev?a.ytd.net/a.ytd.rev:0);
+    if(sortMode === 'margin_asc') return (a.ytd.rev?a.ytd.net/a.ytd.rev:0) - (b.ytd.rev?b.ytd.net/b.ytd.rev:0);
+    if(sortMode === 'adv_desc') return (ADV_MAP[b.b]||'').localeCompare(ADV_MAP[a.b]||'', 'ko');
+    if(sortMode === 'name_desc') return b.b.localeCompare(a.b, 'ko');
+    if(sortMode === 'contract_desc'){
+      // 만료 빠른 순 (dEnd 작은 순), 없는 건 뒤로
+      const ae = (a.meta.contractEnd ? a.dEnd : Infinity);
+      const be = (b.meta.contractEnd ? b.dEnd : Infinity);
+      return ae - be;
+    }
+    // rev_desc (기본)
     return b.ytd.rev - a.ytd.rev;
   });
+
+  // v75: 계약 종료 임박 컴팩트 알림
+  const expiring = scope
+    .map(b=>{ const meta=getMeta(b); return {b, meta, dEnd: daysUntil(meta.contractEnd)}; })
+    .filter(x => !x.meta.ended && x.meta.contractEnd && x.dEnd<=60 && x.dEnd>=-1)
+    .sort((a,b)=>a.dEnd-b.dEnd)
+    .slice(0, 10);
+  const cePanel = document.getElementById('contract-expire-panel');
+  const ceBar = document.getElementById('contract-expire-bar');
+  if(cePanel && ceBar){
+    if(expiring.length){
+      cePanel.style.display = '';
+      const items = expiring.map(x=>{
+        const cls = x.dEnd<=14 ? 'urgent' : '';
+        return `<span class="ce-item"><b>${x.b}</b><span class="days ${cls}">D-${Math.max(0,x.dEnd)}</span></span>`;
+      }).join('');
+      ceBar.innerHTML = `<span class="ce-lbl">계약 종료 임박 ${expiring.length}건</span><div class="ce-items">${items}</div>`;
+    } else {
+      cePanel.style.display = 'none';
+    }
+  }
+
   document.getElementById('brand-list-count').textContent = list.length+'건';
   const html = list.map(x=>{
     const {b,ytd,meta,delta,dEnd} = x;
@@ -5425,17 +5524,17 @@ function renderGroupCard(gid){
   const goalMargin = ALL_TEAMS_DATA.hq_goals.margin || 24;
   const remaining = Math.max(0, g.targetRev - g.rev);
   const today = new Date();
-  const yy = today.getFullYear()%100;
   const mm = today.getMonth()+1;
   const monthsLeft = 12 - mm + 1;
   const monthlyNeeded = monthsLeft>0 ? remaining/monthsLeft : 0;
-
-  // 최근 3개월 - 전주 변동은 CHANGE_LOG 기반 (간단히 텍스트 처리)
   const [prevM, curM, nextM] = getRecentMonths(1);
+
+  // v75: 월별 매출 행 (매출 + 순매출 + 순이익률 + 전주 변동)
   function grpMonthRow(month, type){
     const data = getGroupMonthly(gid, month);
+    const mMargin = data.rev ? (data.net/data.rev*100) : 0;
     const pill = type==='prev' ? '완료' : type==='cur' ? '진행 중' : '계획';
-    // 전주 변동 (대략: CHANGE_LOG에서 그룹 팀의 해당 월 변동분 누적)
+    // 전주 변동
     let delta = 0;
     let detailParts = [];
     try {
@@ -5465,16 +5564,21 @@ function renderGroupCard(gid){
     const pctChange = data.rev>0 && delta!==0 ? (delta/(data.rev-delta)*100).toFixed(1) : '0.0';
     const deltaTxt = delta !== 0 ? `${arrow} ${delta>0?'+':''}${fmtMoney(Math.abs(delta))} (${delta>0?'+':''}${pctChange}%)` : `${arrow} 변동 없음`;
     const detailTxt = detailParts.length ? detailParts.slice(0,3).join(', ') : '-';
+    const marginCls = !data.rev ? '' : mMargin>=goalMargin ? 'good' : mMargin>=0 ? 'warn' : 'bad';
     return `<div class="hq-g3-row ${type}">
       <div class="hq-g3-month">${month} <span class="pill">${pill}</span></div>
       <div class="hq-g3-amt">${fmtMoney(data.rev)}</div>
+      <div class="hq-g3-amt net">${fmtMoney(data.net)}</div>
+      <div class="hq-g3-amt pct ${marginCls}">${data.rev?mMargin.toFixed(1)+'%':'-'}</div>
       <div class="hq-g3-delta ${delta_cls}">${deltaTxt}</div>
       <div class="hq-g3-detail">${detailTxt}</div>
     </div>`;
   }
 
-  // 팀별 매출 변동사항 (자동)
+  // v75: 변동사항 자동 분석 + 요약
   const autoIssues = [];
+  let totalDeltaPos = 0, totalDeltaNeg = 0, posCount = 0, negCount = 0;
+  const teamSummary = {};
   try {
     if(typeof CHANGE_LOG !== 'undefined'){
       const cutoff = Date.now() - 10*24*60*60*1000;
@@ -5487,71 +5591,82 @@ function renderGroupCard(gid){
         if(!perCat[ck]) perCat[ck] = {brand:e.brand, month:e.month, team:e.team, firstPrev:e.prev, lastNext:e.next, ts:e.ts};
         else { perCat[ck].lastNext = e.next; perCat[ck].ts = Math.max(perCat[ck].ts, e.ts); }
       });
-      // brand+month 합산
       const grouped = {};
       Object.values(perCat).forEach(pc=>{
         const k = pc.team+'|'+pc.brand+'|'+pc.month;
-        if(!grouped[k]) grouped[k] = {team:pc.team, brand:pc.brand, month:pc.month, delta:0, latestTs:0};
+        if(!grouped[k]) grouped[k] = {team:pc.team, brand:pc.brand, month:pc.month, delta:0};
         grouped[k].delta += (pc.lastNext - pc.firstPrev);
-        if(pc.ts > grouped[k].latestTs) grouped[k].latestTs = pc.ts;
       });
       Object.values(grouped).forEach(x=>{
         if(Math.abs(x.delta) < 5_000_000) return;
         autoIssues.push(x);
+        if(x.delta > 0){ totalDeltaPos += x.delta; posCount++; }
+        else { totalDeltaNeg += x.delta; negCount++; }
+        teamSummary[x.team] = (teamSummary[x.team] || {pos:0, neg:0, count:0});
+        teamSummary[x.team].count++;
+        if(x.delta > 0) teamSummary[x.team].pos += x.delta;
+        else teamSummary[x.team].neg += x.delta;
       });
       autoIssues.sort((a,b)=>Math.abs(b.delta)-Math.abs(a.delta));
     }
   } catch(e){}
 
+  // 비고 변동 개수 (DATA.notes 최근 10일 - 단순 카운트는 어려우니 전체 notes 중 그룹 팀 브랜드)
+  let noteCount = 0;
+  try {
+    Object.values(ALL_TEAMS_DATA.teams).forEach(t=>{
+      if(!g.teams.includes(Object.keys(ALL_TEAMS_DATA.teams).find(k=>ALL_TEAMS_DATA.teams[k]===t))) return;
+      noteCount += (t.notes||[]).filter(n=>n.note && n.note.trim()).length;
+    });
+  } catch(e){}
+
+  // 분석 요약 문장
+  const teamSummaryParts = Object.entries(teamSummary).map(([t, s])=>{
+    const net = s.pos + s.neg;
+    return `${t}팀 ${s.count}건 (${net>=0?'+':''}${fmtMoney(net)})`;
+  });
+  const analysisLine = autoIssues.length
+    ? `최근 10일 ${autoIssues.length}건 매출 변동 · ` + teamSummaryParts.slice(0,3).join(' · ') + (posCount && negCount ? ` · 급증 ${posCount}건/급감 ${negCount}건` : '')
+    : '최근 10일 내 5,000만원 이상 매출 변동 없음';
+
   const autoIssuesHtml = autoIssues.slice(0,5).map(x=>{
     const dir = x.delta > 0 ? '급증' : '급감';
     const sign = x.delta > 0 ? '+' : '';
     const pctColor = x.delta > 0 ? '#16A34A' : '#E60021';
-    // 10일 전 = current - delta
-    const data = getGroupMonthly(gid, x.month);
-    // approximate brand-specific - we don't have exact, use placeholder
-    return `<div class="hq-iss-item auto">
-      <div class="iss-ico">!</div>
+    return `<div class="hq-iss-item auto no-ico">
       <div class="iss-body">
         <div class="iss-title"><span class="iss-team-pill ${x.team.toLowerCase()}">${x.team}팀</span>${x.brand} 매출 ${dir} (${sign}${fmtMoney(Math.abs(x.delta))}) · ${x.month}</div>
-        <div class="iss-desc">10일 내 변동: <b style="color:${pctColor}">${sign}${fmtMoney(Math.abs(x.delta))}</b></div>
       </div>
     </div>`;
-  }).join('') || '<div style="font-size:11.5px;color:var(--ink3);padding:14px;text-align:center;background:#FAFAFA;border-radius:8px">최근 10일 내 매출 변동 없음</div>';
+  }).join('') || '<div style="font-size:11.5px;color:var(--ink3);padding:10px 14px;background:#FAFAFA;border-radius:6px;border:1px solid var(--line2)">변동사항 없음</div>';
 
-  // 수동 이슈
+  // 수동 이슈사항 - 한 줄 표기, 메타 제거
   const manualList = (STATE.groupIssues && STATE.groupIssues[gid]) || [];
-  const canEdit = getCurrentLevel() >= 2; // 팀장 이상
+  const canEdit = getCurrentLevel() >= 2;
   const manualHtml = manualList.length ? manualList.map(iss=>{
     const teamCls = (iss.team||'').toLowerCase();
-    return `<div class="hq-iss-item manual">
-      <div class="iss-ico">📝</div>
+    const combinedText = [(iss.title||''), (iss.desc||'')].filter(Boolean).join(' — ');
+    return `<div class="hq-iss-item manual no-ico">
       <div class="iss-body">
-        <div class="iss-title">${iss.team?`<span class="iss-team-pill ${teamCls}">${iss.team}팀</span>`:''}${(iss.title||'').replace(/</g,'&lt;')}</div>
-        <div class="iss-desc">${(iss.desc||'').replace(/</g,'&lt;')}</div>
-        <div class="iss-meta">
-          <span>${iss.author||'-'} · ${iss.date||'-'}</span>
-          ${canEdit?`<button class="iss-del" data-grp-del-issue="${gid}" data-iss-id="${iss.id}">삭제</button>`:''}
-        </div>
+        <div class="iss-title">${iss.team?`<span class="iss-team-pill ${teamCls}">${iss.team}팀</span>`:''}${combinedText.replace(/</g,'&lt;')}</div>
+        ${canEdit?`<button class="iss-del-mini" data-grp-del-issue="${gid}" data-iss-id="${iss.id}" title="삭제">×</button>`:''}
       </div>
     </div>`;
-  }).join('') : '<div style="font-size:11.5px;color:var(--ink3);padding:14px;text-align:center;background:#FAFAFA;border-radius:8px">등록된 이슈가 없습니다. 우측 상단 "+ 이슈 추가" 로 등록하세요.</div>';
+  }).join('') : '<div style="font-size:11.5px;color:var(--ink3);padding:10px 14px;background:#FAFAFA;border-radius:6px;border:1px solid var(--line2)">등록된 이슈사항이 없습니다.</div>';
 
   return `<div>
     <div class="hq-section-title">
-      <h3>👥 ${g.label} 매출 보고</h3>
-      <span class="desc">${g.teamLabel} · 요약 + 최근 3개월 매출 + 이슈</span>
+      <h3>${g.label} 매출 보고</h3>
     </div>
     <div class="hq-grp-card ${gid}">
       <div class="hq-grp-head">
         <div class="grp-name">
-          <span class="grp-badge">${g.label}</span>
           <h4>${g.teamLabel}</h4>
         </div>
         <div class="hq-grp-target">목표 매출 <b>${fmtMoney(g.targetRev)}</b> · 순매출 <b>${fmtMoney(g.targetNet)}</b><br/>인원 <b>${g.ppl}명</b> · 운영 브랜드 <b>${g.brands}건</b></div>
       </div>
       <div>
-        <div class="hq-grp-subtitle">📊 요약 대시보드 <span class="sub-desc">· 누적</span></div>
+        <div class="hq-grp-subtitle">요약 대시보드 <span class="sub-desc">· 누적</span></div>
         <div class="hq-grp-summary">
           <div class="hq-grp-stat">
             <div class="lab">매출 누적</div>
@@ -5580,12 +5695,14 @@ function renderGroupCard(gid){
         </div>
       </div>
       <div>
-        <div class="hq-grp-subtitle">💰 월별 매출 (최근 3개월) <span class="sub-desc">· 전주 대비 변동 포함</span></div>
+        <div class="hq-grp-subtitle">월별 매출 (최근 3개월) <span class="sub-desc">· 전주 대비 변동 포함</span></div>
         <div class="hq-grp-3mo">
           <div class="hq-g3-row head">
             <div>월</div>
             <div class="hq-g3-amt">매출</div>
-            <div class="hq-g3-delta">전주 대비 변동</div>
+            <div class="hq-g3-amt">순매출</div>
+            <div class="hq-g3-amt">이익률</div>
+            <div class="hq-g3-delta">전주 변동</div>
             <div class="hq-g3-detail">변동 상세</div>
           </div>
           ${grpMonthRow(prevM, 'prev')}
@@ -5595,14 +5712,15 @@ function renderGroupCard(gid){
       </div>
       <div class="hq-iss-block">
         <div class="hq-iss-head">
-          <div class="ttl">📈 팀별 매출 변동사항 <span style="font-size:10.5px;color:var(--ink3);font-weight:600;letter-spacing:0">· 자동 감지 (10일 내)</span></div>
+          <div class="ttl">팀별 매출 변동사항 <span style="font-size:10.5px;color:var(--ink3);font-weight:600;letter-spacing:0">· 자동 감지 (10일 내)</span></div>
         </div>
+        <div class="hq-analysis-summary">${analysisLine}</div>
         <div class="hq-iss-list">${autoIssuesHtml}</div>
       </div>
       <div class="hq-iss-block">
         <div class="hq-iss-head">
-          <div class="ttl">📝 이슈 <span style="font-size:10.5px;color:var(--ink3);font-weight:600;letter-spacing:0">· 수동 입력</span></div>
-          ${canEdit?`<button class="add-btn" data-grp-add-issue="${gid}">＋ 이슈 추가</button>`:''}
+          <div class="ttl">이슈사항 <span style="font-size:10.5px;color:var(--ink3);font-weight:600;letter-spacing:0">· 수동 입력</span></div>
+          ${canEdit?`<button class="add-btn" data-grp-add-issue="${gid}">＋ 이슈사항 추가</button>`:''}
         </div>
         <div class="hq-iss-list">${manualHtml}</div>
       </div>
@@ -5616,29 +5734,45 @@ function openGroupIssueAdd(gid){
   const teamOpts = ['<option value="">팀 선택 안 함 (그룹 공통)</option>']
     .concat(teams.map(t=>`<option value="${t}">${t}팀</option>`))
     .join('');
-  const html = `
-    <div class="fm-row"><label>대상 팀 (선택)</label><select id="fm-grp-team">${teamOpts}</select></div>
-    <div class="fm-row"><label>제목 <span style="color:var(--pt)">*</span></label><input type="text" id="fm-grp-title" placeholder="예: 신규 클라이언트 발굴 지연" /></div>
-    <div class="fm-row"><label>상세 내용</label><textarea id="fm-grp-desc" rows="4" style="padding:9px 11px;border:1px solid var(--line);border-radius:7px;font-size:13px;background:#fff;font-family:inherit;resize:vertical;line-height:1.55" placeholder="이슈 상세 설명 / 액션 플랜 등"></textarea></div>
+  // v75: 3개 동시 입력 가능 - 동일 폼 3개
+  const issueRowHtml = (idx) => `
+    <div class="grp-iss-row" style="border:1px solid var(--line);border-radius:8px;padding:12px 14px;background:#FAFAFA;margin-bottom:10px">
+      <div class="fm-row" style="margin-top:0"><label style="font-size:11.5px">대상 팀 ${idx}</label><select id="fm-grp-team-${idx}">${teamOpts}</select></div>
+      <div class="fm-row"><label style="font-size:11.5px">이슈 내용 ${idx} <span style="color:var(--ink3);font-weight:500;font-size:10.5px">(첫 줄: 제목 / 이어서 상세)</span></label><textarea id="fm-grp-text-${idx}" rows="2" style="padding:7px 10px;border:1px solid var(--line);border-radius:6px;font-size:12.5px;background:#fff;font-family:inherit;resize:vertical;line-height:1.55;width:100%" placeholder="${idx===1?'예: 신규 클라이언트 발굴 지연 — 2Q 액션 플랜 수립 필요':'(선택) 추가 이슈사항'}"></textarea></div>
+    </div>
   `;
-  openFormModal(`＋ ${GROUP_DEF[gid].label} 이슈 추가`, html, ()=>{
-    const title = (getFM('fm-grp-title')||'').trim();
-    if(!title){ alert('제목을 입력하세요.'); return false; }
-    const team = (getFM('fm-grp-team')||'').trim();
-    const desc = (getFM('fm-grp-desc')||'').trim();
+  const html = `
+    <div style="margin-bottom:8px;font-size:11.5px;color:var(--ink3);font-weight:500;line-height:1.6">최대 3개까지 한 번에 등록할 수 있습니다. 비워둔 항목은 무시됩니다.</div>
+    ${issueRowHtml(1)}
+    ${issueRowHtml(2)}
+    ${issueRowHtml(3)}
+  `;
+  openFormModal(`＋ ${GROUP_DEF[gid].label} 이슈사항 추가 (최대 3개)`, html, ()=>{
     const me = STATE.memberUser || '미상';
     const today = new Date();
     const dateStr = `${today.getFullYear()%100}.${String(today.getMonth()+1).padStart(2,'0')}.${String(today.getDate()).padStart(2,'0')}`;
     STATE.groupIssues = STATE.groupIssues || {g1:[], g2:[]};
     STATE.groupIssues[gid] = STATE.groupIssues[gid] || [];
-    STATE.groupIssues[gid].unshift({
-      id: 'gi_'+Date.now()+'_'+Math.random().toString(36).slice(2,7),
-      team: team || null,
-      title, desc, author: me, date: dateStr, ts: Date.now()
-    });
+    let added = 0;
+    for(let i=1; i<=3; i++){
+      const text = (getFM(`fm-grp-text-${i}`)||'').trim();
+      if(!text) continue;
+      const team = (getFM(`fm-grp-team-${i}`)||'').trim();
+      // 첫 줄을 제목, 나머지를 desc로 분리
+      const lines = text.split('\n');
+      const title = lines[0].trim();
+      const desc = lines.slice(1).join('\n').trim();
+      STATE.groupIssues[gid].unshift({
+        id: 'gi_'+Date.now()+'_'+i+'_'+Math.random().toString(36).slice(2,5),
+        team: team || null,
+        title, desc, author: me, date: dateStr, ts: Date.now()
+      });
+      added++;
+    }
+    if(added === 0){ alert('최소 1개의 이슈사항을 입력하세요.'); return false; }
     try { persistTeamsData(); } catch(e){}
     renderHQDetailPage();
-    showToast(`✓ ${GROUP_DEF[gid].label} 이슈가 추가되었습니다`, 'success');
+    showToast(`✓ ${GROUP_DEF[gid].label} 이슈사항 ${added}건이 추가되었습니다`, 'success');
   });
 }
 async function deleteGroupIssue(gid, id){
