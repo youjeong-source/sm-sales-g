@@ -1048,6 +1048,18 @@
   .ops-table .actions .tax-mini{display:inline-flex;align-items:center;gap:3px;font-size:10.5px;padding:4px 9px;border:1px solid var(--line);border-radius:5px;cursor:pointer;font-weight:700;color:var(--ink2);margin-left:3px;background:#fff}
   .ops-table .actions .tax-mini.on{background:#0F0F10;color:#fff;border-color:#0F0F10}
   .ops-table .actions .tax-mini input{margin:0;cursor:pointer}
+  /* v92: 매출과 이익률 사이 셀 분리선 + FULL 모드 */
+  .ops-table th.pct-sep,
+  .ops-table td.pct-sep,
+  .cat-list-tbl th.pct-sep,
+  .cat-list-tbl td.pct-sep{border-left:1px solid var(--line)}
+  .cat-list-tbl.full-readonly td{padding:7px 8px;font-variant-numeric:tabular-nums}
+  .cat-list-tbl.full-readonly td.num{text-align:right;font-weight:700;color:var(--ink)}
+  .cat-list-tbl.full-readonly td.num.exp{color:#E60021}
+  .b-row.full-mode{background:#FAFAFA}
+  .b-detail-full .b-detail-card{background:#fff;border:1px solid var(--line2)}
+  .btn-mini.pri{background:#0F0F10;color:#fff;border-color:#0F0F10}
+
   /* v71: 편집 상세 행 - 셀 분리선 + 컴팩트 합계바 */
   .ops-table tr.b-detail{background:#fff;border-bottom:1px solid var(--line2)}
   .ops-table tr.b-detail > td{padding:0;background:#fff}
@@ -1817,7 +1829,7 @@
     <div class="panel">
       <div class="head-row">
         <h3>변동 알림 피드 <span class="tag" id="alert-count-full">-</span>
-          <span style="font-size:11px;color:var(--ink3);font-weight:500;margin-left:6px">· 매주 금요일 기준 · 최근 10일 이내</span>
+          <span style="font-size:11px;color:var(--ink3);font-weight:500;margin-left:6px">· 매주 금요일 기준 · 최근 7일 이내</span>
         </h3>
         <div class="al-filters" id="al-filters">
           <button class="al-pill active" data-filter="all">전체</button>
@@ -1845,7 +1857,7 @@
         <button class="btn req-tl" onclick="openBrandAdd()">＋ 브랜드 추가</button>
       </div>
       <table class="role-table contract-tbl" id="contract-tbl"></table>
-      <div style="margin-top:8px;font-size:11px;color:var(--ink3)">※ 2026년에 운영했던 브랜드는 종료 후에도 누적 노출됩니다. 매출 변동 알림은 <b>최근 10일 내 변경된 데이터</b>를 비교합니다 (500만원 이상 변동 시).</div>
+      <div style="margin-top:8px;font-size:11px;color:var(--ink3)">※ 2026년에 운영했던 브랜드는 종료 후에도 누적 노출됩니다. 매출 변동 알림은 <b>최근 7일 내 변경된 데이터</b>를 비교합니다 (500만원 이상 변동 시).</div>
     </div>
   </section>
 
@@ -2175,6 +2187,7 @@ const STATE = {
   groupIssues: { g1: [], g2: [] },  // v64: 그룹별 수동 이슈 (g1: G·D·U, g2: E·I·R)
   goals: ALL_TEAMS_DATA.teams.G.goals,  // 현재 팀 목표 - applyTeamData에서 갱신
   edit: { brand: null, all: false, snapshot: null },  // v70: snapshot for 닫기=취소
+  fullBrand: null,  // v92: FULL 펼침 모드 (읽기 전용)
   goalEditKey: null,
   memberUser: '최유정',
   qualGrowth: {  // 팀별 질적 성장 목표
@@ -3705,7 +3718,7 @@ function buildAllAlerts(){
   const last = months[months.length-1];
   const prev = months[months.length-2];
   const out = [];
-  // 1) 매출 변동 - 작성일 기준 최근 10일 내 변경 이력 기반 (CHANGE_LOG)
+  // 1) 매출 변동 - 작성일 기준 최근 7일 내 변경 이력 기반 (CHANGE_LOG)
   // v59 버그 수정: 카테고리별 firstPrev/lastNext 누적 후 brand+month 단위로 합산
   const recent = getRecent7DayChanges();
   const perCat = {}; // brand|month|category -> {firstPrev, lastNext, brand, month, latestTs, field}
@@ -3803,7 +3816,7 @@ function renderAlerts(){
   const all = buildAllAlerts();
   // 14일 이내 필터링 (alert.time 기반)
   const cutoff = new Date(STATE.today);
-  cutoff.setDate(cutoff.getDate() - 10);
+  cutoff.setDate(cutoff.getDate() - 7);
   function parseAlertTime(t){
     if(!t) return STATE.today;
     // YYYY-MM-DD 형식
@@ -3837,7 +3850,7 @@ function renderAlerts(){
     'note':'<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 5a2 2 0 012-2h11l5 5v11a2 2 0 01-2 2H5a2 2 0 01-2-2z"/><line x1="7" y1="11" x2="17" y2="11"/></svg>',
   };
   feed.innerHTML = display.length === 0
-    ? '<div style="color:var(--ink3);font-size:12px;padding:30px;text-align:center;border:1px dashed var(--line);border-radius:10px">최근 10일 이내 알림이 없습니다.</div>'
+    ? '<div style="color:var(--ink3);font-size:12px;padding:30px;text-align:center;border:1px dashed var(--line);border-radius:10px">최근 7일 이내 알림이 없습니다.</div>'
     : display.map(a=>{
         let iconKey = a.kind, iconCls = a.kind;
         if(a.kind==='revenue'){iconKey='revenue.'+(a.dir||'up');iconCls=a.dir||'up';}
@@ -3958,19 +3971,64 @@ function renderOps(){
     const cancelBtn = (canEdit && editing) ? '<button class="btn-mini" data-cancel-edit="' + encodeURIComponent(b) + '">CLOSE</button>' : '';
     const renameBtn = (canEdit && STATE.role==='lead') ? `<button class="btn-mini" onclick="renameBrand('${escB}')">설정</button>` : '';
     const deleteBtn = (canEdit && STATE.role==='lead') ? `<button class="btn-mini danger" onclick="deleteBrand('${escB}')">삭제</button>` : '';
-    const mainRow = `<tr class="b-row ${editing?'editing':''} ${meta.ended?'ended':''}" data-brand="${b.replace(/"/g,'&quot;')}">
+    const isFull = STATE.fullBrand === b;
+    const fullBtn = !editing ? `<button class="btn-mini ${isFull?'pri':''}" onclick="toggleFullBrand('${escB}')">${isFull?'CLOSE':'FULL'}</button>` : '';
+    const mainRow = `<tr class="b-row ${editing?'editing':''} ${isFull?'full-mode':''} ${meta.ended?'ended':''}" data-brand="${b.replace(/"/g,'&quot;')}">
       <td><span class="b-name">${b}${meta.ended?'<span class="ended-tag">종료</span>':''}</span></td>
       <td><span class="adv-pill">${ADV_MAP[b]||'-'}</span></td>
       <td class="owner">${OWNERS[b]||'-'}</td>
       <td class="num">${fmt(bm.rev)}</td>
       <td class="num exp">${fmt(bm.exp)}</td>
       <td class="num net">${fmt(bm.net)}</td>
-      <td class="pct ${marginCls}">${bm.rev?margin.toFixed(1)+'%':'-'}</td>
-      <td class="actions">${editToggleBtn}${cancelBtn}${renameBtn}${deleteBtn}</td>
+      <td class="pct ${marginCls} pct-sep">${bm.rev?margin.toFixed(1)+'%':'-'}</td>
+      <td class="actions">${fullBtn}${editToggleBtn}${cancelBtn}${renameBtn}${deleteBtn}</td>
     </tr>`;
-    // 편집 모드일 때 카테고리 상세 행 추가
+    // v92: FULL 모드 (읽기 전용) 펼침 상세 행
     let detailRow = '';
-    if(editing){
+    if(!editing && isFull){
+      const catRowsFull = CATS.map(c=>{
+        const x = brandCategoryMonth(b,m,c);
+        const cMargin = x.rev ? (((x.rev-x.exp)/x.rev)*100) : null;
+        const marginText = cMargin === null ? '-' : cMargin.toFixed(1)+'%';
+        const marginCls = cMargin === null ? 'muted' : (cMargin >= 20 ? 'good' : cMargin >= 0 ? 'mid' : 'bad');
+        return `<tr>
+          <td><span class="cat-name">${c}</span></td>
+          <td class="num">${x.rev?fmt(x.rev):'-'}</td>
+          <td class="num exp">${x.exp?fmt(x.exp):'-'}</td>
+          <td class="pct-sep"><span class="cat-margin ${marginCls}">${marginText}</span></td>
+          <td><span style="color:var(--ink3);font-size:11px">${(x.note||'').replace(/</g,'&lt;')||'-'}</span></td>
+        </tr>`;
+      }).join('');
+      const marginValF = bm.rev ? (bm.net/bm.rev*100) : 0;
+      const marginShowClsF = !bm.rev ? '' : (marginValF>=20 ? 'good' : marginValF>=0 ? 'warn' : 'bad');
+      detailRow = `<tr class="b-detail b-detail-full" data-brand="${b.replace(/"/g,'&quot;')}">
+        <td colspan="8">
+          <div class="b-detail-card">
+            <table class="cat-list-tbl full-readonly">
+              <thead>
+                <tr>
+                  <th style="width:18%">카테고리</th>
+                  <th class="r" style="width:18%">매출</th>
+                  <th class="r" style="width:18%">지출</th>
+                  <th class="r pct-sep" style="width:12%">이익률</th>
+                  <th style="width:34%">비고</th>
+                </tr>
+              </thead>
+              <tbody>${catRowsFull}</tbody>
+            </table>
+            <div class="cat-totals-bar">
+              <div class="lbl">합계</div>
+              <div class="nums">
+                <span>매출 <b>${fmt(bm.rev)}</b></span>
+                <span>지출 <b>${fmt(bm.exp)}</b></span>
+                <span class="margin-pct">이익률 <b class="${marginShowClsF}">${bm.rev?marginValF.toFixed(1)+'%':'-'}</b></span>
+                <span class="net">순매출 <b>${fmt(bm.net)}원</b></span>
+              </div>
+            </div>
+          </div>
+        </td>
+      </tr>`;
+    } else if(editing){
       const escB = b.replace(/'/g,"\\'");
       // 카테고리 리스트 표
       const catRows = CATS.map(c=>{
@@ -3982,7 +4040,7 @@ function renderOps(){
           <td><span class="cat-name">${c}</span></td>
           <td><input data-b="${b.replace(/"/g,'&quot;')}" data-c="${c.replace(/"/g,'&quot;')}" data-f="revenue" type="text" value="${x.rev?fmt(x.rev):''}" placeholder="0" /></td>
           <td><input data-b="${b.replace(/"/g,'&quot;')}" data-c="${c.replace(/"/g,'&quot;')}" data-f="expense" type="text" value="${x.exp?fmt(x.exp):''}" placeholder="0" /></td>
-          <td><span class="cat-margin ${marginCls}">${marginText}</span></td>
+          <td class="pct-sep"><span class="cat-margin ${marginCls}">${marginText}</span></td>
           <td><input class="note" data-b="${b.replace(/"/g,'&quot;')}" data-c="${c.replace(/"/g,'&quot;')}" data-f="note" type="text" value="${(x.note||'').replace(/"/g,'&quot;')}" placeholder="전주 대비 변동/비고" /></td>
         </tr>`;
       }).join('');
@@ -4000,7 +4058,7 @@ function renderOps(){
                   <th style="width:18%">카테고리</th>
                   <th class="r" style="width:18%">매출</th>
                   <th class="r" style="width:18%">지출</th>
-                  <th class="r" style="width:12%">이익률</th>
+                  <th class="r pct-sep" style="width:12%">이익률</th>
                   <th style="width:34%">비고 (전주 대비)</th>
                 </tr>
               </thead>
@@ -4036,7 +4094,7 @@ function renderOps(){
           <th class="r" style="width:15%">매출</th>
           <th class="r" style="width:14%">지출</th>
           <th class="r" style="width:14%">순매출</th>
-          <th class="r" style="width:11%">이익률</th>
+          <th class="r pct-sep" style="width:11%">이익률</th>
           <th class="c" style="width:12%">액션</th>
         </tr>
       </thead>
@@ -4202,6 +4260,18 @@ function _restoreBrandSnapshot(snap){
   try { persistTeamsData(); } catch(e){}
   try { rebuildREC(); } catch(e){}
 }
+function toggleFullBrand(b){
+  // v92: FULL 모드 토글 (편집과 다름 - 읽기 전용 펼침)
+  if(STATE.fullBrand === b){
+    STATE.fullBrand = null;
+  } else {
+    // 편집 중이던 다른 브랜드는 그대로 두고 펼침만 변경
+    STATE.fullBrand = b;
+  }
+  renderOps();
+}
+window.toggleFullBrand = toggleFullBrand;
+
 function toggleEditBrand(b){
   if(STATE.edit.brand === b){
     // 저장 - 현재 값 유지, snapshot 폐기 + 상단 대시보드 명시적 갱신
