@@ -1020,10 +1020,10 @@
   .b-card{background:#fff;border:1px solid var(--line);border-radius:8px;padding:10px 16px;position:relative;transition:all .12s}
   /* v68: 옵션 1 - 깔끔 테이블 형식 */
   .ops-table{width:100%;border-collapse:collapse;font-size:12.5px;background:#fff;border:1px solid var(--line);border-radius:10px;overflow:hidden}
-  .ops-table thead th{background:#F1F5F9;color:var(--ink2);font-size:10.5px;font-weight:800;text-transform:uppercase;letter-spacing:.4px;padding:11px 14px;text-align:left;border-bottom:1px solid var(--line)}
+  .ops-table thead th{background:#F1F5F9;color:var(--ink2);font-size:10.5px;font-weight:800;text-transform:uppercase;letter-spacing:.4px;padding:11px 14px;text-align:left;border-bottom:1px solid var(--line);border-right:none;border-left:none}
   .ops-table thead th.r{text-align:right}
   .ops-table thead th.c{text-align:center}
-  .ops-table tbody td{padding:12px 14px;border-bottom:1px solid var(--line2);vertical-align:middle}
+  .ops-table tbody td{padding:12px 14px;border-bottom:1px solid var(--line2);vertical-align:middle;border-right:none;border-left:none}
   .ops-table tbody tr.b-row:hover{background:#FAFAFA}
   .ops-table tbody tr.b-row.editing{background:#FFF5F7}
   .ops-table tbody tr.b-row.ended{opacity:.55;background:#FAFAFA}
@@ -1062,12 +1062,10 @@
   .b-detail-card{background:#fff;padding:18px 22px;border-top:2px solid var(--pt)}
   /* 카테고리 리스트 표 (셀 분리선 추가) */
   .cat-list-tbl{width:100%;border-collapse:collapse;font-size:12.5px;background:#fff;border:1px solid var(--line);border-radius:8px;overflow:hidden;margin-bottom:10px}
-  .cat-list-tbl thead th{background:#F8FAFC;color:var(--ink2);font-size:10.5px;font-weight:800;text-transform:uppercase;letter-spacing:.4px;padding:10px 14px;text-align:left;border-bottom:1px solid var(--line);border-right:1px solid var(--line2)}
-  .cat-list-tbl thead th:last-child{border-right:none}
+  .cat-list-tbl thead th{background:#F8FAFC;color:var(--ink2);font-size:10.5px;font-weight:800;text-transform:uppercase;letter-spacing:.4px;padding:10px 14px;text-align:left;border-bottom:1px solid var(--line)}
   .cat-list-tbl thead th.r{text-align:right}
   .cat-list-tbl thead th.c{text-align:center}
-  .cat-list-tbl tbody td{padding:11px 14px;border-bottom:1px solid var(--line2);border-right:1px solid var(--line2);vertical-align:middle}
-  .cat-list-tbl tbody td:last-child{border-right:none}
+  .cat-list-tbl tbody td{padding:11px 14px;border-bottom:1px solid var(--line2);vertical-align:middle}
   .cat-list-tbl tbody tr:last-child td{border-bottom:none}
   .cat-list-tbl tbody tr:hover{background:#FAFAFA}
   .cat-list-tbl tbody tr:hover td{background:#FAFAFA}
