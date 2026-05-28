@@ -1,14 +1,6 @@
 {
   "rewrites": [
     {
-      "source": "/preview-cyj-7401",
-      "destination": "/app-preview.html"
-    },
-    {
-      "source": "/preview-cyj-7401/(.*)",
-      "destination": "/app-preview.html"
-    },
-    {
       "source": "/demo",
       "destination": "/demo.html"
     },
@@ -17,12 +9,20 @@
       "destination": "/demo-hq.html"
     },
     {
+      "source": "/demo-hq-v2",
+      "destination": "/demo-hq-v2.html"
+    },
+    {
       "source": "/demo-list-ui",
       "destination": "/demo-list-ui.html"
     },
     {
       "source": "/demo-edit-detail",
       "destination": "/demo-edit-detail.html"
+    },
+    {
+      "source": "/preview-cyj-7401",
+      "destination": "/app-preview.html"
     }
   ]
 }
