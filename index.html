@@ -1388,12 +1388,65 @@
   .modal .actions button.pri:hover{background:var(--pt-d)}
 
   /* ============ Workflow / Docs ============ */
-  .wf{display:flex;gap:12px;flex-wrap:wrap}
-  .wf-step{flex:1;min-width:170px;background:#fff;border:1px solid var(--line);border-radius:10px;padding:14px;position:relative}
-  .wf-step .n{position:absolute;top:-10px;left:14px;background:var(--pt);color:#fff;width:24px;height:24px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-weight:800;font-size:11px}
-  .wf-step h4{margin:8px 0 6px;font-size:13px}
-  .wf-step p{margin:0;color:var(--ink3);font-size:11.5px;line-height:1.55}
-  .wf-step .freq{display:inline-block;margin-top:8px;font-size:10px;padding:2px 7px;border-radius:4px;background:var(--pt-l);color:var(--pt);font-weight:600}
+  /* v97: 워크플로우 페이지 리뉴얼 */
+  .wf-hero{background:linear-gradient(135deg,#FFF5F7 0%,#FFE5E9 60%,#FFF 100%);border:1px solid #FBDCE1;border-radius:14px;padding:28px 32px;margin-bottom:18px}
+  .wf-hero .wf-emoji{font-size:36px;margin-bottom:8px;display:inline-block}
+  .wf-hero h2{font-size:22px;font-weight:900;letter-spacing:-.5px;color:var(--ink);margin-bottom:8px}
+  .wf-hero p{font-size:13.5px;color:var(--ink2);font-weight:500;line-height:1.65;max-width:720px}
+  .wf-hero p b{color:#E60021;font-weight:700}
+  .wf-hero .wf-tags{display:flex;gap:8px;margin-top:14px;flex-wrap:wrap}
+  .wf-hero .wf-tag{display:inline-flex;align-items:center;gap:4px;background:#fff;border:1px solid #FBDCE1;color:#B8001A;padding:5px 12px;border-radius:20px;font-size:11.5px;font-weight:700}
+  .wf-hero .wf-tag .ico{font-size:13px}
+
+  .wf-section-title{display:flex;align-items:center;gap:9px;margin:24px 0 14px;font-size:18px;font-weight:800;color:var(--ink);letter-spacing:-.3px}
+  .wf-section-title .ico{font-size:22px}
+  .wf-section-title .desc{font-size:12px;color:var(--ink3);font-weight:500;margin-left:6px;letter-spacing:0}
+
+  /* 워크플로우 5단계 - 가로 진행 카드 */
+  .wf-steps{display:grid;grid-template-columns:repeat(5,1fr);gap:10px}
+  .wf-step{background:#fff;border:1px solid var(--line);border-radius:14px;padding:18px 16px;position:relative;transition:all .15s;display:flex;flex-direction:column;gap:10px;min-height:180px}
+  .wf-step:hover{border-color:#FBDCE1;box-shadow:0 4px 12px rgba(230,0,33,.06);transform:translateY(-2px)}
+  .wf-step .step-head{display:flex;align-items:center;gap:8px}
+  .wf-step .n{background:linear-gradient(135deg,#E60021,#B8001A);color:#fff;width:30px;height:30px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-weight:900;font-size:14px;flex:none;box-shadow:0 2px 8px rgba(230,0,33,.25)}
+  .wf-step .step-emoji{font-size:22px}
+  .wf-step h4{margin:0;font-size:14.5px;font-weight:800;letter-spacing:-.3px;color:var(--ink);line-height:1.3}
+  .wf-step p{margin:0;color:var(--ink2);font-size:12px;line-height:1.6;font-weight:500;flex:1}
+  .wf-step .freq{display:inline-flex;align-items:center;gap:4px;font-size:10.5px;padding:5px 10px;border-radius:6px;background:#FFF5F7;color:#B8001A;font-weight:700;letter-spacing:-.1px;align-self:flex-start;margin-top:auto}
+  .wf-step .freq .ico{font-size:11px}
+
+  /* 기능 카드 그리드 */
+  .wf-feat-grid{display:grid;grid-template-columns:repeat(2,1fr);gap:12px}
+  .wf-feat-box{background:#fff;border:1px solid var(--line);border-radius:12px;padding:18px 20px}
+  .wf-feat-box .fb-head{display:flex;align-items:center;gap:9px;margin-bottom:14px;padding-bottom:11px;border-bottom:1px solid var(--line2)}
+  .wf-feat-box .fb-head .ico-box{width:34px;height:34px;border-radius:8px;background:#FFE5E9;color:#E60021;display:flex;align-items:center;justify-content:center;font-size:16px;flex:none}
+  .wf-feat-box.team .fb-head .ico-box{background:#DBEAFE;color:#1D4ED8}
+  .wf-feat-box.hq .fb-head .ico-box{background:#FFEDD5;color:#D97706}
+  .wf-feat-box.closing .fb-head .ico-box{background:#DCFCE7;color:#16A34A}
+  .wf-feat-box.data .fb-head .ico-box{background:#F1F5F9;color:#475569}
+  .wf-feat-box .fb-head h4{font-size:14.5px;font-weight:800;letter-spacing:-.3px;color:var(--ink);margin:0}
+  .wf-feat-box .fb-list{display:flex;flex-direction:column;gap:10px}
+  .wf-feat-box .fb-item{display:flex;gap:9px;padding:9px 12px;background:#FAFAFA;border-radius:7px}
+  .wf-feat-box .fb-item .fb-bullet{width:5px;height:5px;border-radius:50%;background:#E60021;margin-top:7px;flex:none}
+  .wf-feat-box.team .fb-item .fb-bullet{background:#1D4ED8}
+  .wf-feat-box.hq .fb-item .fb-bullet{background:#D97706}
+  .wf-feat-box.closing .fb-item .fb-bullet{background:#16A34A}
+  .wf-feat-box.data .fb-item .fb-bullet{background:#475569}
+  .wf-feat-box .fb-item .fb-text{flex:1;min-width:0}
+  .wf-feat-box .fb-item .fb-name{font-size:12.5px;font-weight:800;color:var(--ink);letter-spacing:-.2px;margin-bottom:3px}
+  .wf-feat-box .fb-item .fb-desc{font-size:11.5px;color:var(--ink2);line-height:1.55;font-weight:500}
+
+  /* 참고 사항 - 콜아웃 */
+  .wf-tips{display:grid;grid-template-columns:repeat(3,1fr);gap:10px}
+  .wf-tip{background:linear-gradient(135deg,#FFFDF5 0%,#FFFAEB 100%);border:1px solid #FDE68A;border-radius:10px;padding:14px 16px;display:flex;gap:10px;align-items:flex-start}
+  .wf-tip .tip-ico{font-size:18px;flex:none;line-height:1.2}
+  .wf-tip .tip-text{font-size:12px;color:var(--ink2);line-height:1.6;font-weight:500}
+  .wf-tip .tip-text b{color:#B45309;font-weight:800}
+
+  @media(max-width:900px){
+    .wf-steps{grid-template-columns:repeat(2,1fr)}
+    .wf-feat-grid{grid-template-columns:1fr}
+    .wf-tips{grid-template-columns:1fr}
+  }
 
   .role-table{width:100%;border-collapse:collapse;font-size:12px}
   .role-table th, .role-table td{padding:10px;border-bottom:1px solid var(--line);text-align:left;vertical-align:top}
@@ -1956,27 +2009,174 @@
 
   <!-- =============== Workflow =============== -->
   <section id="tab-wf" class="hide">
-    <div class="panel">
-      <h3>🗺 매출 관리 워크플로우</h3>
-      <div class="wf" style="margin-top:12px">
-        <div class="wf-step"><div class="n">1</div><h4>연간 목표 설정</h4><p>매출/순매출/신규 브랜드 KPI를 분기별로 분할하여 입력</p><span class="freq">연 1회 · 1월</span></div>
-        <div class="wf-step"><div class="n">2</div><h4>월별 예상 입력</h4><p>브랜드 × 카테고리(6개)별 예상 매출/지출 일괄 기입</p><span class="freq">월 1회 · 월초</span></div>
-        <div class="wf-step"><div class="n">3</div><h4>주간 변동사항</h4><p>전주 대비 변동사항을 셀별 비고로 기록 → 자동 알림</p><span class="freq">주 1회 · 매주 월</span></div>
-        <div class="wf-step"><div class="n">4</div><h4>월말 마감 · 실적</h4><p>예상 → 실적 전환, 팀장 검토 후 본부장 승인</p><span class="freq">월말</span></div>
-        <div class="wf-step"><div class="n">5</div><h4>대시보드 모니터링</h4><p>KPI 달성률 · TOP · 변동 카드 상시 점검</p><span class="freq">상시</span></div>
+    <!-- Hero: 시스템 개요 -->
+    <div class="wf-hero">
+      <div class="wf-emoji">📊</div>
+      <h2>GOLDENAX · SM본부 매출관리 시스템</h2>
+      <p>연간 KPI 목표 설정부터 월별 실적 입력, 주간 변동 알림, 본부 통합 현황까지 매출 데이터를 통합 관리하는 도구입니다. 데이터는 <b>팀 → 본부</b> 단위로 집계되며, 권한(팀원 / 대리·과장 / 팀장 / 본부장·그룹장)에 따라 열람·수정 범위가 달라집니다.</p>
+      <div class="wf-tags">
+        <span class="wf-tag"><span class="ico">🔐</span>이름 + 개인 비밀번호 로그인</span>
+        <span class="wf-tag"><span class="ico">👥</span>4단계 권한 체계</span>
+        <span class="wf-tag"><span class="ico">📈</span>본부 통합 대시보드</span>
       </div>
     </div>
-    <div class="panel">
-      <h3>🧱 정보 구조</h3>
-      <table class="role-table">
-        <thead><tr><th>계층</th><th>구성요소</th><th>데이터 단위</th><th>주 사용 권한</th></tr></thead>
-        <tbody>
-          <tr><td><b>1. 대시보드</b> (KPI 통합)</td><td>목표 대비 달성률, 추이, TOP, 변동 알림 + 연간 목표 인라인 수정</td><td>집계값</td><td>전체 (스코프 다름)</td></tr>
-          <tr><td><b>2. 브랜드별 매출표</b></td><td>광고주 × 브랜드 × 12개월 매출/원가/이익/%</td><td>월 합계</td><td>팀장/본부장 열람, 팀원 자기 셀</td></tr>
-          <tr><td><b>3. 월간 운영</b></td><td>브랜드 카드 × 6 카테고리 (한 화면, 수정 토글)</td><td>개별 라인</td><td>팀원 입력, 팀장 검토</td></tr>
-          <tr><td><b>4. 변동 알림</b></td><td>±20% / 3천만 이상 자동 + 비고 로그</td><td>이벤트</td><td>전체</td></tr>
-        </tbody>
-      </table>
+
+    <!-- 워크플로우 5단계 -->
+    <div class="wf-section-title">
+      <span class="ico">🚀</span>
+      <span>워크플로우 5단계</span>
+      <span class="desc">시스템은 아래 순서대로 운영되도록 설계되어 있어요</span>
+    </div>
+    <div class="wf-steps">
+      <div class="wf-step">
+        <div class="step-head"><div class="n">1</div><span class="step-emoji">🎯</span></div>
+        <h4>연간 목표 설정</h4>
+        <p>매출, 순매출, 이익률, 신규 브랜드 등 KPI를 분기별로 분할 입력. 팀장이 수정하고 본부장 승인 후 확정됩니다.</p>
+        <span class="freq"><span class="ico">📅</span>연 1회 · 1월</span>
+      </div>
+      <div class="wf-step">
+        <div class="step-head"><div class="n">2</div><span class="step-emoji">📝</span></div>
+        <h4>월별 예상 입력</h4>
+        <p>브랜드별 × 6개 카테고리(업무)별로 예상 매출/지출을 한 화면에서 일괄 기입합니다.</p>
+        <span class="freq"><span class="ico">📅</span>월 1회 · 월초</span>
+      </div>
+      <div class="wf-step">
+        <div class="step-head"><div class="n">3</div><span class="step-emoji">🔔</span></div>
+        <h4>주간 변동사항 기록</h4>
+        <p>전주 대비 변동사항을 셀별 비고로 기록하면 자동으로 알림 생성. 최근 7일 내 500만원 이상 변동 시 자동 감지.</p>
+        <span class="freq"><span class="ico">📅</span>주 1회 · 매주 월</span>
+      </div>
+      <div class="wf-step">
+        <div class="step-head"><div class="n">4</div><span class="step-emoji">✅</span></div>
+        <h4>월말 마감 · 실적 전환</h4>
+        <p>예상 매출을 실적으로 전환하고, 세금계산서 발행 완료 브랜드가 마감 화면에 자동 노출됩니다.</p>
+        <span class="freq"><span class="ico">📅</span>월말</span>
+      </div>
+      <div class="wf-step">
+        <div class="step-head"><div class="n">5</div><span class="step-emoji">📊</span></div>
+        <h4>대시보드 모니터링</h4>
+        <p>KPI 달성률, 매출 TOP 브랜드, 주간 변동 카드 등을 상시 점검합니다.</p>
+        <span class="freq"><span class="ico">📅</span>상시</span>
+      </div>
+    </div>
+
+    <!-- 주요 기능 설명 -->
+    <div class="wf-section-title">
+      <span class="ico">✨</span>
+      <span>주요 기능 안내</span>
+      <span class="desc">사이드바 메뉴에서 빠르게 접근할 수 있어요</span>
+    </div>
+    <div class="wf-feat-grid">
+      <!-- 매출 관리 -->
+      <div class="wf-feat-box">
+        <div class="fb-head"><div class="ico-box">💰</div><h4>매출 관리</h4></div>
+        <div class="fb-list">
+          <div class="fb-item">
+            <div class="fb-bullet"></div>
+            <div class="fb-text">
+              <div class="fb-name">대시보드 (연간 KPI 목표)</div>
+              <div class="fb-desc">연간/상반기 매출·순매출·이익률·운영 브랜드 수의 목표 대비 달성률, 월별·분기별 추이 차트, TOP 5, 주간 변동 알림</div>
+            </div>
+          </div>
+          <div class="fb-item">
+            <div class="fb-bullet"></div>
+            <div class="fb-text">
+              <div class="fb-name">브랜드별 운영 실적 / 매출표</div>
+              <div class="fb-desc">광고주 × 브랜드 × 12개월 매출/원가/이익/이익률. 다양한 정렬 + CSV 다운로드 지원</div>
+            </div>
+          </div>
+          <div class="fb-item">
+            <div class="fb-bullet"></div>
+            <div class="fb-text">
+              <div class="fb-name">월간 매출 현황</div>
+              <div class="fb-desc">브랜드 카드별 6개 카테고리 라인 입력 + 엑셀 업로드. 종료 브랜드도 누적 노출</div>
+            </div>
+          </div>
+          <div class="fb-item">
+            <div class="fb-bullet"></div>
+            <div class="fb-text">
+              <div class="fb-name">변동 알림 피드</div>
+              <div class="fb-desc">매주 금요일 기준, 최근 7일 이내 매출 변동·계약·비고 이벤트 자동 집계</div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- 팀 관리 -->
+      <div class="wf-feat-box team">
+        <div class="fb-head"><div class="ico-box">👥</div><h4>팀 관리</h4></div>
+        <div class="fb-list">
+          <div class="fb-item">
+            <div class="fb-bullet"></div>
+            <div class="fb-text">
+              <div class="fb-name">팀원/브랜드 배정</div>
+              <div class="fb-desc">팀원 명단 관리 및 브랜드 배정을 수행합니다</div>
+            </div>
+          </div>
+          <div class="fb-item">
+            <div class="fb-bullet"></div>
+            <div class="fb-text">
+              <div class="fb-name">연간 목표 설정</div>
+              <div class="fb-desc">연 매출 / 순 매출 / 이익률 / 신규 브랜드 목표 설정 (팀장 권한)</div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- 본부 관리 -->
+      <div class="wf-feat-box hq">
+        <div class="fb-head"><div class="ico-box">🏛</div><h4>본부 관리</h4></div>
+        <div class="fb-list">
+          <div class="fb-item">
+            <div class="fb-bullet"></div>
+            <div class="fb-text">
+              <div class="fb-name">SM본부 통합 현황</div>
+              <div class="fb-desc">본부 통합 매출 추이, 그룹별·팀별 매출 비교, 연간 달성 현황 제공</div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- 마감 관리 + 데이터 관리 한 박스로 묶음 -->
+      <div class="wf-feat-box closing">
+        <div class="fb-head"><div class="ico-box">📦</div><h4>마감 · 데이터 관리</h4></div>
+        <div class="fb-list">
+          <div class="fb-item">
+            <div class="fb-bullet"></div>
+            <div class="fb-text">
+              <div class="fb-name">월 마감 확인</div>
+              <div class="fb-desc">세금계산서 발행 완료 브랜드를 기준으로 월 마감 확인</div>
+            </div>
+          </div>
+          <div class="fb-item">
+            <div class="fb-bullet"></div>
+            <div class="fb-text">
+              <div class="fb-name">데이터 백업 / 복원</div>
+              <div class="fb-desc">전체 데이터를 JSON 파일로 백업하거나 복원할 수 있어요</div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- 참고 사항 -->
+    <div class="wf-section-title">
+      <span class="ico">💡</span>
+      <span>참고 사항</span>
+    </div>
+    <div class="wf-tips">
+      <div class="wf-tip">
+        <div class="tip-ico">🗂</div>
+        <div class="tip-text"><b>종료 브랜드도 누적</b><br/>2026년에 운영했던 브랜드는 종료 후에도 누적 노출됩니다.</div>
+      </div>
+      <div class="wf-tip">
+        <div class="tip-ico">📡</div>
+        <div class="tip-text"><b>변동 알림 기준</b><br/>최근 7일 내 변경된 데이터를 비교합니다 (500만원 이상 변동 시).</div>
+      </div>
+      <div class="wf-tip">
+        <div class="tip-ico">✍️</div>
+        <div class="tip-text"><b>연간 목표 확정</b><br/>팀장이 수정하고 본부장 승인 후 확정됩니다.</div>
+      </div>
     </div>
   </section>
 
