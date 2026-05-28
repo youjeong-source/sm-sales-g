@@ -1048,11 +1048,7 @@
   .ops-table .actions .tax-mini{display:inline-flex;align-items:center;gap:3px;font-size:10.5px;padding:4px 9px;border:1px solid var(--line);border-radius:5px;cursor:pointer;font-weight:700;color:var(--ink2);margin-left:3px;background:#fff}
   .ops-table .actions .tax-mini.on{background:#0F0F10;color:#fff;border-color:#0F0F10}
   .ops-table .actions .tax-mini input{margin:0;cursor:pointer}
-  /* v92: 매출과 이익률 사이 셀 분리선 + FULL 모드 */
-  .ops-table th.pct-sep,
-  .ops-table td.pct-sep,
-  .cat-list-tbl th.pct-sep,
-  .cat-list-tbl td.pct-sep{border-left:1px solid var(--line)}
+  /* v93: 셀 분리선 원복 (FULL 모드만 유지) */
   .cat-list-tbl.full-readonly td{padding:7px 8px;font-variant-numeric:tabular-nums}
   .cat-list-tbl.full-readonly td.num{text-align:right;font-weight:700;color:var(--ink)}
   .cat-list-tbl.full-readonly td.num.exp{color:#E60021}
@@ -3980,7 +3976,7 @@ function renderOps(){
       <td class="num">${fmt(bm.rev)}</td>
       <td class="num exp">${fmt(bm.exp)}</td>
       <td class="num net">${fmt(bm.net)}</td>
-      <td class="pct ${marginCls} pct-sep">${bm.rev?margin.toFixed(1)+'%':'-'}</td>
+      <td class="pct ${marginCls}">${bm.rev?margin.toFixed(1)+'%':'-'}</td>
       <td class="actions">${fullBtn}${editToggleBtn}${cancelBtn}${renameBtn}${deleteBtn}</td>
     </tr>`;
     // v92: FULL 모드 (읽기 전용) 펼침 상세 행
@@ -3995,7 +3991,7 @@ function renderOps(){
           <td><span class="cat-name">${c}</span></td>
           <td class="num">${x.rev?fmt(x.rev):'-'}</td>
           <td class="num exp">${x.exp?fmt(x.exp):'-'}</td>
-          <td class="pct-sep"><span class="cat-margin ${marginCls}">${marginText}</span></td>
+          <td ><span class="cat-margin ${marginCls}">${marginText}</span></td>
           <td><span style="color:var(--ink3);font-size:11px">${(x.note||'').replace(/</g,'&lt;')||'-'}</span></td>
         </tr>`;
       }).join('');
@@ -4010,7 +4006,7 @@ function renderOps(){
                   <th style="width:18%">카테고리</th>
                   <th class="r" style="width:18%">매출</th>
                   <th class="r" style="width:18%">지출</th>
-                  <th class="r pct-sep" style="width:12%">이익률</th>
+                  <th class="r" style="width:12%">이익률</th>
                   <th style="width:34%">비고</th>
                 </tr>
               </thead>
@@ -4040,7 +4036,7 @@ function renderOps(){
           <td><span class="cat-name">${c}</span></td>
           <td><input data-b="${b.replace(/"/g,'&quot;')}" data-c="${c.replace(/"/g,'&quot;')}" data-f="revenue" type="text" value="${x.rev?fmt(x.rev):''}" placeholder="0" /></td>
           <td><input data-b="${b.replace(/"/g,'&quot;')}" data-c="${c.replace(/"/g,'&quot;')}" data-f="expense" type="text" value="${x.exp?fmt(x.exp):''}" placeholder="0" /></td>
-          <td class="pct-sep"><span class="cat-margin ${marginCls}">${marginText}</span></td>
+          <td ><span class="cat-margin ${marginCls}">${marginText}</span></td>
           <td><input class="note" data-b="${b.replace(/"/g,'&quot;')}" data-c="${c.replace(/"/g,'&quot;')}" data-f="note" type="text" value="${(x.note||'').replace(/"/g,'&quot;')}" placeholder="전주 대비 변동/비고" /></td>
         </tr>`;
       }).join('');
@@ -4058,7 +4054,7 @@ function renderOps(){
                   <th style="width:18%">카테고리</th>
                   <th class="r" style="width:18%">매출</th>
                   <th class="r" style="width:18%">지출</th>
-                  <th class="r pct-sep" style="width:12%">이익률</th>
+                  <th class="r" style="width:12%">이익률</th>
                   <th style="width:34%">비고 (전주 대비)</th>
                 </tr>
               </thead>
@@ -4094,7 +4090,7 @@ function renderOps(){
           <th class="r" style="width:15%">매출</th>
           <th class="r" style="width:14%">지출</th>
           <th class="r" style="width:14%">순매출</th>
-          <th class="r pct-sep" style="width:11%">이익률</th>
+          <th class="r" style="width:11%">이익률</th>
           <th class="c" style="width:12%">액션</th>
         </tr>
       </thead>
