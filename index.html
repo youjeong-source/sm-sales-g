@@ -801,19 +801,44 @@
   /* 월간 운영 - 1열 컴팩트 (요약은 헤더에 인라인) */
   .brand-cards{display:grid;grid-template-columns:1fr;gap:8px}
   .b-card{background:#fff;border:1px solid var(--line);border-radius:8px;padding:10px 16px;position:relative;transition:all .12s}
-  /* v67: 컴팩트 리스트 행 모드 (펼치지 않은 상태) */
-  .b-card:not(.expanded){display:flex;align-items:center;min-height:46px}
-  .b-card:not(.expanded):hover{border-color:#CFCFD2;box-shadow:0 1px 3px rgba(0,0,0,.04)}
-  .b-card:not(.expanded) .head{flex:1;display:grid;grid-template-columns:1.4fr auto;gap:14px;align-items:center;margin-bottom:0}
-  .b-card:not(.expanded) .head .name{font-size:13px;font-weight:700;display:flex;align-items:center;gap:8px;flex-wrap:wrap}
-  .b-card:not(.expanded) .head .adv{font-size:10.5px;padding:2px 7px}
-  .b-card:not(.expanded) .head .owner{font-size:10.5px;margin-left:2px}
-  .b-card:not(.expanded) .inline-sum{display:inline-flex;gap:14px;font-size:11.5px;margin-left:14px;flex-wrap:wrap}
-  .b-card:not(.expanded) .inline-sum .lbl{color:var(--ink3);font-weight:600;margin-right:3px}
-  .b-card:not(.expanded) .inline-sum b{font-weight:800;font-variant-numeric:tabular-nums}
-  .b-card:not(.expanded) .head > div:last-child{display:flex;align-items:center;gap:6px;flex-wrap:wrap;justify-content:flex-end}
-  .b-card:not(.expanded) .end-toggle{display:none}
-  .b-card.ended:not(.expanded){opacity:.55;background:#FAFAFA}
+  /* v68: 옵션 1 - 깔끔 테이블 형식 */
+  .ops-table{width:100%;border-collapse:collapse;font-size:12.5px;background:#fff;border:1px solid var(--line);border-radius:10px;overflow:hidden}
+  .ops-table thead th{background:#F1F5F9;color:var(--ink2);font-size:10.5px;font-weight:800;text-transform:uppercase;letter-spacing:.4px;padding:11px 14px;text-align:left;border-bottom:1px solid var(--line)}
+  .ops-table thead th.r{text-align:right}
+  .ops-table thead th.c{text-align:center}
+  .ops-table tbody td{padding:12px 14px;border-bottom:1px solid var(--line2);vertical-align:middle}
+  .ops-table tbody tr.b-row:hover{background:#FAFAFA}
+  .ops-table tbody tr.b-row.editing{background:#FFF5F7}
+  .ops-table tbody tr.b-row.ended{opacity:.55;background:#FAFAFA}
+  .ops-table .b-name{font-weight:800;color:var(--ink);font-size:13px}
+  .ops-table .b-name .ended-tag{display:inline-block;background:#FEE2E2;color:#B91C1C;font-size:9px;padding:2px 5px;border-radius:3px;margin-left:5px;font-weight:800;letter-spacing:.3px}
+  .ops-table .adv-pill{display:inline-block;background:var(--bg2);color:var(--ink2);font-size:10.5px;padding:2px 8px;border-radius:4px;font-weight:700}
+  .ops-table .owner{font-size:11.5px;color:var(--ink2);font-weight:600}
+  .ops-table .num{text-align:right;font-variant-numeric:tabular-nums;font-weight:800;font-size:13px}
+  .ops-table .num.exp{color:var(--ink3);font-weight:700}
+  .ops-table .num.net{color:#1D4ED8}
+  .ops-table .pct{text-align:right;font-weight:800;font-size:13px;font-variant-numeric:tabular-nums}
+  .ops-table .pct.good{color:#16A34A}
+  .ops-table .pct.warn{color:#D97706}
+  .ops-table .pct.bad{color:#E60021}
+  .ops-table .actions{text-align:right;white-space:nowrap}
+  .ops-table .actions .btn-mini{font-size:10.5px;padding:4px 9px;border:1px solid var(--line);background:#fff;border-radius:5px;cursor:pointer;font-weight:700;color:var(--ink2);margin-left:3px;font-family:inherit}
+  .ops-table .actions .btn-mini:hover{border-color:var(--ink);color:var(--ink)}
+  .ops-table .actions .btn-mini.pri{background:var(--pt);color:#fff;border-color:var(--pt)}
+  .ops-table .actions .btn-mini.pri:hover{background:var(--pt-d);border-color:var(--pt-d)}
+  .ops-table .actions .btn-mini.danger{color:#B8001A}
+  .ops-table .actions .btn-mini.danger:hover{border-color:#B8001A}
+  .ops-table .actions .tax-mini{display:inline-flex;align-items:center;gap:3px;font-size:10.5px;padding:4px 9px;border:1px solid var(--line);border-radius:5px;cursor:pointer;font-weight:700;color:var(--ink2);margin-left:3px;background:#fff}
+  .ops-table .actions .tax-mini.on{background:#0F0F10;color:#fff;border-color:#0F0F10}
+  .ops-table .actions .tax-mini input{margin:0;cursor:pointer}
+  /* 편집 상세 행 (펼친 카테고리 표) */
+  .ops-table tr.b-detail{background:#FAFAFA;border-bottom:1px solid var(--line2)}
+  .ops-table tr.b-detail > td{padding:14px 18px}
+  .ops-table .b-detail-tools{display:flex;align-items:center;gap:10px;margin-bottom:10px;padding:0 4px;flex-wrap:wrap}
+  .ops-table .b-detail-tools label{display:inline-flex;align-items:center;gap:4px;font-size:11px;font-weight:600;color:var(--ink2);cursor:pointer}
+  .ops-table .b-detail-tools label input{margin:0;cursor:pointer}
+  .ops-table .b-detail-tools .btn-mini{font-size:10.5px;padding:4px 9px;border:1px solid var(--line);background:#fff;border-radius:5px;cursor:pointer;font-weight:700;color:var(--ink2);font-family:inherit}
+  .ops-table .b-detail-tools .btn-mini:hover{border-color:var(--ink);color:var(--ink)}
   .b-card.editing{border-color:var(--ink);box-shadow:0 0 0 2px var(--bg2)}
   .b-card.ended{background:#FAFAFA;opacity:.7;order:99}
   .b-card.ended .name::after{content:'계약 종료';margin-left:6px;background:var(--bg2);color:var(--ink3);font-size:10px;font-weight:700;padding:2px 7px;border-radius:5px}
@@ -3629,60 +3654,79 @@ function renderOps(){
   // 본부장이라도 특정 팀을 보고 있을 때(그룹장 등)는 편집 가능
   const canEdit = STATE.role !== 'head' || (STATE.team && STATE.team !== 'HQ');
 
-  wrap.innerHTML = scope.map(b=>{
+  // v68: 옵션 1 - 깔끔 테이블 형식
+  const bodyRows = scope.map(b=>{
     const editing = STATE.edit.brand===b;
     const meta = getMeta(b);
     const bm = brandMonth(b,m);
     const taxIssued = isTaxIssued(b,m);
-    const rows = CATS.map(c=>{
-      const x = brandCategoryMonth(b,m,c);
-      const cMargin = x.rev ? (((x.rev-x.exp)/x.rev)*100) : null;
-      const marginCell = cMargin===null ? '<span style="color:var(--muted)">-</span>' : `<span class="cat-margin ${cMargin>=20?'good':cMargin>=0?'mid':'bad'}">${cMargin.toFixed(1)}%</span>`;
-      return `<tr>
-        <td><span class="cat-name">${c}</span></td>
-        <td class="r"><input data-b="${b.replace(/"/g,'&quot;')}" data-c="${c.replace(/"/g,'&quot;')}" data-f="revenue" type="text" value="${x.rev?fmt(x.rev):''}" placeholder="0" ${editing?'':'disabled'} /></td>
-        <td class="r"><input data-b="${b.replace(/"/g,'&quot;')}" data-c="${c.replace(/"/g,'&quot;')}" data-f="expense" type="text" value="${x.exp?fmt(x.exp):''}" placeholder="0" ${editing?'':'disabled'} /></td>
-        <td class="r">${marginCell}</td>
-        <td><input class="note" data-b="${b.replace(/"/g,'&quot;')}" data-c="${c.replace(/"/g,'&quot;')}" data-f="note" type="text" value="${(x.note||'').replace(/"/g,'&quot;')}" placeholder="${editing?'전주 대비 변동/비고':'-'}" ${editing?'':'disabled'} /></td>
+    const margin = bm.rev ? (bm.net/bm.rev*100) : 0;
+    const marginCls = !bm.rev ? '' : (margin>=20 ? 'good' : margin>=0 ? 'warn' : 'bad');
+    const escB = b.replace(/'/g,"\\'");
+    // 액션 버튼들
+    const taxBtn = `<label class="tax-mini ${taxIssued?'on':''}" title="세금계산서 발행"><input type="checkbox" ${taxIssued?'checked':''} ${canEdit?'':'disabled'} onchange="toggleTaxIssued('${escB}','${m}', this.checked)" />세금</label>`;
+    const editToggleBtn = canEdit ? `<button class="btn-mini ${editing?'pri':''}" onclick="toggleEditBrand('${escB}')">${editing?'저장':'수정'}</button>` : '';
+    const cancelBtn = (canEdit && editing) ? '<button class="btn-mini" data-cancel-edit="' + encodeURIComponent(b) + '">닫기</button>' : '';
+    const renameBtn = (canEdit && STATE.role==='lead') ? `<button class="btn-mini" onclick="renameBrand('${escB}')">설정</button>` : '';
+    const deleteBtn = (canEdit && STATE.role==='lead') ? `<button class="btn-mini danger" onclick="deleteBrand('${escB}')">삭제</button>` : '';
+    const mainRow = `<tr class="b-row ${editing?'editing':''} ${meta.ended?'ended':''}" data-brand="${b.replace(/"/g,'&quot;')}">
+      <td><span class="b-name">${b}${meta.ended?'<span class="ended-tag">종료</span>':''}</span></td>
+      <td><span class="adv-pill">${ADV_MAP[b]||'-'}</span></td>
+      <td class="owner">${OWNERS[b]||'-'}</td>
+      <td class="num">${fmt(bm.rev)}</td>
+      <td class="num exp">${fmt(bm.exp)}</td>
+      <td class="num net">${fmt(bm.net)}</td>
+      <td class="pct ${marginCls}">${bm.rev?margin.toFixed(1)+'%':'-'}</td>
+      <td class="actions">${taxBtn}${editToggleBtn}${cancelBtn}${renameBtn}${deleteBtn}</td>
+    </tr>`;
+    // 편집 모드일 때 카테고리 상세 행 추가
+    let detailRow = '';
+    if(editing){
+      const rows = CATS.map(c=>{
+        const x = brandCategoryMonth(b,m,c);
+        const cMargin = x.rev ? (((x.rev-x.exp)/x.rev)*100) : null;
+        const marginCell = cMargin===null ? '<span style="color:var(--muted)">-</span>' : `<span class="cat-margin ${cMargin>=20?'good':cMargin>=0?'mid':'bad'}">${cMargin.toFixed(1)}%</span>`;
+        return `<tr>
+          <td><span class="cat-name">${c}</span></td>
+          <td class="r"><input data-b="${b.replace(/"/g,'&quot;')}" data-c="${c.replace(/"/g,'&quot;')}" data-f="revenue" type="text" value="${x.rev?fmt(x.rev):''}" placeholder="0" /></td>
+          <td class="r"><input data-b="${b.replace(/"/g,'&quot;')}" data-c="${c.replace(/"/g,'&quot;')}" data-f="expense" type="text" value="${x.exp?fmt(x.exp):''}" placeholder="0" /></td>
+          <td class="r">${marginCell}</td>
+          <td><input class="note" data-b="${b.replace(/"/g,'&quot;')}" data-c="${c.replace(/"/g,'&quot;')}" data-f="note" type="text" value="${(x.note||'').replace(/"/g,'&quot;')}" placeholder="전주 대비 변동/비고" /></td>
+        </tr>`;
+      }).join('');
+      const endToggle = `<label class="end-toggle"><input type="checkbox" ${meta.ended?'checked':''} onchange="toggleBrandEnded('${escB}', this.checked)" />브랜드 종료</label>`;
+      const removeMonthBtn = !isHiddenInMonth(b, m) ? '<button class="btn-mini" data-remove-month-brand="' + encodeURIComponent(b) + '" data-month="' + m + '" style="color:#D97706">이 달에서 제외</button>' : '';
+      detailRow = `<tr class="b-detail" data-brand="${b.replace(/"/g,'&quot;')}">
+        <td colspan="8">
+          <div class="b-detail-tools">${endToggle}${removeMonthBtn}</div>
+          <table class="cat">
+            <thead><tr><th style="width:18%">카테고리</th><th class="r" style="width:16%">매출</th><th class="r" style="width:16%">지출</th><th class="r" style="width:14%">순이익률</th><th style="width:36%">비고 (전주 대비)</th></tr></thead>
+            <tbody>${rows}</tbody>
+            <tfoot><tr><td>합계</td><td class="r"><b>${fmt(bm.rev)}</b></td><td class="r"><b>${fmt(bm.exp)}</b></td><td class="r net">${bm.rev?((bm.net/bm.rev*100).toFixed(1)+'%'):'-'}</td><td class="r net"><b>${fmt(bm.net)}원</b> (순매출)</td></tr></tfoot>
+          </table>
+        </td>
       </tr>`;
-    }).join('');
-    // 인라인 요약 (브랜드명 옆 상단)
-    const inlineSum = `
-      <span class="inline-sum">
-        <span class="rev"><span class="lbl">매출</span> <b>${fmtShort(bm.rev)}</b></span>
-        <span class="exp"><span class="lbl">지출</span> <b>${fmtShort(bm.exp)}</b></span>
-        <span class="net"><span class="lbl">순매출</span> <b>${fmtShort(bm.net)}</b></span>
-        <span class="marg"><span class="lbl">이익률</span> <b>${bm.rev?((bm.net/bm.rev*100).toFixed(1)+'%'):'-'}</b></span>
-      </span>`;
-    const taxToggle = `<label class="tax-toggle ${taxIssued?'done':''}"><input type="checkbox" ${taxIssued?'checked':''} ${canEdit?'':'disabled'} onchange="toggleTaxIssued('${b.replace(/'/g,"\\'")}','${m}', this.checked)" />세금계산서 ${taxIssued?'발행완료(월마감)':'발행여부'}</label>`;
-    const endToggle = (canEdit && editing) ? `<label class="end-toggle"><input type="checkbox" ${meta.ended?'checked':''} onchange="toggleBrandEnded('${b.replace(/'/g,"\\'")}', this.checked)" />브랜드 종료</label>` : '';
-    const removeMonthBtn = (canEdit && editing && !isHiddenInMonth(b, m)) ? '<button class="expand-btn" data-remove-month-brand="' + encodeURIComponent(b) + '" data-month="' + m + '" style="color:#D97706">이 달에서 제외</button>' : '';
-    const editToggleBtn = canEdit ? `<button class="expand-btn ${editing?'pri':''}" onclick="toggleEditBrand('${b.replace(/'/g,"\\'")}')">${editing?'저장':'수정'}</button>` : '';
-    const cancelEditBtn = (canEdit && editing) ? '<button class="expand-btn" data-cancel-edit="' + encodeURIComponent(b) + '" style="color:var(--ink3)">닫기</button>' : '';
-    const renameBtn = (canEdit && STATE.role==='lead') ? `<button class="expand-btn" onclick="renameBrand('${b.replace(/'/g,"\\'")}')">설정</button>` : '';
-    const deleteBtn = (canEdit && STATE.role==='lead') ? `<button class="expand-btn" onclick="deleteBrand('${b.replace(/'/g,"\\'")}')" style="color:#B8001A">삭제</button>` : '';
-    const expandBtn = `<button class="expand-btn" onclick="toggleCardExpand('${b.replace(/'/g,"\\'")}')">상세 ▾</button>`;
-    return `<div class="b-card ${editing?'editing expanded':''} ${meta.ended?'ended':''}" data-brand="${b.replace(/"/g,'&quot;')}">
-      <div class="head">
-        <div class="name">${b}<span class="adv">${ADV_MAP[b]||'-'}</span><span class="owner">담당 ${OWNERS[b]||'-'}</span>${inlineSum}</div>
-        <div style="display:flex;align-items:center;gap:8px;flex-wrap:wrap">
-          ${taxToggle}
-          ${endToggle}
-          ${removeMonthBtn}
-          ${expandBtn}
-          ${editToggleBtn}
-          ${cancelEditBtn}
-          ${renameBtn}
-          ${deleteBtn}
-        </div>
-      </div>
-      <table class="cat">
-        <thead><tr><th style="width:18%">카테고리</th><th class="r" style="width:16%">매출</th><th class="r" style="width:16%">지출</th><th class="r" style="width:14%">순이익률</th><th style="width:36%">비고 (전주 대비)</th></tr></thead>
-        <tbody>${rows}</tbody>
-        <tfoot><tr><td>합계</td><td class="r"><b>${fmt(bm.rev)}</b></td><td class="r"><b>${fmt(bm.exp)}</b></td><td class="r net">${bm.rev?((bm.net/bm.rev*100).toFixed(1)+'%'):'-'}</td><td class="r net"><b>${fmt(bm.net)}원</b> (순매출)</td></tr></tfoot>
-      </table>
-    </div>`;
+    }
+    return mainRow + detailRow;
   }).join('');
+  wrap.innerHTML = `
+    <table class="ops-table">
+      <thead>
+        <tr>
+          <th style="width:16%">브랜드</th>
+          <th style="width:11%">광고주</th>
+          <th style="width:12%">담당</th>
+          <th class="r" style="width:11%">매출</th>
+          <th class="r" style="width:11%">지출</th>
+          <th class="r" style="width:11%">순매출</th>
+          <th class="r" style="width:8%">이익률</th>
+          <th class="c" style="width:20%">액션</th>
+        </tr>
+      </thead>
+      <tbody>${bodyRows}</tbody>
+    </table>`;
+
+
 
   // 이 달에서 제외 버튼 이벤트 위임
   wrap.querySelectorAll('button[data-remove-month-brand]').forEach(btn=>{
