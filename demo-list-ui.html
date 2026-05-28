@@ -1,0 +1,445 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8">
+<title>월간 매출 카드 UI 4가지 데모 - GOLDENAX</title>
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<style>
+  *{box-sizing:border-box;margin:0;padding:0}
+  :root{
+    --pt:#E60021;--pt-d:#B8001A;--ink:#0F0F10;--ink2:#475569;--ink3:#94A3B8;
+    --line:#E5E5E5;--line2:#F1F5F9;--bg:#FAFAFA;--bg2:#F4F4F5;
+  }
+  body{font-family:'Pretendard','Apple SD Gothic Neo',-apple-system,sans-serif;background:#FAFAFA;color:var(--ink);font-size:13px;line-height:1.5;padding-bottom:80px}
+
+  .topbar{background:linear-gradient(135deg,#E60021,#B8001A);color:#fff;padding:16px 32px;display:flex;align-items:center;gap:20px;border-bottom:1px solid #B8001A}
+  .topbar .brand{font-weight:900;letter-spacing:-.5px;font-size:18px}
+  .topbar .title{font-weight:600;font-size:14px;opacity:.95}
+  .topbar .back{margin-left:auto;font-size:12px;color:#fff;text-decoration:none;background:rgba(255,255,255,.18);padding:7px 14px;border-radius:7px;border:1px solid rgba(255,255,255,.28)}
+  .topbar .back:hover{background:rgba(255,255,255,.28)}
+  .topbar .demo-tag{background:#FCD34D;color:#0F0F10;font-size:10.5px;font-weight:800;padding:3px 9px;border-radius:5px;letter-spacing:.3px}
+
+  .container{max-width:1340px;margin:24px auto;padding:0 32px;display:flex;flex-direction:column;gap:42px}
+
+  .opt-section{display:flex;flex-direction:column;gap:14px}
+  .opt-title{display:flex;align-items:baseline;gap:14px;border-bottom:2px solid var(--line);padding-bottom:10px}
+  .opt-title .badge{font-size:11px;font-weight:900;background:#0F0F10;color:#fff;padding:5px 11px;border-radius:5px;letter-spacing:.5px}
+  .opt-title h2{font-size:20px;font-weight:900;letter-spacing:-.5px}
+  .opt-title .desc{font-size:12.5px;color:var(--ink3);font-weight:500}
+
+  .demo-frame{background:#fff;border:1px solid var(--line);border-radius:12px;padding:16px 0;overflow:hidden}
+  .demo-frame .toolbar{padding:0 22px 14px;display:flex;justify-content:space-between;align-items:center;border-bottom:1px solid var(--line2);margin-bottom:14px}
+  .demo-frame .toolbar h3{font-size:14px;font-weight:800}
+  .demo-frame .toolbar .meta{font-size:11px;color:var(--ink3)}
+
+  /* ========== Option 1: 깔끔 테이블 ========== */
+  .opt1-tbl{width:100%;border-collapse:collapse;font-size:12.5px}
+  .opt1-tbl thead th{background:#F1F5F9;color:var(--ink2);font-size:10.5px;font-weight:800;text-transform:uppercase;letter-spacing:.4px;padding:11px 16px;text-align:left;border-bottom:1px solid var(--line)}
+  .opt1-tbl thead th.r{text-align:right}
+  .opt1-tbl thead th.c{text-align:center}
+  .opt1-tbl tbody td{padding:13px 16px;border-bottom:1px solid var(--line2)}
+  .opt1-tbl tbody tr:hover{background:#FAFAFA}
+  .opt1-tbl .b-name{font-weight:800;color:var(--ink);font-size:13px}
+  .opt1-tbl .adv{display:inline-block;background:var(--bg2);color:var(--ink2);font-size:10.5px;padding:2px 8px;border-radius:4px;font-weight:700}
+  .opt1-tbl .owner{font-size:11.5px;color:var(--ink2)}
+  .opt1-tbl .num{text-align:right;font-variant-numeric:tabular-nums;font-weight:800;font-size:13px}
+  .opt1-tbl .num.exp{color:var(--ink3);font-weight:700}
+  .opt1-tbl .num.net{color:#1D4ED8}
+  .opt1-tbl .pct{text-align:right;font-weight:800;font-size:13px;font-variant-numeric:tabular-nums}
+  .opt1-tbl .pct.good{color:#16A34A}
+  .opt1-tbl .pct.warn{color:#D97706}
+  .opt1-tbl .pct.bad{color:#E60021}
+  .opt1-tbl .act{text-align:center}
+  .opt1-tbl .act button{font-size:10.5px;padding:4px 9px;border:1px solid var(--line);background:#fff;border-radius:5px;cursor:pointer;font-weight:700;color:var(--ink2);margin:0 2px}
+  .opt1-tbl .act button:hover{border-color:var(--ink);color:var(--ink)}
+
+  /* ========== Option 2: 카드 그리드 (3 col) ========== */
+  .opt2-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:14px;padding:0 18px 18px}
+  .o2-card{background:#fff;border:1px solid var(--line);border-radius:11px;padding:16px 18px;transition:all .15s;cursor:pointer}
+  .o2-card:hover{border-color:#0F0F10;box-shadow:0 4px 14px rgba(0,0,0,.06);transform:translateY(-1px)}
+  .o2-card .o2-top{display:flex;justify-content:space-between;align-items:flex-start;margin-bottom:11px}
+  .o2-card .o2-name{font-size:15px;font-weight:900;letter-spacing:-.3px;color:var(--ink)}
+  .o2-card .o2-pct{font-size:13px;font-weight:900;padding:4px 9px;border-radius:6px;letter-spacing:-.2px}
+  .o2-card .o2-pct.good{background:#DCFCE7;color:#16A34A}
+  .o2-card .o2-pct.warn{background:#FEF3C7;color:#D97706}
+  .o2-card .o2-pct.bad{background:#FFE5E9;color:#E60021}
+  .o2-card .o2-sub{font-size:11px;color:var(--ink3);margin-bottom:14px}
+  .o2-card .o2-sub b{color:var(--ink2);font-weight:700}
+  .o2-card .o2-main{font-size:24px;font-weight:900;letter-spacing:-.6px;color:var(--ink);font-variant-numeric:tabular-nums;line-height:1;margin-bottom:6px}
+  .o2-card .o2-main .small{font-size:13px;color:var(--ink3);font-weight:600;margin-left:3px}
+  .o2-card .o2-secondary{display:flex;gap:14px;font-size:11px;color:var(--ink3);font-weight:600;padding-top:11px;border-top:1px solid var(--line2)}
+  .o2-card .o2-secondary span{display:flex;flex-direction:column;gap:1px}
+  .o2-card .o2-secondary b{color:var(--ink2);font-weight:800;font-size:12px;font-variant-numeric:tabular-nums}
+  .o2-card .o2-secondary .net b{color:#1D4ED8}
+
+  /* ========== Option 3: 막대 시각화 행 ========== */
+  .opt3-list{display:flex;flex-direction:column}
+  .o3-row{display:grid;grid-template-columns:32px 1.5fr 2fr auto auto;gap:14px;padding:13px 22px;border-bottom:1px solid var(--line2);align-items:center;cursor:pointer;transition:background .12s}
+  .o3-row:hover{background:#FAFAFA}
+  .o3-row:last-child{border-bottom:none}
+  .o3-rank{font-size:14px;font-weight:900;color:var(--ink3);text-align:center;font-variant-numeric:tabular-nums}
+  .o3-row.r1 .o3-rank{color:#E60021}
+  .o3-row.r2 .o3-rank{color:#D97706}
+  .o3-row.r3 .o3-rank{color:#1D4ED8}
+  .o3-name{font-weight:800;font-size:13px;color:var(--ink);display:flex;align-items:center;gap:8px;flex-wrap:wrap}
+  .o3-name .adv{font-size:10.5px;background:var(--bg2);color:var(--ink2);padding:2px 7px;border-radius:4px;font-weight:700}
+  .o3-name .owner{font-size:10.5px;color:var(--ink3);font-weight:600}
+  .o3-bar-wrap{position:relative;height:28px;background:var(--bg2);border-radius:6px;overflow:hidden}
+  .o3-bar{position:absolute;left:0;top:0;bottom:0;background:linear-gradient(90deg,#E60021,#B8001A);border-radius:6px;transition:width .4s}
+  .o3-bar.med{background:linear-gradient(90deg,#FBBF24,#D97706)}
+  .o3-bar.low{background:linear-gradient(90deg,#94A3B8,#64748B)}
+  .o3-bar-label{position:absolute;right:8px;top:50%;transform:translateY(-50%);font-size:11px;font-weight:800;color:#fff;font-variant-numeric:tabular-nums;text-shadow:0 1px 2px rgba(0,0,0,.2);z-index:1}
+  .o3-pct{font-size:13px;font-weight:900;font-variant-numeric:tabular-nums;text-align:right;min-width:60px}
+  .o3-pct.good{color:#16A34A}
+  .o3-pct.warn{color:#D97706}
+  .o3-pct.bad{color:#E60021}
+  .o3-act{display:flex;gap:5px}
+  .o3-act button{font-size:10.5px;padding:4px 8px;border:1px solid var(--line);background:#fff;border-radius:5px;cursor:pointer;font-weight:700;color:var(--ink2)}
+  .o3-act button:hover{border-color:var(--ink);color:var(--ink)}
+
+  /* ========== Option 4: 미니멀 한 줄 ========== */
+  .opt4-list{display:flex;flex-direction:column;padding:0 22px 14px}
+  .o4-row{display:grid;grid-template-columns:1fr auto auto auto;gap:18px;padding:13px 0;border-bottom:1px solid var(--line2);align-items:center;cursor:pointer;position:relative}
+  .o4-row:last-child{border-bottom:none}
+  .o4-row:hover .o4-detail{opacity:1;transform:translateY(0)}
+  .o4-name-block{display:flex;align-items:baseline;gap:9px}
+  .o4-name-block .nm{font-size:14.5px;font-weight:900;letter-spacing:-.3px}
+  .o4-name-block .ctx{font-size:11px;color:var(--ink3);font-weight:600}
+  .o4-rev-block{display:flex;align-items:baseline;gap:5px;font-variant-numeric:tabular-nums}
+  .o4-rev-block .v{font-size:18px;font-weight:900;letter-spacing:-.5px;color:var(--ink)}
+  .o4-rev-block .lbl{font-size:10.5px;color:var(--ink3);font-weight:700;text-transform:uppercase;letter-spacing:.3px}
+  .o4-marg-pill{font-size:12px;font-weight:900;padding:5px 11px;border-radius:7px;letter-spacing:-.2px}
+  .o4-marg-pill.good{background:#DCFCE7;color:#16A34A;border:1px solid #BBF7D0}
+  .o4-marg-pill.warn{background:#FEF3C7;color:#D97706;border:1px solid #FCD34D}
+  .o4-marg-pill.bad{background:#FFE5E9;color:#E60021;border:1px solid #FBDCE1}
+  .o4-arrow{font-size:14px;color:var(--ink3);font-weight:900;transition:transform .15s,color .15s}
+  .o4-row:hover .o4-arrow{color:var(--ink);transform:translateX(3px)}
+  .o4-detail{position:absolute;left:0;right:0;top:100%;background:#fff;border:1px solid var(--line);border-radius:8px;padding:10px 14px;font-size:11.5px;color:var(--ink2);box-shadow:0 6px 18px rgba(0,0,0,.08);opacity:0;transform:translateY(-4px);transition:all .15s;pointer-events:none;z-index:10;display:flex;gap:16px;margin-top:2px}
+  .o4-detail span{display:flex;flex-direction:column;gap:2px}
+  .o4-detail span .l{font-size:10px;color:var(--ink3);font-weight:700;letter-spacing:.3px;text-transform:uppercase}
+  .o4-detail span .v{font-size:13px;color:var(--ink);font-weight:800;font-variant-numeric:tabular-nums}
+
+  /* Footnote */
+  .footnote{font-size:11.5px;color:var(--ink3);text-align:center;padding:18px;background:var(--bg2);border-radius:10px;line-height:1.7}
+  .footnote b{color:var(--ink2)}
+
+  .pros-cons{display:grid;grid-template-columns:1fr 1fr;gap:14px;margin-top:6px}
+  .pros-cons > div{background:var(--bg2);padding:12px 16px;border-radius:8px}
+  .pros-cons .pros{background:#ECFDF5;border:1px solid #BBF7D0}
+  .pros-cons .cons{background:#FFF1F2;border:1px solid #FBDCE1}
+  .pros-cons h4{font-size:11.5px;font-weight:800;color:var(--ink);margin-bottom:5px;display:flex;align-items:center;gap:4px}
+  .pros-cons .pros h4{color:#15803D}
+  .pros-cons .cons h4{color:#B91C1C}
+  .pros-cons ul{list-style:none;font-size:11.5px;color:var(--ink2);line-height:1.7}
+  .pros-cons li{padding:2px 0}
+
+  @media(max-width:1100px){
+    .opt2-grid{grid-template-columns:1fr 1fr}
+    .pros-cons{grid-template-columns:1fr}
+  }
+</style>
+</head>
+<body>
+
+<div class="topbar">
+  <div class="brand">GOLDENAX</div>
+  <div class="title">월간 매출 현황 — 브랜드 카드 UI 4가지 데모</div>
+  <span class="demo-tag">DEMO</span>
+  <a href="/" class="back">← 본 사이트로</a>
+</div>
+
+<div class="container">
+
+  <!-- ============== Option 1: 깔끔 테이블 ============== -->
+  <div class="opt-section">
+    <div class="opt-title">
+      <span class="badge">옵션 1</span>
+      <h2>깔끔 테이블</h2>
+      <span class="desc">표 형식 · 컬럼 정렬 · 빠른 스캔 가능 (첨부 두번째 이미지 스타일)</span>
+    </div>
+    <div class="demo-frame">
+      <div class="toolbar">
+        <h3>월간 매출 현황</h3>
+        <div class="meta">26년 5월 · 매출 높은 순</div>
+      </div>
+      <table class="opt1-tbl">
+        <thead>
+          <tr>
+            <th>브랜드</th>
+            <th>광고주</th>
+            <th>담당</th>
+            <th class="r">매출</th>
+            <th class="r">지출</th>
+            <th class="r">순매출</th>
+            <th class="r">이익률</th>
+            <th class="c">액션</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr><td><span class="b-name">더마비</span></td><td><span class="adv">네오팜</span></td><td><span class="owner">강성령</span></td><td class="num">2,745만</td><td class="num exp">2,368만</td><td class="num net">377만</td><td class="pct warn">13.7%</td><td class="act"><button>상세</button><button>수정</button></td></tr>
+          <tr><td><span class="b-name">어메이징오트</span></td><td><span class="adv">매일유업</span></td><td><span class="owner">박지현, 임지원</span></td><td class="num">2,342만</td><td class="num exp">1,087만</td><td class="num net">1,255만</td><td class="pct good">53.6%</td><td class="act"><button>상세</button><button>수정</button></td></tr>
+          <tr><td><span class="b-name">아토팜/티엘스</span></td><td><span class="adv">네오팜</span></td><td><span class="owner">박지현, 남해인</span></td><td class="num">1,600만</td><td class="num exp">1,500만</td><td class="num net">100만</td><td class="pct bad">6.3%</td><td class="act"><button>상세</button><button>수정</button></td></tr>
+          <tr><td><span class="b-name">테카테카</span></td><td><span class="adv">뉴트리원</span></td><td><span class="owner">남해인</span></td><td class="num">950만</td><td class="num exp">390만</td><td class="num net">560만</td><td class="pct good">58.9%</td><td class="act"><button>상세</button><button>수정</button></td></tr>
+          <tr><td><span class="b-name">메디웰</span></td><td><span class="adv">매일유업</span></td><td><span class="owner">남해인</span></td><td class="num">800만</td><td class="num exp">121만</td><td class="num net">679만</td><td class="pct good">84.9%</td><td class="act"><button>상세</button><button>수정</button></td></tr>
+          <tr><td><span class="b-name">어바웃미</span></td><td><span class="adv">삼양사</span></td><td><span class="owner">임지원</span></td><td class="num">500만</td><td class="num exp">43만</td><td class="num net">458만</td><td class="pct good">91.5%</td><td class="act"><button>상세</button><button>수정</button></td></tr>
+        </tbody>
+      </table>
+    </div>
+    <div class="pros-cons">
+      <div class="pros"><h4>✓ 장점</h4><ul><li>• 빠른 비교 · 컬럼별 데이터 정렬 명확</li><li>• 많은 브랜드 한눈에 (10~20+ 행)</li><li>• 표준 UX, 학습 비용 낮음</li><li>• 가독성 최고 (이익률 색상 구분)</li></ul></div>
+      <div class="cons"><h4>✗ 단점</h4><ul><li>• 다소 평범 · 비주얼 임팩트 적음</li><li>• 모바일에서 가로 스크롤 필요</li></ul></div>
+    </div>
+  </div>
+
+  <!-- ============== Option 2: 카드 그리드 ============== -->
+  <div class="opt-section">
+    <div class="opt-title">
+      <span class="badge">옵션 2</span>
+      <h2>카드 그리드 (3 columns)</h2>
+      <span class="desc">3열 배치 · 매출 큰 숫자 강조 · 모던 대시보드 스타일</span>
+    </div>
+    <div class="demo-frame">
+      <div class="toolbar">
+        <h3>월간 매출 현황</h3>
+        <div class="meta">26년 5월 · 매출 높은 순</div>
+      </div>
+      <div class="opt2-grid">
+        <div class="o2-card">
+          <div class="o2-top">
+            <div class="o2-name">더마비</div>
+            <div class="o2-pct warn">13.7%</div>
+          </div>
+          <div class="o2-sub">네오팜 · 담당 <b>강성령</b></div>
+          <div class="o2-main">2,745<span class="small">만원</span></div>
+          <div class="o2-secondary">
+            <span><span>지출</span><b>2,368만</b></span>
+            <span class="net"><span>순매출</span><b>377만</b></span>
+          </div>
+        </div>
+        <div class="o2-card">
+          <div class="o2-top">
+            <div class="o2-name">어메이징오트</div>
+            <div class="o2-pct good">53.6%</div>
+          </div>
+          <div class="o2-sub">매일유업 · 담당 <b>박지현, 임지원</b></div>
+          <div class="o2-main">2,342<span class="small">만원</span></div>
+          <div class="o2-secondary">
+            <span><span>지출</span><b>1,087만</b></span>
+            <span class="net"><span>순매출</span><b>1,255만</b></span>
+          </div>
+        </div>
+        <div class="o2-card">
+          <div class="o2-top">
+            <div class="o2-name">아토팜/티엘스</div>
+            <div class="o2-pct bad">6.3%</div>
+          </div>
+          <div class="o2-sub">네오팜 · 담당 <b>박지현, 남해인</b></div>
+          <div class="o2-main">1,600<span class="small">만원</span></div>
+          <div class="o2-secondary">
+            <span><span>지출</span><b>1,500만</b></span>
+            <span class="net"><span>순매출</span><b>100만</b></span>
+          </div>
+        </div>
+        <div class="o2-card">
+          <div class="o2-top">
+            <div class="o2-name">테카테카</div>
+            <div class="o2-pct good">58.9%</div>
+          </div>
+          <div class="o2-sub">뉴트리원 · 담당 <b>남해인</b></div>
+          <div class="o2-main">950<span class="small">만원</span></div>
+          <div class="o2-secondary">
+            <span><span>지출</span><b>390만</b></span>
+            <span class="net"><span>순매출</span><b>560만</b></span>
+          </div>
+        </div>
+        <div class="o2-card">
+          <div class="o2-top">
+            <div class="o2-name">메디웰</div>
+            <div class="o2-pct good">84.9%</div>
+          </div>
+          <div class="o2-sub">매일유업 · 담당 <b>남해인</b></div>
+          <div class="o2-main">800<span class="small">만원</span></div>
+          <div class="o2-secondary">
+            <span><span>지출</span><b>121만</b></span>
+            <span class="net"><span>순매출</span><b>679만</b></span>
+          </div>
+        </div>
+        <div class="o2-card">
+          <div class="o2-top">
+            <div class="o2-name">어바웃미</div>
+            <div class="o2-pct good">91.5%</div>
+          </div>
+          <div class="o2-sub">삼양사 · 담당 <b>임지원</b></div>
+          <div class="o2-main">500<span class="small">만원</span></div>
+          <div class="o2-secondary">
+            <span><span>지출</span><b>43만</b></span>
+            <span class="net"><span>순매출</span><b>458만</b></span>
+          </div>
+        </div>
+      </div>
+    </div>
+    <div class="pros-cons">
+      <div class="pros"><h4>✓ 장점</h4><ul><li>• 시각적 임팩트 · 매출 큰 숫자 강조</li><li>• 이익률 색상 배지로 한눈에 좋고 나쁨 식별</li><li>• 호버 시 카드 떠오름 (인터랙티브)</li></ul></div>
+      <div class="cons"><h4>✗ 단점</h4><ul><li>• 한 화면에 6~9개만 표시 (스크롤 길어짐)</li><li>• 비교가 표보다 어려움</li><li>• 모바일에서 1열 됨</li></ul></div>
+    </div>
+  </div>
+
+  <!-- ============== Option 3: 막대 시각화 (랭킹) ============== -->
+  <div class="opt-section">
+    <div class="opt-title">
+      <span class="badge">옵션 3</span>
+      <h2>막대 시각화 (랭킹)</h2>
+      <span class="desc">순위 + 매출 막대 그래프 · 즉각적 비례감 · 시각적 임팩트</span>
+    </div>
+    <div class="demo-frame">
+      <div class="toolbar">
+        <h3>월간 매출 현황</h3>
+        <div class="meta">26년 5월 · 1위 대비 막대 비율</div>
+      </div>
+      <div class="opt3-list">
+        <div class="o3-row r1">
+          <div class="o3-rank">1</div>
+          <div class="o3-name">더마비 <span class="adv">네오팜</span> <span class="owner">강성령</span></div>
+          <div class="o3-bar-wrap"><div class="o3-bar" style="width:100%"></div><span class="o3-bar-label">2,745만</span></div>
+          <div class="o3-pct warn">13.7%</div>
+          <div class="o3-act"><button>상세</button><button>수정</button></div>
+        </div>
+        <div class="o3-row r2">
+          <div class="o3-rank">2</div>
+          <div class="o3-name">어메이징오트 <span class="adv">매일유업</span> <span class="owner">박지현, 임지원</span></div>
+          <div class="o3-bar-wrap"><div class="o3-bar" style="width:85.3%"></div><span class="o3-bar-label">2,342만</span></div>
+          <div class="o3-pct good">53.6%</div>
+          <div class="o3-act"><button>상세</button><button>수정</button></div>
+        </div>
+        <div class="o3-row r3">
+          <div class="o3-rank">3</div>
+          <div class="o3-name">아토팜/티엘스 <span class="adv">네오팜</span> <span class="owner">박지현, 남해인</span></div>
+          <div class="o3-bar-wrap"><div class="o3-bar med" style="width:58.3%"></div><span class="o3-bar-label">1,600만</span></div>
+          <div class="o3-pct bad">6.3%</div>
+          <div class="o3-act"><button>상세</button><button>수정</button></div>
+        </div>
+        <div class="o3-row">
+          <div class="o3-rank">4</div>
+          <div class="o3-name">테카테카 <span class="adv">뉴트리원</span> <span class="owner">남해인</span></div>
+          <div class="o3-bar-wrap"><div class="o3-bar med" style="width:34.6%"></div><span class="o3-bar-label">950만</span></div>
+          <div class="o3-pct good">58.9%</div>
+          <div class="o3-act"><button>상세</button><button>수정</button></div>
+        </div>
+        <div class="o3-row">
+          <div class="o3-rank">5</div>
+          <div class="o3-name">메디웰 <span class="adv">매일유업</span> <span class="owner">남해인</span></div>
+          <div class="o3-bar-wrap"><div class="o3-bar low" style="width:29.1%"></div><span class="o3-bar-label">800만</span></div>
+          <div class="o3-pct good">84.9%</div>
+          <div class="o3-act"><button>상세</button><button>수정</button></div>
+        </div>
+        <div class="o3-row">
+          <div class="o3-rank">6</div>
+          <div class="o3-name">어바웃미 <span class="adv">삼양사</span> <span class="owner">임지원</span></div>
+          <div class="o3-bar-wrap"><div class="o3-bar low" style="width:18.2%"></div><span class="o3-bar-label">500만</span></div>
+          <div class="o3-pct good">91.5%</div>
+          <div class="o3-act"><button>상세</button><button>수정</button></div>
+        </div>
+      </div>
+    </div>
+    <div class="pros-cons">
+      <div class="pros"><h4>✓ 장점</h4><ul><li>• 매출 비례감 즉시 인식 (TOP 1 대비)</li><li>• 순위 1·2·3 컬러 차별화 (금/주/파)</li><li>• 비주얼 임팩트 매우 강함</li><li>• 자연스러운 정렬 (랭킹 메타포)</li></ul></div>
+      <div class="cons"><h4>✗ 단점</h4><ul><li>• 지출/순매출 표시 못함 (이익률만)</li><li>• 막대가 큰 격차에서 1·2위 외 시각효과 약함</li><li>• "순위 매기는" 느낌이 운영팀에 부담될 수 있음</li></ul></div>
+    </div>
+  </div>
+
+  <!-- ============== Option 4: 미니멀 한 줄 ============== -->
+  <div class="opt-section">
+    <div class="opt-title">
+      <span class="badge">옵션 4</span>
+      <h2>미니멀 한 줄 (호버 디테일)</h2>
+      <span class="desc">한 줄에 매출+이익률만 · 호버 시 상세 팝오버 · 한 화면에 10~20개</span>
+    </div>
+    <div class="demo-frame">
+      <div class="toolbar">
+        <h3>월간 매출 현황</h3>
+        <div class="meta">26년 5월 · 행 호버로 상세 확인</div>
+      </div>
+      <div class="opt4-list">
+        <div class="o4-row">
+          <div class="o4-name-block"><span class="nm">더마비</span><span class="ctx">네오팜 · 강성령</span></div>
+          <div class="o4-rev-block"><span class="v">2,745만원</span><span class="lbl">매출</span></div>
+          <div class="o4-marg-pill warn">13.7%</div>
+          <div class="o4-arrow">›</div>
+          <div class="o4-detail">
+            <span><span class="l">지출</span><span class="v">2,368만원</span></span>
+            <span><span class="l">순매출</span><span class="v">377만원</span></span>
+            <span><span class="l">세금계산서</span><span class="v">미발행</span></span>
+          </div>
+        </div>
+        <div class="o4-row">
+          <div class="o4-name-block"><span class="nm">어메이징오트</span><span class="ctx">매일유업 · 박지현, 임지원</span></div>
+          <div class="o4-rev-block"><span class="v">2,342만원</span><span class="lbl">매출</span></div>
+          <div class="o4-marg-pill good">53.6%</div>
+          <div class="o4-arrow">›</div>
+          <div class="o4-detail">
+            <span><span class="l">지출</span><span class="v">1,087만원</span></span>
+            <span><span class="l">순매출</span><span class="v">1,255만원</span></span>
+            <span><span class="l">세금계산서</span><span class="v">발행 완료</span></span>
+          </div>
+        </div>
+        <div class="o4-row">
+          <div class="o4-name-block"><span class="nm">아토팜/티엘스</span><span class="ctx">네오팜 · 박지현, 남해인</span></div>
+          <div class="o4-rev-block"><span class="v">1,600만원</span><span class="lbl">매출</span></div>
+          <div class="o4-marg-pill bad">6.3%</div>
+          <div class="o4-arrow">›</div>
+          <div class="o4-detail">
+            <span><span class="l">지출</span><span class="v">1,500만원</span></span>
+            <span><span class="l">순매출</span><span class="v">100만원</span></span>
+            <span><span class="l">세금계산서</span><span class="v">미발행</span></span>
+          </div>
+        </div>
+        <div class="o4-row">
+          <div class="o4-name-block"><span class="nm">테카테카</span><span class="ctx">뉴트리원 · 남해인</span></div>
+          <div class="o4-rev-block"><span class="v">950만원</span><span class="lbl">매출</span></div>
+          <div class="o4-marg-pill good">58.9%</div>
+          <div class="o4-arrow">›</div>
+          <div class="o4-detail">
+            <span><span class="l">지출</span><span class="v">390만원</span></span>
+            <span><span class="l">순매출</span><span class="v">560만원</span></span>
+            <span><span class="l">세금계산서</span><span class="v">미발행</span></span>
+          </div>
+        </div>
+        <div class="o4-row">
+          <div class="o4-name-block"><span class="nm">메디웰</span><span class="ctx">매일유업 · 남해인</span></div>
+          <div class="o4-rev-block"><span class="v">800만원</span><span class="lbl">매출</span></div>
+          <div class="o4-marg-pill good">84.9%</div>
+          <div class="o4-arrow">›</div>
+          <div class="o4-detail">
+            <span><span class="l">지출</span><span class="v">121만원</span></span>
+            <span><span class="l">순매출</span><span class="v">679만원</span></span>
+            <span><span class="l">세금계산서</span><span class="v">발행 완료</span></span>
+          </div>
+        </div>
+        <div class="o4-row">
+          <div class="o4-name-block"><span class="nm">어바웃미</span><span class="ctx">삼양사 · 임지원</span></div>
+          <div class="o4-rev-block"><span class="v">500만원</span><span class="lbl">매출</span></div>
+          <div class="o4-marg-pill good">91.5%</div>
+          <div class="o4-arrow">›</div>
+          <div class="o4-detail">
+            <span><span class="l">지출</span><span class="v">43만원</span></span>
+            <span><span class="l">순매출</span><span class="v">458만원</span></span>
+            <span><span class="l">세금계산서</span><span class="v">미발행</span></span>
+          </div>
+        </div>
+      </div>
+    </div>
+    <div class="pros-cons">
+      <div class="pros"><h4>✓ 장점</h4><ul><li>• 한 화면 정보 밀도 최고 (15~20행)</li><li>• 깔끔 · 시선 분산 적음</li><li>• 매출/이익률만 강조 · 핵심 정보 빠른 인식</li><li>• 호버 디테일로 지출/순매출 확인 가능</li></ul></div>
+      <div class="cons"><h4>✗ 단점</h4><ul><li>• 지출/순매출이 기본 화면에 없음 (호버 필요)</li><li>• 모바일 호버 없음 → 탭으로 변경 필요</li><li>• 데이터 비교는 표보다 약함</li></ul></div>
+    </div>
+  </div>
+
+  <div class="footnote">
+    ※ 이 페이지는 <b>월간 매출 현황 브랜드 카드 UI 4가지 데모</b>입니다.<br/>
+    원하시는 옵션 번호 알려주시면 본 사이트에 적용하겠습니다. (조합 가능 · 예: "옵션 1 + 호버 디테일")
+  </div>
+
+</div>
+
+</body>
+</html>

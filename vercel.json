@@ -63,6 +63,10 @@
     {
       "source": "/demo-hq",
       "destination": "/demo-hq.html"
+    },
+    {
+      "source": "/demo-list-ui",
+      "destination": "/demo-list-ui.html"
     }
   ]
 }
