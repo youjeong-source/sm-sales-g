@@ -743,7 +743,7 @@
   .hq-grp-card.g1 .hq-grp-stat .pbar > i{background:linear-gradient(90deg,#E60021,#B8001A)}
   .hq-grp-card.g2 .hq-grp-stat .pbar > i{background:linear-gradient(90deg,#1D4ED8,#1E3A8A)}
   .hq-grp-stat .pbar > i{display:block;height:100%;border-radius:3px;transition:width .4s}
-  .hq-grp-subtitle{font-size:12.5px;font-weight:700;color:var(--ink);letter-spacing:-.2px;display:flex;align-items:center;gap:5px;margin-bottom:8px;margin-top:18px}
+  .hq-grp-subtitle{font-size:15px;font-weight:700;color:var(--ink);letter-spacing:-.3px;display:flex;align-items:center;gap:5px;margin-bottom:10px;margin-top:22px}
   .hq-grp-subtitle .sub-desc{font-size:9.5px;color:var(--ink3);font-weight:600;letter-spacing:0}
   /* v76: Group 3-month list - 컴팩트 */
   .hq-grp-3mo{background:#fff;border:1px solid var(--line);border-radius:8px;overflow:hidden}
@@ -815,16 +815,19 @@
 
 
   /* ============ v88: 박스 부제 + 그룹 누적 표 ============ */
-  .v88-box-sub{font-size:12px;font-weight:700;color:var(--ink3);letter-spacing:-.1px;margin-bottom:14px;padding-bottom:0}
+  .v88-box-sub{font-size:15px;font-weight:700;color:var(--ink);letter-spacing:-.3px;margin:0 0 12px;padding-bottom:0}
+  .v88-box-sub.divider{margin-top:24px;padding-top:20px;border-top:1px solid var(--line2)}
   .v88-grp-sum-tbl{width:100%;border-collapse:collapse;font-size:13px;border:1px solid var(--line);border-radius:8px;overflow:hidden;background:#fff}
-  .v88-grp-sum-tbl thead th{background:#FAFAFA;color:var(--ink3);font-size:10.5px;font-weight:700;letter-spacing:.2px;padding:11px 16px;text-align:left;border-bottom:1px solid var(--line2)}
-  .v88-grp-sum-tbl thead th.r{text-align:right}
+  .v88-grp-sum-tbl thead th{background:#F8FAFC;color:var(--ink3);font-size:13px;font-weight:700;letter-spacing:-.2px;padding:11px 14px;text-align:center;border-bottom:1px solid var(--line2);border-right:1px solid var(--line2)}
+  .v88-grp-sum-tbl thead th:last-child{border-right:none}
+  .v88-grp-sum-tbl thead th.r{text-align:center}
   .v88-grp-sum-tbl thead th .dot{display:inline-block;width:6px;height:6px;border-radius:50%;margin-right:5px;vertical-align:middle}
   .v88-grp-sum-tbl thead th .dot.rev{background:#E60021}
   .v88-grp-sum-tbl thead th .dot.net{background:#1D4ED8}
-  .v88-grp-sum-tbl tbody td{padding:13px 16px;border-bottom:1px solid var(--line2);font-variant-numeric:tabular-nums;font-weight:700;color:var(--ink2)}
-  .v88-grp-sum-tbl tbody td.lbl{font-size:12.5px;font-weight:600;color:var(--ink3)}
-  .v88-grp-sum-tbl tbody td.r{text-align:right;font-size:13.5px}
+  .v88-grp-sum-tbl tbody td{padding:13px 14px;border-bottom:1px solid var(--line2);font-variant-numeric:tabular-nums;font-weight:700;color:var(--ink2);background:#FEFEFE;text-align:center;border-right:1px solid var(--line2)}
+  .v88-grp-sum-tbl tbody td:last-child{border-right:none}
+  .v88-grp-sum-tbl tbody td.lbl{font-size:13px;font-weight:600;color:var(--ink3);text-align:center}
+  .v88-grp-sum-tbl tbody td.r{text-align:center;font-size:13.5px}
   .v88-grp-sum-tbl tbody td.r.big{font-size:16px;font-weight:800;color:var(--ink)}
   .v88-grp-sum-tbl tbody td.r.big.rev{color:#E60021}
   .v88-grp-sum-tbl tbody td.r.big.net{color:#1D4ED8}
@@ -834,9 +837,10 @@
   .v85-annual-box{background:#fff;border:1px solid var(--line);border-radius:12px;padding:18px 22px}
   .v85-annual-box .v82-rate-grid{gap:0;grid-template-columns:1fr 1px 1fr}
   .v85-annual-box .v82-rate-card{border:none;border-radius:0;padding:0 22px}
-  .v85-annual-box .v82-rate-card.primary{background:transparent}
+  .v85-annual-box .v82-rate-card.primary{background:#fff}
   .v85-annual-box .v82-rate-card.net{background:transparent}
-  .v85-annual-box .v85-divider{background:var(--line2);width:1px}
+  .v85-annual-box .v85-divider{background:transparent;width:0}
+  .v85-annual-box .v82-rate-grid{grid-template-columns:1fr 1fr;gap:14px}
   /* v88: 그룹 헤더 - 라인 제거 + 컴팩트 + inline */
   .v85-grp-head{display:flex;align-items:baseline;gap:8px;padding-bottom:4px;margin-bottom:0;border-bottom:none}
   .v85-grp-head .label{font-size:17px;font-weight:800;letter-spacing:-.4px;color:var(--ink);line-height:1.2}
@@ -845,35 +849,36 @@
   .v85-grp-info b{color:var(--ink);font-weight:800}
   /* 월별 펼치기 (collapsible) */
   .v85-mx-tbl{width:100%;border-collapse:collapse;font-size:13px;border:1px solid var(--line);border-radius:8px;overflow:hidden}
-  .v85-mx-tbl thead th{background:#FAFAFA;color:var(--ink3);font-size:10.5px;font-weight:700;letter-spacing:.2px;padding:10px 16px;text-align:left;border-bottom:1px solid var(--line2);text-transform:none}
-  .v85-mx-tbl thead th.r{text-align:right}
-  .v85-mx-tbl tbody td{padding:13px 16px;border-bottom:1px solid var(--line2);font-variant-numeric:tabular-nums;font-weight:700;font-size:13px;color:var(--ink2)}
-  .v85-mx-tbl tbody td.r{text-align:right;font-weight:700}
+  .v85-mx-tbl thead th{background:#F8FAFC;color:var(--ink3);font-size:13px;font-weight:700;letter-spacing:-.2px;padding:11px 14px;text-align:center;border-bottom:1px solid var(--line2);text-transform:none;border-right:1px solid var(--line2)}
+  .v85-mx-tbl thead th:last-child{border-right:none}
+  .v85-mx-tbl thead th.r{text-align:center}
+  .v85-mx-tbl tbody td{padding:13px 14px;border-bottom:1px solid var(--line2);font-variant-numeric:tabular-nums;font-weight:700;font-size:13px;color:var(--ink2);background:#FEFEFE;text-align:center;border-right:1px solid var(--line2)}
+  .v85-mx-tbl tbody td:last-child{border-right:none}
+  .v85-mx-tbl tbody td.r{text-align:center;font-weight:700}
   .v85-mx-tbl tbody td.muted{color:var(--ink3);font-weight:700}
   .v85-mx-tbl tbody td.pct.good{color:#16A34A}
   .v85-mx-tbl tbody td.pct.warn{color:#D97706}
   .v85-mx-tbl tbody tr:last-child td{border-bottom:none}
   /* 월 헤더 row - 클릭 가능 */
-  .v85-mx-tbl .mo-row{cursor:pointer;transition:background .12s}
+  .v85-mx-tbl .mo-row{transition:background .12s}
   .v85-mx-tbl .mo-row td{padding:11px 14px;font-weight:900;font-size:13px}
-  .v85-mx-tbl .mo-row:hover td{background:#F8FAFB}
+  .v85-mx-tbl .mo-row:hover td{background:#FEFEFE}
   .v85-mx-tbl .mo-row.cur .mo-name{color:#E60021}
   .v85-mx-tbl .mo-row.cur td{background:#fff;color:var(--ink)}
   .v85-mx-tbl .mo-row.cur td.r{color:#E60021;font-weight:800}
   .v85-mx-tbl .mo-row.cur:hover td{background:#FFEFF3}
   .v85-mx-tbl .mo-row.next td{color:var(--ink3)}
   .v85-mx-tbl .mo-row .mo-name{font-weight:900;display:inline-flex;align-items:center;gap:8px}
-  .v85-mx-tbl .mo-row .caret{display:inline-block;width:9px;height:9px;color:var(--ink3);font-size:9px;transition:transform .15s;line-height:1}
+  .v85-mx-tbl .mo-row .caret{display:none}
   .v85-mx-tbl .mo-row.expanded .caret{transform:rotate(90deg)}
   .v85-mx-tbl .mo-row .pill{font-size:9.5px;font-weight:800;padding:2px 6px;border-radius:4px;letter-spacing:.3px}
   .v85-mx-tbl .mo-row.prev .pill{background:var(--bg2);color:var(--ink3)}
   .v85-mx-tbl .mo-row.cur .pill{background:#E60021;color:#fff}
   .v85-mx-tbl .mo-row.next .pill{background:#EFF6FF;color:#1D4ED8}
   /* 팀별 세부 row - 기본 hidden */
-  .v85-mx-tbl .team-row{display:none}
-  .v85-mx-tbl .team-row.show{display:table-row}
+  .v85-mx-tbl .team-row{display:table-row}
   .v85-mx-tbl .team-row td{font-size:12.5px;background:#FAFAFA}
-  .v85-mx-tbl .team-row td.tname{padding-left:36px;color:var(--ink2);font-weight:700}
+  .v85-mx-tbl .team-row td.tname{padding-left:14px;color:var(--ink2);font-weight:700;text-align:center}
   .v85-mx-tbl .team-row.cur td{background:#FFFAFB}
   /* 합계는 펼쳐졌을 때만 보이거나, 항상 보일 수 있음 - 합계는 mo-row 그 자체임 */
 
@@ -901,8 +906,8 @@
   .v84-grp-card.net .title .dot{background:#1D4ED8}
 
   /* ============ v82: SM본부 상세 보고 - 섹션 타이틀 + 달성률 중심 ============ */
-  .v82-page-title{font-size:15px;font-weight:700;letter-spacing:-.3px;color:var(--ink);margin:0 0 6px 2px;padding:0}
-  .v82-page-title:not(:first-child){margin-top:14px}
+  .v82-page-title{font-size:17px;font-weight:800;letter-spacing:-.4px;color:var(--ink);margin:0 0 8px 2px;padding:0}
+  .v82-page-title:not(:first-child){margin-top:18px}
   /* 2-card 달성률 중심 그리드 */
   .v82-rate-grid{display:grid;grid-template-columns:repeat(2,1fr);gap:14px;margin-bottom:14px}
   .v82-rate-card{background:#fff;border:1px solid var(--line);border-radius:12px;padding:20px 24px;display:flex;align-items:center;gap:20px}
@@ -912,7 +917,7 @@
   .v82-rate-card .donut{flex:none;width:108px;height:108px;position:relative}
   .v82-rate-card .donut svg{width:100%;height:100%;transform:rotate(-90deg)}
   .v82-rate-card .donut .track{stroke:#F1F5F9}
-  .v82-rate-card.primary .donut .track{stroke:#FFE5E9}
+  .v82-rate-card.primary .donut .track{stroke:#F1F5F9}
   .v82-rate-card .donut .fill{stroke:#E60021;transition:stroke-dashoffset .5s}
   .v82-rate-card.net .donut .fill{stroke:#1D4ED8}
   .v82-rate-card .donut .ctr{position:absolute;inset:0;display:flex;flex-direction:column;align-items:center;justify-content:center;text-align:center}
@@ -929,18 +934,20 @@
   .v82-rate-card .info .target{font-size:13px;color:var(--ink3);font-weight:600;letter-spacing:-.1px}
   .v82-rate-card .info .target b{color:var(--ink2);font-weight:800}
 
-  /* v88: 월별 매출 표 - 깔끔한 셀 분리선 + 그레이 톤 */
+  /* v89: 월별 매출 표 - 가운데 정렬 + 셀 분리선 + 컬러 배경 */
   .v82-mo-list{background:#fff;border:1px solid var(--line);border-radius:8px;overflow:hidden}
-  .v82-mo-row{display:grid;grid-template-columns:130px repeat(4,1fr);padding:13px 20px;border-bottom:1px solid var(--line2);align-items:center;gap:10px}
-  .v82-mo-row.head{background:#FAFAFA;color:var(--ink3);font-size:10.5px;font-weight:700;letter-spacing:.2px;padding:11px 20px;text-transform:none}
+  .v82-mo-row{display:grid;grid-template-columns:1fr 1fr 1fr 1fr 1fr;padding:13px 0;border-bottom:1px solid var(--line2);align-items:center;gap:0;background:#FEFEFE}
+  .v82-mo-row.head{background:#F8FAFC;color:var(--ink3);font-size:13px;font-weight:700;letter-spacing:-.2px;padding:11px 0;text-transform:none}
   .v82-mo-row:last-child{border-bottom:none}
-  .v82-mo-row.cur .v82-mo-name{color:#E60021;font-weight:900}
-  .v82-mo-name{font-size:13.5px;font-weight:700;letter-spacing:-.3px;display:flex;align-items:center;gap:7px;color:var(--ink2)}
+  .v82-mo-row > *{padding:0 14px;border-right:1px solid var(--line2)}
+  .v82-mo-row > *:last-child{border-right:none}
+  .v82-mo-name{font-size:13px;font-weight:700;letter-spacing:-.3px;display:flex;align-items:center;justify-content:center;gap:6px;color:var(--ink2)}
   .v82-mo-name .pill{font-size:9.5px;font-weight:700;padding:2px 6px;border-radius:4px;letter-spacing:.2px}
   .v82-mo-row.prev .pill{background:var(--bg2);color:var(--ink3)}
   .v82-mo-row.cur .pill{background:#E60021;color:#fff;font-weight:800}
+  .v82-mo-row.cur .v82-mo-name{color:#E60021;font-weight:900}
   .v82-mo-row.next .pill{background:#F1F5F9;color:#64748B}
-  .v82-mo-cell{font-size:13.5px;font-weight:700;letter-spacing:-.3px;font-variant-numeric:tabular-nums;text-align:right;color:var(--ink2)}
+  .v82-mo-cell{font-size:13px;font-weight:700;letter-spacing:-.3px;font-variant-numeric:tabular-nums;text-align:center;color:var(--ink2)}
   .v82-mo-cell.muted{color:var(--ink3);font-weight:600}
   .v82-mo-cell.pct{color:var(--ink2);font-weight:700}
   .v82-mo-cell.pct.good{color:#16A34A}
@@ -976,7 +983,7 @@
   .v83-iss-combined{background:#FAFAFA;border:1px solid var(--line2);border-radius:10px;padding:16px 18px;display:flex;flex-direction:column;gap:14px;margin-top:6px}
   .v83-iss-block{display:flex;flex-direction:column;gap:8px}
   .v83-iss-hd{display:flex;justify-content:space-between;align-items:center}
-  .v83-iss-hd .ttl{font-size:13px;font-weight:800;color:var(--ink);display:flex;align-items:center;gap:6px;letter-spacing:-.2px}
+  .v83-iss-hd .ttl{font-size:15px;font-weight:700;color:var(--ink);display:flex;align-items:center;gap:6px;letter-spacing:-.3px}
   .v83-iss-hd .ttl .ds{font-size:11px;color:var(--ink3);font-weight:600;letter-spacing:0}
   .v83-iss-hd .add-btn{background:#fff;border:1px solid var(--line);color:var(--ink2);font-size:11px;font-weight:700;padding:5px 11px;border-radius:5px;cursor:pointer;font-family:inherit}
   .v83-iss-hd .add-btn:hover{border-color:var(--ink);color:var(--ink)}
@@ -1879,15 +1886,14 @@
   <!-- =============== v75: SM본부 상세 보고 - 통합 박스 + 그룹 보고 =============== -->
   <section id="tab-hq-detail" class="hide">
     <div class="hq-detail-grid">
-      <!-- v88: SM본부 연간 달성 현황 - 1박스 통합 + 부제 -->
+      <!-- v89: SM본부 연간 달성 현황 + 월별 매출 - 1박스 통합 -->
       <h1 class="v82-page-title">SM본부 연간 달성 현황</h1>
       <div class="v85-annual-box">
         <div class="v88-box-sub">연간 달성 현황</div>
         <div class="v82-rate-grid" id="v82-rate-grid"></div>
+        <div class="v88-box-sub divider">월별 매출 현황</div>
+        <div class="v82-mo-list" id="v82-mo-list"></div>
       </div>
-      <!-- 월별 매출 -->
-      <h1 class="v82-page-title" style="margin-top:8px">월별 매출 현황</h1>
-      <div class="v82-mo-list" id="v82-mo-list"></div>
       <!-- 그룹별 매출 -->
       <h1 class="v82-page-title" style="margin-top:8px">그룹별 매출 현황</h1>
       <div class="hq-grp-section" id="hq-grp-section"></div>
@@ -5574,6 +5580,7 @@ function fmtEokWon(v){
   return v.toLocaleString('ko-KR')+'원';
 }
 function fmtMoney(v){ return fmtEokWon(v); }
+function fmtFull(v){ return (v|0).toLocaleString('ko-KR')+'원'; }
 
 function renderHQAnnual(){
   if(STATE.team !== 'HQ') return;
@@ -5626,8 +5633,8 @@ function renderHQAnnual(){
         <div class="info">
           <div class="title"><span class="dot"></span>매출 누적</div>
           <div class="v84-kpi-rows">
-            <div class="v84-kr"><span class="k">목표</span><span class="v">${fmtMoney(goalRev)}</span></div>
-            <div class="v84-kr"><span class="k">달성 매출</span><span class="v big">${fmtMoney(totRev)}</span></div>
+            <div class="v84-kr"><span class="k">목표</span><span class="v">${fmtFull(goalRev)}</span></div>
+            <div class="v84-kr"><span class="k">달성 매출</span><span class="v big">${fmtFull(totRev)}</span></div>
             <div class="v84-kr"><span class="k">달성률</span><span class="v big pct">${revPct.toFixed(1)}%</span></div>
           </div>
         </div>
@@ -5641,8 +5648,8 @@ function renderHQAnnual(){
         <div class="info">
           <div class="title"><span class="dot"></span>순매출 누적</div>
           <div class="v84-kpi-rows">
-            <div class="v84-kr"><span class="k">목표</span><span class="v">${fmtMoney(goalNet)}</span></div>
-            <div class="v84-kr"><span class="k">달성 매출</span><span class="v big net">${fmtMoney(totNet)}</span></div>
+            <div class="v84-kr"><span class="k">목표</span><span class="v">${fmtFull(goalNet)}</span></div>
+            <div class="v84-kr"><span class="k">달성 매출</span><span class="v big net">${fmtFull(totNet)}</span></div>
             <div class="v84-kr"><span class="k">달성률</span><span class="v big pct net">${netPct.toFixed(1)}%</span></div>
           </div>
         </div>
@@ -5682,8 +5689,8 @@ function renderHQDetailPage(){
       const goalCls = !rev?'':goalPct>=100?'good':goalPct>=70?'':'warn';
       return `<div class="v82-mo-row ${type}">
         <div class="v82-mo-name">${month} <span class="pill">${pill}</span></div>
-        <div class="v82-mo-cell muted">${fmtMoney(monthGoal)}</div>
-        <div class="v82-mo-cell">${rev?fmtMoney(rev):'-'}</div>
+        <div class="v82-mo-cell muted">${fmtFull(monthGoal)}</div>
+        <div class="v82-mo-cell">${rev?fmtFull(rev):'-'}</div>
         <div class="v82-mo-cell pct ${goalCls}">${rev?goalPct.toFixed(0)+'%':'-'}</div>
         <div class="v82-mo-cell pct ${marginCls}">${rev?mMargin.toFixed(1)+'%':'-'}</div>
       </div>`;
@@ -5917,12 +5924,12 @@ function renderGroupCard(gid){
     const teamRows = teamRowsData.map(d=>{
       const pct = d.goal ? (d.rev/d.goal*100) : 0;
       const cls = !d.rev?'':pct>=100?'good':pct>=70?'':'warn';
-      return `<tr class="${type} team-row" data-month="${mo}"><td class="tname">${d.tid}팀</td><td class="r muted">${d.goal?fmtMoney(d.goal):'-'}</td><td class="r">${d.rev?fmtMoney(d.rev):'-'}</td><td class="r pct ${cls}">${d.rev?pct.toFixed(0)+'%':'-'}</td></tr>`;
+      return `<tr class="${type} team-row" data-month="${mo}"><td class="tname">${d.tid}팀</td><td class="r muted">${d.goal?fmtFull(d.goal):'-'}</td><td class="r">${d.rev?fmtFull(d.rev):'-'}</td><td class="r pct ${cls}">${d.rev?pct.toFixed(0)+'%':'-'}</td></tr>`;
     }).join('');
     const totPct = totalGoal ? (totalRev/totalGoal*100) : 0;
     const totCls = !totalRev?'':totPct>=100?'good':totPct>=70?'':'warn';
     return `
-      <tr class="mo-row ${type}" data-toggle-month="${mo}"><td><span class="mo-name"><span class="caret">▶</span>${mo} <span class="pill">${pillTxt}</span></span></td><td class="r muted">${totalGoal?fmtMoney(totalGoal):'-'}</td><td class="r">${totalRev?fmtMoney(totalRev):'-'}</td><td class="r pct ${totCls}">${totalRev?totPct.toFixed(0)+'%':'-'}</td></tr>
+      <tr class="mo-row ${type}"><td><span class="mo-name">${mo} <span class="pill">${pillTxt}</span></span></td><td class="r muted">${totalGoal?fmtFull(totalGoal):'-'}</td><td class="r">${totalRev?fmtFull(totalRev):'-'}</td><td class="r pct ${totCls}">${totalRev?totPct.toFixed(0)+'%':'-'}</td></tr>
       ${teamRows}
     `;
   }).join('');
@@ -5940,13 +5947,13 @@ function renderGroupCard(gid){
         <div class="label">${g.label}</div>
         <div class="sub">${g.teamLabel}</div>
       </div>
-      <div class="v85-grp-info">목표 매출 <b>${fmtMoney(g.targetRev)}</b> · 순매출 <b>${fmtMoney(g.targetNet)}</b> · 인원 <b>${g.ppl}명</b> · 운영 브랜드 <b>${g.brands}건</b></div>
+      <div class="v85-grp-info">목표 매출 <b>${fmtFull(g.targetRev)}</b> · 순매출 <b>${fmtFull(g.targetNet)}</b> · 인원 <b>${g.ppl}명</b> · 운영 브랜드 <b>${g.brands}건</b></div>
       <div>
         <table class="v88-grp-sum-tbl">
           <thead><tr><th>항목</th><th class="r" style="width:30%"><span class="dot rev"></span>매출 누적</th><th class="r" style="width:30%"><span class="dot net"></span>순매출 누적</th></tr></thead>
           <tbody>
-            <tr><td class="lbl">목표</td><td class="r">${fmtMoney(g.targetRev)}</td><td class="r">${fmtMoney(g.targetNet)}</td></tr>
-            <tr><td class="lbl">누적 달성 매출</td><td class="r big rev">${fmtMoney(g.rev)}</td><td class="r big net">${fmtMoney(g.net)}</td></tr>
+            <tr><td class="lbl">목표</td><td class="r">${fmtFull(g.targetRev)}</td><td class="r">${fmtFull(g.targetNet)}</td></tr>
+            <tr><td class="lbl">누적 달성 매출</td><td class="r big rev">${fmtFull(g.rev)}</td><td class="r big net">${fmtFull(g.net)}</td></tr>
             <tr><td class="lbl">달성률</td><td class="r big rev">${revPct.toFixed(1)}%</td><td class="r big net">${netPct.toFixed(1)}%</td></tr>
           </tbody>
         </table>
