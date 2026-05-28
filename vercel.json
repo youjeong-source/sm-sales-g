@@ -67,6 +67,10 @@
     {
       "source": "/demo-list-ui",
       "destination": "/demo-list-ui.html"
+    },
+    {
+      "source": "/demo-edit-detail",
+      "destination": "/demo-edit-detail.html"
     }
   ]
 }
