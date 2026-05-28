@@ -831,18 +831,23 @@
   .ops-table .actions .tax-mini{display:inline-flex;align-items:center;gap:3px;font-size:10.5px;padding:4px 9px;border:1px solid var(--line);border-radius:5px;cursor:pointer;font-weight:700;color:var(--ink2);margin-left:3px;background:#fff}
   .ops-table .actions .tax-mini.on{background:#0F0F10;color:#fff;border-color:#0F0F10}
   .ops-table .actions .tax-mini input{margin:0;cursor:pointer}
-  /* v70: 편집 상세 행 - 깔끔 리스트 (테이블 형식) */
+  /* v71: 편집 상세 행 - 셀 분리선 + 컴팩트 합계바 */
   .ops-table tr.b-detail{background:#fff;border-bottom:1px solid var(--line2)}
   .ops-table tr.b-detail > td{padding:0;background:#fff}
   .b-detail-card{background:#fff;padding:18px 22px;border-top:2px solid var(--pt)}
-  /* 카테고리 리스트 표 */
-  .cat-list-tbl{width:100%;border-collapse:collapse;font-size:12.5px;background:#fff;border:1px solid var(--line);border-radius:8px;overflow:hidden;margin-bottom:14px}
-  .cat-list-tbl thead th{background:#F8FAFC;color:var(--ink2);font-size:10.5px;font-weight:800;text-transform:uppercase;letter-spacing:.4px;padding:10px 14px;text-align:left;border-bottom:1px solid var(--line)}
+  /* 카테고리 리스트 표 (셀 분리선 추가) */
+  .cat-list-tbl{width:100%;border-collapse:collapse;font-size:12.5px;background:#fff;border:1px solid var(--line);border-radius:8px;overflow:hidden;margin-bottom:10px}
+  .cat-list-tbl thead th{background:#F8FAFC;color:var(--ink2);font-size:10.5px;font-weight:800;text-transform:uppercase;letter-spacing:.4px;padding:10px 14px;text-align:left;border-bottom:1px solid var(--line);border-right:1px solid var(--line2)}
+  .cat-list-tbl thead th:last-child{border-right:none}
   .cat-list-tbl thead th.r{text-align:right}
   .cat-list-tbl thead th.c{text-align:center}
-  .cat-list-tbl tbody td{padding:11px 14px;border-bottom:1px solid var(--line2);vertical-align:middle}
+  .cat-list-tbl tbody td{padding:11px 14px;border-bottom:1px solid var(--line2);border-right:1px solid var(--line2);vertical-align:middle}
+  .cat-list-tbl tbody td:last-child{border-right:none}
   .cat-list-tbl tbody tr:last-child td{border-bottom:none}
   .cat-list-tbl tbody tr:hover{background:#FAFAFA}
+  .cat-list-tbl tbody tr:hover td{background:#FAFAFA}
+  /* 카테고리 컬럼 좌측 강조 (옵션 4 스타일) */
+  .cat-list-tbl tbody td:first-child{background:#FAFBFC;font-weight:700}
   .cat-list-tbl .cat-name{font-size:12.5px;font-weight:700;color:var(--ink)}
   .cat-list-tbl input{padding:6px 10px;border:1px solid var(--line);border-radius:5px;font-family:inherit;font-size:12.5px;background:#fff;color:var(--ink);font-weight:700;font-variant-numeric:tabular-nums;width:100%;text-align:right}
   .cat-list-tbl input.note{text-align:left;font-weight:500;color:var(--ink2)}
@@ -855,16 +860,16 @@
   .cat-list-tbl .cat-margin.mid{color:#D97706}
   .cat-list-tbl .cat-margin.bad{color:#E60021}
   .cat-list-tbl .cat-margin.muted{color:var(--ink3);font-weight:600}
-  /* 합계 바 (다크) */
-  .cat-totals-bar{display:flex;justify-content:space-between;align-items:center;padding:14px 20px;background:linear-gradient(135deg,#0F0F10 0%,#1F1F23 100%);color:#fff;border-radius:9px;margin-bottom:14px}
-  .cat-totals-bar .lbl{font-size:11px;font-weight:800;letter-spacing:.4px;text-transform:uppercase;color:rgba(255,255,255,.65)}
-  .cat-totals-bar .nums{display:flex;gap:24px;font-variant-numeric:tabular-nums;flex-wrap:wrap}
-  .cat-totals-bar .nums span{font-size:11.5px;color:rgba(255,255,255,.7);font-weight:600;display:inline-flex;align-items:baseline;gap:5px}
-  .cat-totals-bar .nums span b{font-size:16px;font-weight:800;color:#fff;letter-spacing:-.3px}
-  .cat-totals-bar .nums .net b{color:#10B981}
-  .cat-totals-bar .nums .margin-pct b.good{color:#10B981}
-  .cat-totals-bar .nums .margin-pct b.warn{color:#FBBF24}
-  .cat-totals-bar .nums .margin-pct b.bad{color:#FB923C}
+  /* v71: 합계 바 - 라이트 그레이 + 컴팩트 */
+  .cat-totals-bar{display:flex;justify-content:space-between;align-items:center;padding:8px 16px;background:#F1F5F9;color:var(--ink);border:1px solid var(--line);border-radius:7px;margin-bottom:10px}
+  .cat-totals-bar .lbl{font-size:10px;font-weight:800;letter-spacing:.4px;text-transform:uppercase;color:var(--ink3)}
+  .cat-totals-bar .nums{display:flex;gap:18px;font-variant-numeric:tabular-nums;flex-wrap:wrap}
+  .cat-totals-bar .nums span{font-size:10.5px;color:var(--ink3);font-weight:600;display:inline-flex;align-items:baseline;gap:4px}
+  .cat-totals-bar .nums span b{font-size:12.5px;font-weight:800;color:var(--ink);letter-spacing:-.2px}
+  .cat-totals-bar .nums .net b{color:#1D4ED8}
+  .cat-totals-bar .nums .margin-pct b.good{color:#16A34A}
+  .cat-totals-bar .nums .margin-pct b.warn{color:#D97706}
+  .cat-totals-bar .nums .margin-pct b.bad{color:#E60021}
   /* 우하단 액션 */
   .cat-actions-bottom{display:flex;justify-content:flex-end;gap:10px;align-items:center;flex-wrap:wrap}
   .cat-actions-bottom .end-toggle{display:inline-flex;align-items:center;gap:5px;font-size:11.5px;color:var(--ink2);font-weight:700;cursor:pointer;padding:7px 13px;border:1px solid var(--line);border-radius:6px;background:#fff;transition:all .12s}
@@ -3696,10 +3701,9 @@ function renderOps(){
     const margin = bm.rev ? (bm.net/bm.rev*100) : 0;
     const marginCls = !bm.rev ? '' : (margin>=20 ? 'good' : margin>=0 ? 'warn' : 'bad');
     const escB = b.replace(/'/g,"\\'");
-    // 액션 버튼들
-    const taxBtn = `<label class="tax-mini ${taxIssued?'on':''}" title="세금계산서 발행"><input type="checkbox" ${taxIssued?'checked':''} ${canEdit?'':'disabled'} onchange="toggleTaxIssued('${escB}','${m}', this.checked)" />세금</label>`;
-    const editToggleBtn = canEdit ? `<button class="btn-mini ${editing?'pri':''}" onclick="toggleEditBrand('${escB}')">${editing?'저장':'수정'}</button>` : '';
-    const cancelBtn = (canEdit && editing) ? '<button class="btn-mini" data-cancel-edit="' + encodeURIComponent(b) + '">닫기</button>' : '';
+    // 액션 버튼들 (v71: 세금 제거, EDIT/SAVE/CLOSE 라벨)
+    const editToggleBtn = canEdit ? `<button class="btn-mini ${editing?'pri':''}" onclick="toggleEditBrand('${escB}')">${editing?'SAVE':'EDIT'}</button>` : '';
+    const cancelBtn = (canEdit && editing) ? '<button class="btn-mini" data-cancel-edit="' + encodeURIComponent(b) + '">CLOSE</button>' : '';
     const renameBtn = (canEdit && STATE.role==='lead') ? `<button class="btn-mini" onclick="renameBrand('${escB}')">설정</button>` : '';
     const deleteBtn = (canEdit && STATE.role==='lead') ? `<button class="btn-mini danger" onclick="deleteBrand('${escB}')">삭제</button>` : '';
     const mainRow = `<tr class="b-row ${editing?'editing':''} ${meta.ended?'ended':''}" data-brand="${b.replace(/"/g,'&quot;')}">
@@ -3710,7 +3714,7 @@ function renderOps(){
       <td class="num exp">${fmt(bm.exp)}</td>
       <td class="num net">${fmt(bm.net)}</td>
       <td class="pct ${marginCls}">${bm.rev?margin.toFixed(1)+'%':'-'}</td>
-      <td class="actions">${taxBtn}${editToggleBtn}${cancelBtn}${renameBtn}${deleteBtn}</td>
+      <td class="actions">${editToggleBtn}${cancelBtn}${renameBtn}${deleteBtn}</td>
     </tr>`;
     // 편집 모드일 때 카테고리 상세 행 추가
     let detailRow = '';
@@ -3732,6 +3736,7 @@ function renderOps(){
       }).join('');
       const marginVal = bm.rev ? (bm.net/bm.rev*100) : 0;
       const marginShowCls = !bm.rev ? '' : (marginVal>=20 ? 'good' : marginVal>=0 ? 'warn' : 'bad');
+      const taxToggle = `<label class="end-toggle"><input type="checkbox" ${taxIssued?'checked':''} onchange="toggleTaxIssued('${escB}','${m}', this.checked)" />세금계산서 발행</label>`;
       const endToggle = `<label class="end-toggle"><input type="checkbox" ${meta.ended?'checked':''} onchange="toggleBrandEnded('${escB}', this.checked)" />브랜드 종료</label>`;
       const removeMonthBtn = !isHiddenInMonth(b, m) ? '<button class="remove-month-btn" data-remove-month-brand="' + encodeURIComponent(b) + '" data-month="' + m + '">이 달에서 제외</button>' : '';
       detailRow = `<tr class="b-detail" data-brand="${b.replace(/"/g,'&quot;')}">
@@ -3759,6 +3764,7 @@ function renderOps(){
               </div>
             </div>
             <div class="cat-actions-bottom">
+              ${taxToggle}
               ${endToggle}
               ${removeMonthBtn}
             </div>
@@ -3772,14 +3778,14 @@ function renderOps(){
     <table class="ops-table">
       <thead>
         <tr>
-          <th style="width:16%">브랜드</th>
-          <th style="width:11%">광고주</th>
-          <th style="width:12%">담당</th>
-          <th class="r" style="width:11%">매출</th>
-          <th class="r" style="width:11%">지출</th>
-          <th class="r" style="width:11%">순매출</th>
-          <th class="r" style="width:8%">이익률</th>
-          <th class="c" style="width:20%">액션</th>
+          <th style="width:14%">브랜드</th>
+          <th style="width:10%">광고주</th>
+          <th style="width:10%">담당</th>
+          <th class="r" style="width:13%">매출</th>
+          <th class="r" style="width:13%">지출</th>
+          <th class="r" style="width:13%">순매출</th>
+          <th class="r" style="width:10%">이익률</th>
+          <th class="c" style="width:17%">액션</th>
         </tr>
       </thead>
       <tbody>${bodyRows}</tbody>
@@ -3837,14 +3843,32 @@ function renderOps(){
         ALL_TEAMS_DATA.teams[STATE.team].notes = DATA.notes.slice();
       }
       persistTeamsData();
-      // partial refresh
-      renderKPI(); renderCharts(); renderAlerts();
-      // update top sums w/o re-rendering all cards
-      let sr=0,se=0; scope.forEach(bb=>{const bm=brandMonth(bb,month);sr+=bm.rev;se+=bm.exp;});
-      document.getElementById('ms-rev').textContent = fmt(sr)+'원';
-      document.getElementById('ms-exp').textContent = fmt(se)+'원';
-      document.getElementById('ms-net').textContent = fmt(sr-se)+'원';
-      document.getElementById('ms-margin').textContent = (sr?((sr-se)/sr*100):0).toFixed(1)+'%';
+      // v71: 편집 중에는 상단 대시보드 갱신 X, 저장(toggleEditBrand) 시점에 반영
+      const isEditingNow = STATE.edit && STATE.edit.brand === b;
+      if(!isEditingNow){
+        renderKPI(); renderCharts(); renderAlerts();
+        let sr=0,se=0; scope.forEach(bb=>{const bm=brandMonth(bb,month);sr+=bm.rev;se+=bm.exp;});
+        document.getElementById('ms-rev').textContent = fmt(sr)+'원';
+        document.getElementById('ms-exp').textContent = fmt(se)+'원';
+        document.getElementById('ms-net').textContent = fmt(sr-se)+'원';
+        document.getElementById('ms-margin').textContent = (sr?((sr-se)/sr*100):0).toFixed(1)+'%';
+      } else {
+        // 편집 중 → 펼친 영역 합계바만 실시간 갱신
+        const detailRow = wrap.querySelector(`tr.b-detail[data-brand="${CSS.escape(b)}"]`);
+        if(detailRow){
+          const bm = brandMonth(b, month);
+          const bar = detailRow.querySelector('.cat-totals-bar .nums');
+          if(bar){
+            const marginVal = bm.rev ? (bm.net/bm.rev*100) : 0;
+            const marginCls = !bm.rev ? '' : (marginVal>=20 ? 'good' : marginVal>=0 ? 'warn' : 'bad');
+            bar.innerHTML = `
+              <span>매출 <b>${fmt(bm.rev)}</b></span>
+              <span>지출 <b>${fmt(bm.exp)}</b></span>
+              <span class="margin-pct">이익률 <b class="${marginCls}">${bm.rev?marginVal.toFixed(1)+'%':'-'}</b></span>
+              <span class="net">순매출 <b>${fmt(bm.net)}원</b></span>`;
+          }
+        }
+      }
 
       // 해당 브랜드 카드의 inline-sum / tfoot 합계 / row 이익률 실시간 갱신
       try {
@@ -3928,11 +3952,12 @@ function _restoreBrandSnapshot(snap){
 }
 function toggleEditBrand(b){
   if(STATE.edit.brand === b){
-    // 저장 - 현재 값 유지, snapshot 폐기
+    // 저장 - 현재 값 유지, snapshot 폐기 + 상단 대시보드 명시적 갱신
     STATE.edit.brand = null;
     STATE.edit.snapshot = null;
     renderOps();
-    showToast('변경사항이 저장되었습니다', 'success');
+    try { renderKPI(); renderCharts(); renderAlerts(); } catch(e){}
+    showToast('✓ 변경사항이 저장되었습니다', 'success');
   } else {
     // 편집 시작 - 현재 상태 snapshot
     STATE.edit.brand = b;
