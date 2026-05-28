@@ -800,7 +800,20 @@
 
   /* 월간 운영 - 1열 컴팩트 (요약은 헤더에 인라인) */
   .brand-cards{display:grid;grid-template-columns:1fr;gap:8px}
-  .b-card{background:#fff;border:1px solid var(--line);border-radius:10px;padding:10px 14px;position:relative}
+  .b-card{background:#fff;border:1px solid var(--line);border-radius:8px;padding:10px 16px;position:relative;transition:all .12s}
+  /* v67: 컴팩트 리스트 행 모드 (펼치지 않은 상태) */
+  .b-card:not(.expanded){display:flex;align-items:center;min-height:46px}
+  .b-card:not(.expanded):hover{border-color:#CFCFD2;box-shadow:0 1px 3px rgba(0,0,0,.04)}
+  .b-card:not(.expanded) .head{flex:1;display:grid;grid-template-columns:1.4fr auto;gap:14px;align-items:center;margin-bottom:0}
+  .b-card:not(.expanded) .head .name{font-size:13px;font-weight:700;display:flex;align-items:center;gap:8px;flex-wrap:wrap}
+  .b-card:not(.expanded) .head .adv{font-size:10.5px;padding:2px 7px}
+  .b-card:not(.expanded) .head .owner{font-size:10.5px;margin-left:2px}
+  .b-card:not(.expanded) .inline-sum{display:inline-flex;gap:14px;font-size:11.5px;margin-left:14px;flex-wrap:wrap}
+  .b-card:not(.expanded) .inline-sum .lbl{color:var(--ink3);font-weight:600;margin-right:3px}
+  .b-card:not(.expanded) .inline-sum b{font-weight:800;font-variant-numeric:tabular-nums}
+  .b-card:not(.expanded) .head > div:last-child{display:flex;align-items:center;gap:6px;flex-wrap:wrap;justify-content:flex-end}
+  .b-card:not(.expanded) .end-toggle{display:none}
+  .b-card.ended:not(.expanded){opacity:.55;background:#FAFAFA}
   .b-card.editing{border-color:var(--ink);box-shadow:0 0 0 2px var(--bg2)}
   .b-card.ended{background:#FAFAFA;opacity:.7;order:99}
   .b-card.ended .name::after{content:'계약 종료';margin-left:6px;background:var(--bg2);color:var(--ink3);font-size:10px;font-weight:700;padding:2px 7px;border-radius:5px}
@@ -1744,6 +1757,7 @@ function applyTeamData(teamId){
       advertiserOrder: allAdvOrder,
       brandMeta: allBrandMeta,
       taxInvoice: allTaxInvoice,
+      monthlyHidden: {},  // HQ 뷰에서는 빈 객체 (읽기 전용)
     };
   } else {
     const t = ALL_TEAMS_DATA.teams[teamId];
@@ -1766,6 +1780,7 @@ function applyTeamData(teamId){
       });
     }
     if(!t.taxInvoice) t.taxInvoice = {};
+    if(!t.monthlyHidden) t.monthlyHidden = {};
     DATA = {
       months: ALL_TEAMS_DATA.months,
       brands: t.brands.slice(),
@@ -1774,9 +1789,10 @@ function applyTeamData(teamId){
       advertiserMap: Object.assign({}, t.advertiserMap||{}),
       owners: Object.assign({}, t.owners||{}),
       advertiserOrder: (t.advertiserOrder||[]).slice(),
-      // brandMeta와 taxInvoice는 직접 reference (mutations 자동 반영)
+      // brandMeta/taxInvoice/monthlyHidden 직접 reference (mutations 자동 반영)
       brandMeta: t.brandMeta,
       taxInvoice: t.taxInvoice,
+      monthlyHidden: t.monthlyHidden,  // v67: 팀별 분리
     };
   }
   // 데이터 교체 후 REC/NOTES_MAP 캐시 무효화 필수
@@ -2009,14 +2025,27 @@ function brandsInScope(){
   return DATA.brands;
 }
 
-/* ========= 월별 브랜드 운영 관리 (Phase 4) ========= */
-const MONTHLY_HIDDEN = {};
+/* ========= 월별 브랜드 운영 관리 (v67: 팀별 분리) ========= */
+// MONTHLY_HIDDEN getter - 현재 팀의 monthlyHidden을 반환
+Object.defineProperty(window, 'MONTHLY_HIDDEN', {
+  get: ()=> (typeof DATA !== 'undefined' && DATA && DATA.monthlyHidden) ? DATA.monthlyHidden : {},
+  configurable: true
+});
 function _mkHideKey(brand, month){ return brand + '§' + month; }
-function isHiddenInMonth(brand, month){ return !!MONTHLY_HIDDEN[_mkHideKey(brand, month)]; }
+function isHiddenInMonth(brand, month){
+  const m = (typeof DATA !== 'undefined' && DATA && DATA.monthlyHidden) ? DATA.monthlyHidden : null;
+  return !!(m && m[_mkHideKey(brand, month)]);
+}
 function setHiddenInMonth(brand, month, hidden){
+  const m = (typeof DATA !== 'undefined' && DATA && DATA.monthlyHidden) ? DATA.monthlyHidden : null;
+  if(!m) return;
   const k = _mkHideKey(brand, month);
-  if(hidden) MONTHLY_HIDDEN[k] = true;
-  else delete MONTHLY_HIDDEN[k];
+  if(hidden) m[k] = true;
+  else delete m[k];
+  // 팀 데이터 동기화 (직접 reference라 자동이지만 명시적으로)
+  if(STATE.team !== 'HQ' && ALL_TEAMS_DATA.teams[STATE.team]){
+    ALL_TEAMS_DATA.teams[STATE.team].monthlyHidden = m;
+  }
   try { persistTeamsData(); } catch(e){}
 }
 async function removeBrandFromMonth(brand, month){
@@ -4596,8 +4625,9 @@ function persistTeamsData(silent){
         advertiserOrder: t.advertiserOrder,
         goals: t.goals,
         roster: t.roster,
-        brandMeta: t.brandMeta || {},      // v58: 팀별 분리
-        taxInvoice: t.taxInvoice || {}     // v58: 팀별 분리
+        brandMeta: t.brandMeta || {},
+        taxInvoice: t.taxInvoice || {},
+        monthlyHidden: t.monthlyHidden || {}  // v67: 팀별 분리
       };
     });
     localStorage.setItem(DATA_KEY, JSON.stringify(snapshot));
@@ -4639,7 +4669,8 @@ window.addEventListener('beforeunload', function(){
           advertiserMap: t.advertiserMap, owners: t.owners,
           advertiserOrder: t.advertiserOrder, goals: t.goals, roster: t.roster,
           brandMeta: t.brandMeta || {},
-          taxInvoice: t.taxInvoice || {}
+          taxInvoice: t.taxInvoice || {},
+          monthlyHidden: t.monthlyHidden || {}
         };
       });
       localStorage.setItem(DATA_KEY, JSON.stringify(snapshot));
@@ -4681,9 +4712,10 @@ function restoreTeamsData(){
         }
         if(stored.goals) cur.goals = Object.assign({}, cur.goals||{}, stored.goals);
         if(stored.roster) cur.roster = stored.roster;
-        // brandMeta/taxInvoice: stored 권위 (삭제된 브랜드 메타가 부활하지 않도록)
+        // brandMeta/taxInvoice/monthlyHidden: stored 권위 (삭제된 브랜드 메타가 부활하지 않도록)
         if(stored.brandMeta) cur.brandMeta = Object.assign({}, stored.brandMeta);
         if(stored.taxInvoice) cur.taxInvoice = Object.assign({}, stored.taxInvoice);
+        if(stored.monthlyHidden) cur.monthlyHidden = Object.assign({}, stored.monthlyHidden);
       }
     });
     // 저장된 월 목록 복원 (기존 + 신규 자동 생성 월)
@@ -4695,8 +4727,22 @@ function restoreTeamsData(){
     if(snapshot.hqInsightOverrides) STATE.hqInsightOverrides = snapshot.hqInsightOverrides;
     if(snapshot.qualGrowth) Object.assign(STATE.qualGrowth, snapshot.qualGrowth);
     if(snapshot.taxInvoice) Object.assign(TAX_INVOICE, snapshot.taxInvoice);
+    // v67: 기존 글로벌 monthlyHidden → 각 팀에 분배 (브랜드 보유 팀에만)
     if(snapshot.monthlyHidden){
-      Object.keys(snapshot.monthlyHidden).forEach(k=>{ MONTHLY_HIDDEN[k] = snapshot.monthlyHidden[k]; });
+      Object.keys(snapshot.monthlyHidden).forEach(k=>{
+        const parts = k.split('§');
+        const brand = parts[0];
+        Object.keys(ALL_TEAMS_DATA.teams).forEach(tid=>{
+          const t = ALL_TEAMS_DATA.teams[tid];
+          if((t.brands||[]).includes(brand)){
+            t.monthlyHidden = t.monthlyHidden || {};
+            // 팀별로 명시 설정이 없는 경우만 분배
+            if(t.monthlyHidden[k] === undefined){
+              t.monthlyHidden[k] = snapshot.monthlyHidden[k];
+            }
+          }
+        });
+      });
     }
     // v64: 그룹 이슈 복원
     if(snapshot.groupIssues){
