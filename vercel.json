@@ -1,60 +1,12 @@
 {
   "rewrites": [
     {
-      "source": "/g",
-      "destination": "/"
+      "source": "/preview-cyj-7401",
+      "destination": "/app-preview.html"
     },
     {
-      "source": "/d",
-      "destination": "/"
-    },
-    {
-      "source": "/u",
-      "destination": "/"
-    },
-    {
-      "source": "/e",
-      "destination": "/"
-    },
-    {
-      "source": "/i",
-      "destination": "/"
-    },
-    {
-      "source": "/r",
-      "destination": "/"
-    },
-    {
-      "source": "/hq",
-      "destination": "/"
-    },
-    {
-      "source": "/G",
-      "destination": "/"
-    },
-    {
-      "source": "/D",
-      "destination": "/"
-    },
-    {
-      "source": "/U",
-      "destination": "/"
-    },
-    {
-      "source": "/E",
-      "destination": "/"
-    },
-    {
-      "source": "/I",
-      "destination": "/"
-    },
-    {
-      "source": "/R",
-      "destination": "/"
-    },
-    {
-      "source": "/HQ",
-      "destination": "/"
+      "source": "/preview-cyj-7401/(.*)",
+      "destination": "/app-preview.html"
     },
     {
       "source": "/demo",
