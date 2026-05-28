@@ -1447,6 +1447,12 @@
       <button data-tab="approve"><span class="ico"><svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M22 11.07V12a10 10 0 11-5.93-9.14"/><polyline points="22 4 12 14.01 9 11.01"/></svg></span>월 마감 확인</button>
     </div>
 
+    <h5>데이터 관리</h5>
+    <div class="nav">
+      <button onclick="event.preventDefault();exportAllData()" title="모든 데이터를 JSON 파일로 다운로드"><span class="ico"><svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg></span>데이터 백업 (다운로드)</button>
+      <button onclick="event.preventDefault();importAllData()" class="req-head" title="백업 파일에서 데이터 복원 (본부장만)"><span class="ico"><svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="17 8 12 3 7 8"/><line x1="12" y1="3" x2="12" y2="15"/></svg></span>데이터 복원 (업로드)</button>
+    </div>
+
     <h5>Documentation</h5>
     <div class="nav">
       <button data-tab="wf"><span class="ico"><svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polygon points="1 6 8 3 16 6 23 3 23 18 16 21 8 18 1 21 1 6"/><line x1="8" y1="3" x2="8" y2="18"/><line x1="16" y1="6" x2="16" y2="21"/></svg></span>워크플로우</button>
@@ -5081,10 +5087,7 @@ function restoreTeamsData(){
     if(!raw) return false;
     const snapshot = JSON.parse(raw);
     if(!snapshot.teams) return false;
-    // 30일 이상 오래된 데이터는 무시
-    if(snapshot.updatedAt && (Date.now() - snapshot.updatedAt) > 30*24*60*60*1000){
-      return false;
-    }
+    // v87: 데이터 영구 보존 (30일 TTL 제거)
     // ALL_TEAMS_DATA에 안전하게 병합 (사용자 입력 데이터 손실 방지)
     Object.keys(snapshot.teams).forEach(tid=>{
       if(ALL_TEAMS_DATA.teams[tid]){
@@ -5189,6 +5192,59 @@ window.addEventListener('storage', function(e){
     }
   }
 });
+/* ================ v87: 데이터 백업/복원 ================ */
+function exportAllData(){
+  try {
+    const blob = {
+      __version: 'v87',
+      __exportedAt: new Date().toISOString(),
+      data: localStorage.getItem(DATA_KEY) ? JSON.parse(localStorage.getItem(DATA_KEY)) : null,
+      changeLog: localStorage.getItem(CHANGE_LOG_KEY) ? JSON.parse(localStorage.getItem(CHANGE_LOG_KEY)) : []
+    };
+    const json = JSON.stringify(blob, null, 2);
+    const today = new Date();
+    const ts = `${today.getFullYear()}${String(today.getMonth()+1).padStart(2,'0')}${String(today.getDate()).padStart(2,'0')}_${String(today.getHours()).padStart(2,'0')}${String(today.getMinutes()).padStart(2,'0')}`;
+    const filename = `sm_sales_backup_${ts}.json`;
+    const blobObj = new Blob([json], {type: 'application/json'});
+    const url = URL.createObjectURL(blobObj);
+    const a = document.createElement('a');
+    a.href = url; a.download = filename;
+    document.body.appendChild(a); a.click(); document.body.removeChild(a);
+    URL.revokeObjectURL(url);
+    showToast(`✓ 백업 파일 다운로드 완료: ${filename}`, 'success');
+  } catch(e){
+    showToast('백업 실패: ' + (e.message||''), 'error');
+  }
+}
+async function importAllData(){
+  const ok = await confirmUI('백업 파일에서 데이터를 복원합니다.\n현재 입력된 모든 데이터가 백업 파일 내용으로 교체됩니다.\n계속하시겠습니까?', '데이터 복원', {danger:true, yesLabel:'복원'});
+  if(!ok) return;
+  const input = document.createElement('input');
+  input.type = 'file';
+  input.accept = '.json,application/json';
+  input.onchange = (e)=>{
+    const file = e.target.files[0];
+    if(!file) return;
+    const reader = new FileReader();
+    reader.onload = (ev)=>{
+      try {
+        const blob = JSON.parse(ev.target.result);
+        if(!blob || !blob.data){ showToast('유효하지 않은 백업 파일입니다', 'error'); return; }
+        localStorage.setItem(DATA_KEY, JSON.stringify(blob.data));
+        if(blob.changeLog) localStorage.setItem(CHANGE_LOG_KEY, JSON.stringify(blob.changeLog));
+        showToast('✓ 복원 완료 - 페이지를 새로고침합니다', 'success');
+        setTimeout(()=>{ window.location.reload(); }, 1200);
+      } catch(err){
+        showToast('파일 읽기 실패: ' + (err.message||''), 'error');
+      }
+    };
+    reader.readAsText(file);
+  };
+  input.click();
+}
+window.exportAllData = exportAllData;
+window.importAllData = importAllData;
+
 async function logout(){
   const ok = await confirmUI('로그아웃 하시겠습니까?\n현재 세션이 종료되고 로그인 화면으로 이동합니다.', '로그아웃');
   if(!ok) return;
