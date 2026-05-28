@@ -814,6 +814,39 @@
   .hq-iss-item .iss-del:hover{color:#B8001A;background:#FEE2E2}
 
 
+  /* ============ v96: 연간 A (카드+막대) + 그룹 E (한줄 가로형) ============ */
+  .v96-a-grid{display:grid;grid-template-columns:1fr 1fr;gap:14px}
+  .v96-a-card{background:#fff;border:1px solid var(--line);border-radius:10px;padding:18px 20px}
+  .v96-a-card.rev{border-color:#FBDCE1;background:linear-gradient(180deg,#FFF9FA 0%,#fff 30%)}
+  .v96-a-card.net{border-color:#BFDBFE;background:linear-gradient(180deg,#F0F7FF 0%,#fff 30%)}
+  .v96-a-card .title{font-size:14px;font-weight:800;color:var(--ink);margin-bottom:14px;display:flex;align-items:center;gap:7px;letter-spacing:-.2px}
+  .v96-a-card .title .dot{width:8px;height:8px;border-radius:50%;background:var(--pt)}
+  .v96-a-card.net .title .dot{background:#1D4ED8}
+  .v96-a-card .big-pct{font-size:34px;font-weight:900;letter-spacing:-1px;line-height:1;color:var(--pt);font-variant-numeric:tabular-nums}
+  .v96-a-card.net .big-pct{color:#1D4ED8}
+  .v96-a-card .pct-sub{font-size:11px;color:var(--ink3);font-weight:700;letter-spacing:.3px;text-transform:uppercase;margin-top:4px;margin-bottom:14px}
+  .v96-a-card .bar{height:9px;background:var(--bg2);border-radius:4px;overflow:hidden;margin-bottom:14px}
+  .v96-a-card .bar i{display:block;height:100%;border-radius:4px;background:var(--pt);transition:width .5s}
+  .v96-a-card.net .bar i{background:#1D4ED8}
+  .v96-a-card .stats{display:flex;flex-direction:column;gap:9px}
+  .v96-a-card .stat{display:flex;justify-content:space-between;align-items:baseline;font-variant-numeric:tabular-nums}
+  .v96-a-card .stat .k{font-size:12px;color:var(--ink3);font-weight:600}
+  .v96-a-card .stat .v{font-size:14px;color:var(--ink);font-weight:800;letter-spacing:-.3px}
+
+  /* 그룹 E - 한줄 가로형 strip */
+  .v96-e-stack{display:flex;flex-direction:column;gap:10px}
+  .v96-e-strip{background:#fff;border:1px solid var(--line);border-radius:10px;padding:14px 18px;display:flex;align-items:center;gap:18px;font-variant-numeric:tabular-nums;flex-wrap:wrap}
+  .v96-e-strip .seg{display:flex;flex-direction:column;gap:3px;padding:0 12px}
+  .v96-e-strip .seg:not(:last-child){border-right:1px solid var(--line2)}
+  .v96-e-strip .seg.head{padding:0;min-width:120px}
+  .v96-e-strip .seg.head .l{font-size:13px;color:var(--ink);font-weight:800;letter-spacing:-.2px;text-transform:none;display:flex;align-items:center;gap:6px}
+  .v96-e-strip .seg .l{font-size:10.5px;color:var(--ink3);font-weight:700;letter-spacing:.2px;text-transform:uppercase}
+  .v96-e-strip .seg .v{font-size:14.5px;color:var(--ink);font-weight:800;letter-spacing:-.3px}
+  .v96-e-strip .seg .v.rev{color:var(--pt)}
+  .v96-e-strip .seg .v.net{color:#1D4ED8}
+  .v96-e-strip .dot{width:8px;height:8px;border-radius:50%;background:var(--pt);display:inline-block}
+  .v96-e-strip .dot.net{background:#1D4ED8}
+
   /* ============ v88: 박스 부제 + 그룹 누적 표 ============ */
   .v88-box-sub{font-size:15px;font-weight:700;color:var(--ink);letter-spacing:-.3px;margin:0 0 12px;padding-bottom:0}
   .v88-box-sub.divider{margin-top:28px;padding-top:0;border-top:none}
@@ -5684,40 +5717,30 @@ function renderHQAnnual(){
   const descEl = document.getElementById('hq-annual-desc');
   if(descEl) descEl.textContent = `2026년 본부 통합 KPI · 누적 ${monthsDone}개월`;
 
-  // v84: 2-card 도넛 우측 + 좌측 목표/달성/달성률 명시
+  // v96: 안 A 적용 - 카드 + 진행 막대 + 목표/달성 매출
   const rateEl = document.getElementById('v82-rate-grid');
   if(rateEl){
-    const CIRC = 2*Math.PI*32;
-    const revDash = CIRC * (1 - Math.min(100, revPct)/100);
-    const netDash = CIRC * (1 - Math.min(100, netPct)/100);
     rateEl.innerHTML = `
-      <div class="v82-rate-card primary">
-        <div class="info">
+      <div class="v96-a-grid">
+        <div class="v96-a-card rev">
           <div class="title"><span class="dot"></span>매출 누적</div>
-          <div class="v84-kpi-rows">
-            <div class="v84-kr"><span class="k">목표</span><span class="v">${fmtFull(goalRev)}</span></div>
-            <div class="v84-kr"><span class="k">달성 매출</span><span class="v big">${fmtFull(totRev)}</span></div>
-            <div class="v84-kr"><span class="k">달성률</span><span class="v big pct">${revPct.toFixed(1)}%</span></div>
+          <div class="big-pct">${revPct.toFixed(1)}%</div>
+          <div class="pct-sub">달성률</div>
+          <div class="bar"><i style="width:${Math.min(100,revPct)}%"></i></div>
+          <div class="stats">
+            <div class="stat"><span class="k">목표</span><span class="v">${fmtFull(goalRev)}</span></div>
+            <div class="stat"><span class="k">달성 매출</span><span class="v">${fmtFull(totRev)}</span></div>
           </div>
         </div>
-        <div class="donut">
-          <svg viewBox="0 0 80 80"><circle class="track" cx="40" cy="40" r="32" fill="none" stroke-width="8"/><circle class="fill" cx="40" cy="40" r="32" fill="none" stroke-width="8" stroke-dasharray="${CIRC}" stroke-dashoffset="${revDash}"/></svg>
-          <div class="ctr"><div class="pct">${revPct.toFixed(1)}%</div><div class="lab">달성률</div></div>
-        </div>
-      </div>
-      <div class="v85-divider"></div>
-      <div class="v82-rate-card net">
-        <div class="info">
+        <div class="v96-a-card net">
           <div class="title"><span class="dot"></span>순매출 누적</div>
-          <div class="v84-kpi-rows">
-            <div class="v84-kr"><span class="k">목표</span><span class="v">${fmtFull(goalNet)}</span></div>
-            <div class="v84-kr"><span class="k">달성 매출</span><span class="v big net">${fmtFull(totNet)}</span></div>
-            <div class="v84-kr"><span class="k">달성률</span><span class="v big pct net">${netPct.toFixed(1)}%</span></div>
+          <div class="big-pct">${netPct.toFixed(1)}%</div>
+          <div class="pct-sub">달성률</div>
+          <div class="bar"><i style="width:${Math.min(100,netPct)}%"></i></div>
+          <div class="stats">
+            <div class="stat"><span class="k">목표</span><span class="v">${fmtFull(goalNet)}</span></div>
+            <div class="stat"><span class="k">달성 매출</span><span class="v">${fmtFull(totNet)}</span></div>
           </div>
-        </div>
-        <div class="donut">
-          <svg viewBox="0 0 80 80"><circle class="track" cx="40" cy="40" r="32" fill="none" stroke-width="8"/><circle class="fill" cx="40" cy="40" r="32" fill="none" stroke-width="8" stroke-dasharray="${CIRC}" stroke-dashoffset="${netDash}"/></svg>
-          <div class="ctr"><div class="pct">${netPct.toFixed(1)}%</div><div class="lab">달성률</div></div>
         </div>
       </div>
     `;
@@ -6011,14 +6034,20 @@ function renderGroupCard(gid){
       </div>
       <div class="v85-grp-info">목표 매출 <b>${fmtFull(g.targetRev)}</b> · 순매출 <b>${fmtFull(g.targetNet)}</b> · 인원 <b>${g.ppl}명</b> · 운영 브랜드 <b>${g.brands}건</b></div>
       <div>
-        <table class="v88-grp-sum-tbl">
-          <thead><tr><th>항목</th><th class="r" style="width:30%"><span class="dot rev"></span>매출 누적</th><th class="r" style="width:30%"><span class="dot net"></span>순매출 누적</th></tr></thead>
-          <tbody>
-            <tr><td class="lbl">목표</td><td class="r">${fmtFull(g.targetRev)}</td><td class="r">${fmtFull(g.targetNet)}</td></tr>
-            <tr><td class="lbl">누적 달성 매출</td><td class="r big rev">${fmtFull(g.rev)}</td><td class="r big net">${fmtFull(g.net)}</td></tr>
-            <tr><td class="lbl">달성률</td><td class="r big rev">${revPct.toFixed(1)}%</td><td class="r big net">${netPct.toFixed(1)}%</td></tr>
-          </tbody>
-        </table>
+        <div class="v96-e-stack">
+          <div class="v96-e-strip">
+            <div class="seg head"><div class="l"><span class="dot"></span>매출 누적</div></div>
+            <div class="seg"><div class="l">목표</div><div class="v">${fmtFull(g.targetRev)}</div></div>
+            <div class="seg"><div class="l">달성 매출</div><div class="v">${fmtFull(g.rev)}</div></div>
+            <div class="seg"><div class="l">달성률</div><div class="v rev">${revPct.toFixed(1)}%</div></div>
+          </div>
+          <div class="v96-e-strip">
+            <div class="seg head"><div class="l"><span class="dot net"></span>순매출 누적</div></div>
+            <div class="seg"><div class="l">목표</div><div class="v">${fmtFull(g.targetNet)}</div></div>
+            <div class="seg"><div class="l">달성 매출</div><div class="v">${fmtFull(g.net)}</div></div>
+            <div class="seg"><div class="l">달성률</div><div class="v net">${netPct.toFixed(1)}%</div></div>
+          </div>
+        </div>
       </div>
       <div>
         <div class="hq-grp-subtitle">월별 매출 (최근 3개월)</div>
