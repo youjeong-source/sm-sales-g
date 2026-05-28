@@ -1,0 +1,759 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8">
+<title>SM본부 상세 보고 - 레이아웃 데모 v2 | GOLDENAX</title>
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="robots" content="noindex,nofollow">
+<style>
+  *{box-sizing:border-box;margin:0;padding:0}
+  :root{
+    --ink:#0F0F10; --ink2:#475569; --ink3:#94A3B8;
+    --line:#E5E5E5; --line2:#EFEFEF;
+    --bg:#FAFAFA; --bg2:#F4F4F5;
+    --pt:#E60021; --pt-d:#B8001A; --pt-l:#FBDCE1; --pt-ll:#FFF5F7;
+    --muted:#94A3B8;
+  }
+  body{font-family:'Pretendard','Apple SD Gothic Neo',-apple-system,sans-serif;background:var(--bg);color:var(--ink);padding:24px;line-height:1.5;font-size:13px}
+  .demo-nav{position:sticky;top:0;background:#fff;border:1px solid var(--line);border-radius:10px;padding:14px 20px;margin-bottom:24px;display:flex;align-items:center;gap:14px;z-index:100;box-shadow:0 1px 4px rgba(0,0,0,.03)}
+  .demo-nav h1{font-size:16px;font-weight:900;letter-spacing:-.4px;color:var(--ink);flex:none}
+  .demo-nav .tabs{display:flex;gap:6px;flex:1}
+  .demo-nav .tabs button{background:#fff;border:1px solid var(--line);color:var(--ink2);font-size:12px;font-weight:700;padding:7px 14px;border-radius:6px;cursor:pointer;font-family:inherit;letter-spacing:-.2px}
+  .demo-nav .tabs button.active{background:var(--ink);color:#fff;border-color:var(--ink)}
+  .demo-nav .desc{font-size:11px;color:var(--ink3);font-weight:500}
+  .demo-section{display:none}
+  .demo-section.active{display:block}
+  .demo-label{display:inline-flex;align-items:center;gap:8px;font-size:12px;font-weight:800;color:var(--ink);background:#fff;border:1px solid var(--line);padding:7px 13px;border-radius:6px;margin-bottom:14px;letter-spacing:-.2px}
+  .demo-label .num{background:var(--pt);color:#fff;width:18px;height:18px;border-radius:50%;display:inline-flex;align-items:center;justify-content:center;font-size:10.5px;font-weight:900}
+  .demo-label .tip{color:var(--ink3);font-weight:600;font-size:10.5px}
+
+  /* ============ 공통 ============ */
+  .panel{background:#fff;border:1px solid var(--line);border-radius:12px;padding:16px 18px}
+  .num-val{font-variant-numeric:tabular-nums;font-weight:800;letter-spacing:-.4px}
+  .pill{display:inline-block;font-size:9px;font-weight:800;padding:2px 6px;border-radius:4px;letter-spacing:.3px}
+  .pill.cur{background:var(--pt);color:#fff}
+  .pill.prev{background:var(--bg2);color:var(--ink3)}
+  .pill.next{background:#EFF6FF;color:#1D4ED8}
+  .team-pill{display:inline-block;font-size:9.5px;font-weight:800;padding:2px 6px;border-radius:4px;letter-spacing:.3px;background:#fff;border:1px solid var(--line)}
+  .team-pill.g{color:#E60021;border-color:#FBDCE1}
+  .team-pill.d{color:#1D4ED8;border-color:#BFDBFE}
+  .team-pill.u{color:#D97706;border-color:#FCD34D}
+  .team-pill.e{color:#7C3AED;border-color:#DDD6FE}
+  .team-pill.i{color:#0891B2;border-color:#A5F3FC}
+  .team-pill.r{color:#16A34A;border-color:#BBF7D0}
+
+  /* =====================================================================
+     안 A: 2단 분할 - 좌측 정보 패널 + 우측 그룹 카드
+     ===================================================================== */
+  .a-grid{display:grid;grid-template-columns:380px 1fr;gap:16px;align-items:flex-start}
+  .a-left{display:flex;flex-direction:column;gap:14px;position:sticky;top:80px}
+  .a-right{display:flex;flex-direction:column;gap:14px;min-width:0}
+  /* 좌측 - HQ KPI 컴팩트 */
+  .a-hq-hero{padding:18px 20px;background:linear-gradient(135deg,#0F0F10 0%,#1F1F23 100%);color:#fff;border-radius:12px}
+  .a-hq-hero .lab{font-size:10.5px;font-weight:700;color:#94A3B8;letter-spacing:.3px;text-transform:uppercase;margin-bottom:5px}
+  .a-hq-hero h2{font-size:14px;font-weight:800;margin-bottom:18px;letter-spacing:-.3px}
+  .a-hq-hero .big-pct{font-size:42px;font-weight:900;line-height:1;letter-spacing:-1.5px}
+  .a-hq-hero .big-pct .unit{font-size:18px;color:#94A3B8;margin-left:4px;font-weight:700}
+  .a-hq-hero .achievement{font-size:11px;color:#94A3B8;font-weight:600;margin-top:6px}
+  .a-hq-hero .pbar{height:6px;background:rgba(255,255,255,.1);border-radius:3px;margin-top:14px;overflow:hidden}
+  .a-hq-hero .pbar > i{display:block;height:100%;background:var(--pt);border-radius:3px}
+  .a-hq-hero .stats{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-top:14px;padding-top:14px;border-top:1px solid rgba(255,255,255,.08)}
+  .a-hq-hero .stats .item .l{font-size:9.5px;color:#94A3B8;font-weight:700;letter-spacing:.3px;text-transform:uppercase}
+  .a-hq-hero .stats .item .v{font-size:15px;font-weight:800;color:#fff;margin-top:3px}
+  .a-hq-hero .stats .item .v .s{font-size:10px;color:#94A3B8;margin-left:3px;font-weight:600}
+  /* 좌측 - 월별 매출 미니 리스트 */
+  .a-mini-mo{padding:14px 16px}
+  .a-mini-mo .hd{display:flex;justify-content:space-between;align-items:baseline;margin-bottom:10px}
+  .a-mini-mo .hd h3{font-size:12.5px;font-weight:800;letter-spacing:-.2px}
+  .a-mini-mo .hd .desc{font-size:9.5px;color:var(--ink3);font-weight:600}
+  .a-mini-mo .mo-row{display:grid;grid-template-columns:62px 1fr 70px;align-items:center;gap:10px;padding:8px 0;border-bottom:1px dashed var(--line2)}
+  .a-mini-mo .mo-row:last-child{border-bottom:none}
+  .a-mini-mo .mo-row.cur{background:linear-gradient(90deg,var(--pt-ll) 0%,transparent 100%);margin:0 -16px;padding:8px 16px;border-radius:6px;border-bottom:none}
+  .a-mini-mo .mo-name{font-size:11.5px;font-weight:800;display:flex;align-items:center;gap:6px}
+  .a-mini-mo .mo-row.cur .mo-name{color:var(--pt)}
+  .a-mini-mo .mo-bar{height:10px;background:var(--bg2);border-radius:3px;overflow:hidden;position:relative}
+  .a-mini-mo .mo-bar i{display:block;height:100%;background:var(--pt);border-radius:3px}
+  .a-mini-mo .mo-amt{font-size:11.5px;font-weight:800;text-align:right;font-variant-numeric:tabular-nums}
+  /* 우측 - 그룹 카드 (한 줄에 헤더+요약, 그 아래 월별, 아래 이슈) */
+  .a-grp-card{background:#fff;border:1px solid var(--line);border-radius:12px;padding:18px 20px}
+  .a-grp-card + .a-grp-card{margin-top:0}
+  .a-grp-head{display:flex;justify-content:space-between;align-items:center;gap:14px;padding-bottom:14px;border-bottom:1px solid var(--line2);margin-bottom:14px}
+  .a-grp-head .name{display:flex;align-items:center;gap:10px}
+  .a-grp-head .name .label{font-size:9.5px;font-weight:800;letter-spacing:.4px;text-transform:uppercase;color:var(--ink3)}
+  .a-grp-head .name h4{font-size:16px;font-weight:900;letter-spacing:-.4px}
+  .a-grp-head .grp-pills{display:flex;gap:5px}
+  .a-grp-head .right{display:flex;align-items:center;gap:18px}
+  .a-grp-head .achievement-big{font-size:26px;font-weight:900;letter-spacing:-1px;line-height:1}
+  .a-grp-head .achievement-big.high{color:#16A34A}
+  .a-grp-head .achievement-big.mid{color:var(--pt)}
+  .a-grp-head .achievement-big.low{color:var(--ink3)}
+  .a-grp-head .achievement-big .unit{font-size:13px;color:var(--ink3);margin-left:2px;font-weight:700}
+  .a-grp-head .achievement-lab{font-size:9.5px;color:var(--ink3);font-weight:700;letter-spacing:.3px;text-transform:uppercase;text-align:center;margin-top:3px}
+  .a-grp-quick{display:grid;grid-template-columns:repeat(4,1fr);gap:0;margin-bottom:16px;background:var(--bg);border-radius:8px;padding:0;overflow:hidden}
+  .a-grp-quick .qitem{padding:10px 14px;border-right:1px solid var(--line2)}
+  .a-grp-quick .qitem:last-child{border-right:none}
+  .a-grp-quick .qitem .l{font-size:9.5px;color:var(--ink3);font-weight:700;letter-spacing:.3px;text-transform:uppercase}
+  .a-grp-quick .qitem .v{font-size:14px;font-weight:800;letter-spacing:-.3px;margin-top:3px;font-variant-numeric:tabular-nums}
+  .a-grp-quick .qitem .v.net{color:#1D4ED8}
+  .a-grp-quick .qitem .v.good{color:#16A34A}
+  /* 월별 행 */
+  .a-grp-mo{display:flex;flex-direction:column;gap:6px;margin-bottom:16px}
+  .a-grp-mo .row{display:grid;grid-template-columns:70px 1fr 1fr 60px 1fr;gap:10px;padding:8px 12px;background:var(--bg);border-radius:7px;align-items:center;font-size:11.5px}
+  .a-grp-mo .row.cur{background:var(--pt-ll);border:1px solid var(--pt-l)}
+  .a-grp-mo .row .mo{font-weight:800;display:flex;align-items:center;gap:5px}
+  .a-grp-mo .row.cur .mo{color:var(--pt)}
+  .a-grp-mo .row .amt{font-weight:800;text-align:right;font-variant-numeric:tabular-nums}
+  .a-grp-mo .row .amt.net{color:#1D4ED8}
+  .a-grp-mo .row .pct{font-weight:800;text-align:right}
+  .a-grp-mo .row .pct.good{color:#16A34A}
+  .a-grp-mo .row .delta{font-size:10.5px;color:var(--ink3);font-weight:600}
+  /* 이슈 영역 */
+  .a-iss-section{display:grid;grid-template-columns:1fr 1fr;gap:14px}
+  .a-iss-block{background:var(--bg);border-radius:8px;padding:11px 13px}
+  .a-iss-block .hd{display:flex;justify-content:space-between;align-items:center;margin-bottom:8px}
+  .a-iss-block .hd .ttl{font-size:11px;font-weight:800;display:flex;align-items:center;gap:5px}
+  .a-iss-block .hd .ttl .dot{width:5px;height:5px;border-radius:50%}
+  .a-iss-block.auto .hd .ttl .dot{background:var(--pt)}
+  .a-iss-block.manual .hd .ttl .dot{background:#0EA5E9}
+  .a-iss-block .hd .add{background:#fff;border:1px solid var(--line);font-size:9.5px;font-weight:700;padding:3px 8px;border-radius:4px;cursor:pointer;color:var(--ink2);font-family:inherit}
+  .a-iss-list{display:flex;flex-direction:column;gap:5px}
+  .a-iss-item{background:#fff;border:1px solid var(--line2);border-radius:6px;padding:8px 10px;font-size:10.5px;color:var(--ink);font-weight:600;line-height:1.45;display:flex;align-items:flex-start;gap:6px}
+  .a-iss-item .ix{flex:none;font-size:9px;font-weight:800;color:#0EA5E9;background:#EFF6FF;width:15px;height:15px;border-radius:50%;display:inline-flex;align-items:center;justify-content:center;line-height:1;margin-top:1px}
+
+  /* =====================================================================
+     안 B: 카드 그리드 (대시보드) — 상단 KPI 그리드 + 하단 그룹 비교 표
+     ===================================================================== */
+  .b-hero{padding:18px 20px;background:linear-gradient(135deg,#FFF5F7 0%,#FFE5E9 100%);border:1px solid var(--pt-l);border-radius:12px;margin-bottom:14px;display:flex;justify-content:space-between;align-items:center;gap:20px}
+  .b-hero .left .lab{font-size:10.5px;font-weight:700;color:var(--pt-d);letter-spacing:.4px;text-transform:uppercase}
+  .b-hero .left h2{font-size:15px;font-weight:800;margin-top:2px;letter-spacing:-.3px;color:var(--ink)}
+  .b-hero .center{display:flex;align-items:baseline;gap:8px}
+  .b-hero .center .pct{font-size:48px;font-weight:900;letter-spacing:-1.5px;color:var(--pt);line-height:1}
+  .b-hero .center .vs{font-size:11px;color:var(--ink3);font-weight:600}
+  .b-hero .right{font-size:11px;text-align:right;color:var(--ink2);font-weight:600;line-height:1.7}
+  .b-hero .right b{color:var(--ink);font-weight:800}
+  .b-kpi-grid{display:grid;grid-template-columns:repeat(6,1fr);gap:10px;margin-bottom:18px}
+  .b-kpi{background:#fff;border:1px solid var(--line);border-radius:10px;padding:13px 14px}
+  .b-kpi .l{font-size:9.5px;color:var(--ink3);font-weight:700;letter-spacing:.3px;text-transform:uppercase;margin-bottom:5px}
+  .b-kpi .v{font-size:18px;font-weight:800;letter-spacing:-.5px;font-variant-numeric:tabular-nums}
+  .b-kpi .v .s{font-size:10px;color:var(--ink3);margin-left:2px;font-weight:600}
+  .b-kpi .sub{font-size:9.5px;color:var(--ink3);margin-top:5px;font-weight:600}
+  .b-kpi .sub.up{color:#16A34A}
+  .b-kpi .sub.down{color:var(--pt)}
+  .b-section-title{font-size:13px;font-weight:800;letter-spacing:-.3px;margin-bottom:10px;display:flex;align-items:center;gap:8px}
+  .b-section-title .desc{font-size:10px;color:var(--ink3);font-weight:600}
+  .b-grp-cmp{background:#fff;border:1px solid var(--line);border-radius:10px;overflow:hidden;margin-bottom:14px}
+  .b-grp-cmp table{width:100%;border-collapse:collapse;font-size:11.5px}
+  .b-grp-cmp th{background:#F1F5F9;color:var(--ink2);font-size:9.5px;font-weight:800;text-transform:uppercase;letter-spacing:.3px;padding:9px 11px;text-align:left;border-bottom:1px solid var(--line2)}
+  .b-grp-cmp th.r{text-align:right}
+  .b-grp-cmp td{padding:11px;border-bottom:1px solid var(--line2);vertical-align:middle;font-size:11.5px}
+  .b-grp-cmp td.r{text-align:right;font-variant-numeric:tabular-nums;font-weight:800}
+  .b-grp-cmp tr:last-child td{border-bottom:none}
+  .b-grp-cmp tr.total{background:var(--bg2);font-weight:900}
+  .b-grp-cmp tr.total td{font-weight:900}
+  .b-grp-cmp .grp-name{display:flex;align-items:center;gap:7px;font-weight:800}
+  .b-grp-cmp .grp-name .num{display:inline-flex;align-items:center;justify-content:center;width:18px;height:18px;border-radius:50%;background:var(--pt);color:#fff;font-size:10px;font-weight:900}
+  .b-grp-cmp .grp-name .num.g2{background:#1D4ED8}
+  .b-grp-cmp .pbar{display:inline-block;width:60px;height:6px;background:var(--bg2);border-radius:3px;overflow:hidden;vertical-align:middle;margin-right:6px}
+  .b-grp-cmp .pbar i{display:block;height:100%;background:var(--pt);border-radius:3px}
+  .b-grp-cmp .pct-cell{display:flex;align-items:center;justify-content:flex-end;gap:7px;font-weight:800}
+  .b-grp-cmp .pct-cell.good{color:#16A34A}
+  /* 하단 - 그룹별 이슈 카드 그리드 */
+  .b-grp-iss-grid{display:grid;grid-template-columns:1fr 1fr;gap:14px}
+  .b-grp-iss-card{background:#fff;border:1px solid var(--line);border-radius:10px;padding:14px 16px}
+  .b-grp-iss-card .hd{display:flex;justify-content:space-between;align-items:center;margin-bottom:11px;padding-bottom:9px;border-bottom:1px solid var(--line2)}
+  .b-grp-iss-card .hd .name{display:flex;align-items:center;gap:8px;font-size:13px;font-weight:800}
+  .b-grp-iss-card .hd .name .dot{width:6px;height:6px;border-radius:50%}
+  .b-grp-iss-card.g1 .hd .name .dot{background:var(--pt)}
+  .b-grp-iss-card.g2 .hd .name .dot{background:#1D4ED8}
+  .b-grp-iss-card .hd .achievement{font-size:13px;font-weight:900;letter-spacing:-.3px}
+  .b-grp-iss-card .hd .achievement.good{color:#16A34A}
+  .b-grp-iss-card .iss-cols{display:grid;grid-template-columns:1fr 1fr;gap:10px}
+  .b-grp-iss-card .iss-col .ttl{font-size:10px;font-weight:800;color:var(--ink2);margin-bottom:6px;letter-spacing:.2px;text-transform:uppercase}
+  .b-grp-iss-card .iss-col .list{display:flex;flex-direction:column;gap:5px}
+  .b-grp-iss-card .iss-col .item{background:var(--bg);border-radius:6px;padding:7px 10px;font-size:10.5px;color:var(--ink);font-weight:600;line-height:1.45}
+  .b-grp-iss-card .iss-col .item.auto{background:var(--pt-ll);border:1px solid var(--pt-l)}
+
+  /* =====================================================================
+     안 C: 컴팩트 타임라인 + 그룹 카드 (단일 컬럼, 한 흐름)
+     ===================================================================== */
+  .c-wrap{display:flex;flex-direction:column;gap:14px}
+  /* 상단 - 한 줄 KPI 스트립 */
+  .c-strip{background:#fff;border:1px solid var(--line);border-radius:10px;padding:14px 18px;display:flex;align-items:center;gap:24px}
+  .c-strip .pri{display:flex;align-items:baseline;gap:8px;padding-right:24px;border-right:1px solid var(--line2)}
+  .c-strip .pri .lab{font-size:9.5px;color:var(--ink3);font-weight:700;letter-spacing:.3px;text-transform:uppercase}
+  .c-strip .pri .pct{font-size:32px;font-weight:900;color:var(--pt);letter-spacing:-1px;line-height:1}
+  .c-strip .item{display:flex;flex-direction:column;gap:3px}
+  .c-strip .item .l{font-size:9.5px;color:var(--ink3);font-weight:700;letter-spacing:.3px;text-transform:uppercase}
+  .c-strip .item .v{font-size:14px;font-weight:800;letter-spacing:-.3px;font-variant-numeric:tabular-nums}
+  .c-strip .item .v .s{font-size:10px;color:var(--ink3);margin-left:3px;font-weight:600}
+  .c-strip .item .v.net{color:#1D4ED8}
+  .c-strip .pbar-wrap{flex:1;padding-left:14px}
+  .c-strip .pbar-wrap .l{font-size:9.5px;color:var(--ink3);font-weight:700;letter-spacing:.3px;text-transform:uppercase;margin-bottom:5px}
+  .c-strip .pbar-wrap .pbar{height:8px;background:var(--bg2);border-radius:4px;overflow:hidden}
+  .c-strip .pbar-wrap .pbar i{display:block;height:100%;background:linear-gradient(90deg,var(--pt),var(--pt-d));border-radius:4px}
+  /* 월별 매출 - 가로 막대 타임라인 */
+  .c-timeline{background:#fff;border:1px solid var(--line);border-radius:10px;padding:16px 18px}
+  .c-timeline .hd{display:flex;justify-content:space-between;align-items:baseline;margin-bottom:14px}
+  .c-timeline .hd h3{font-size:13px;font-weight:800;letter-spacing:-.3px}
+  .c-timeline .hd .desc{font-size:10px;color:var(--ink3);font-weight:600}
+  .c-mo-row{display:grid;grid-template-columns:55px 1fr 80px 80px 65px;align-items:center;gap:12px;padding:9px 0;border-bottom:1px dashed var(--line2);font-size:11.5px}
+  .c-mo-row:last-child{border-bottom:none}
+  .c-mo-row.cur{background:linear-gradient(90deg,var(--pt-ll) 0%,transparent 80%);margin:0 -18px;padding:9px 18px;border-bottom:none;border-radius:6px}
+  .c-mo-row .mo{font-weight:800;display:flex;align-items:center;gap:5px}
+  .c-mo-row.cur .mo{color:var(--pt)}
+  .c-mo-row .bars{display:flex;flex-direction:column;gap:3px;position:relative;height:24px}
+  .c-mo-row .bar{height:11px;background:var(--bg2);border-radius:3px;overflow:hidden;position:relative}
+  .c-mo-row .bar i{display:block;height:100%;border-radius:3px}
+  .c-mo-row .bar.plan i{background:#CBD5E1}
+  .c-mo-row .bar.rev i{background:var(--pt)}
+  .c-mo-row .amt{text-align:right;font-weight:800;font-variant-numeric:tabular-nums}
+  .c-mo-row .amt.net{color:#1D4ED8}
+  .c-mo-row .pct{text-align:right;font-weight:800}
+  .c-mo-row .pct.good{color:#16A34A}
+  /* 그룹 카드 - 컴팩트 가로형 */
+  .c-grp-card{background:#fff;border:1px solid var(--line);border-radius:10px;padding:16px 18px}
+  .c-grp-card + .c-grp-card{margin-top:0}
+  .c-grp-row{display:grid;grid-template-columns:200px 1fr 180px;gap:18px;align-items:center;padding-bottom:14px;border-bottom:1px solid var(--line2);margin-bottom:14px}
+  .c-grp-row .name{display:flex;flex-direction:column;gap:4px}
+  .c-grp-row .name .label{font-size:9.5px;font-weight:800;letter-spacing:.4px;text-transform:uppercase;color:var(--ink3)}
+  .c-grp-row .name h4{font-size:16px;font-weight:900;letter-spacing:-.3px}
+  .c-grp-row .name .teams{display:flex;gap:4px;margin-top:3px}
+  .c-grp-row .pbar-multi{display:flex;flex-direction:column;gap:5px}
+  .c-grp-row .pbar-line{display:flex;align-items:center;gap:8px;font-size:10.5px}
+  .c-grp-row .pbar-line .l{flex:none;width:50px;font-weight:700;color:var(--ink2)}
+  .c-grp-row .pbar-line .b{flex:1;height:6px;background:var(--bg2);border-radius:3px;overflow:hidden}
+  .c-grp-row .pbar-line .b i{display:block;height:100%;border-radius:3px}
+  .c-grp-row .pbar-line.rev .b i{background:var(--pt)}
+  .c-grp-row .pbar-line.net .b i{background:#1D4ED8}
+  .c-grp-row .pbar-line .pct{font-weight:800;width:42px;text-align:right;font-variant-numeric:tabular-nums}
+  .c-grp-row .achievement{text-align:right}
+  .c-grp-row .achievement .pct-big{font-size:30px;font-weight:900;letter-spacing:-1px;line-height:1;color:var(--pt)}
+  .c-grp-row .achievement .pct-big.good{color:#16A34A}
+  .c-grp-row .achievement .pct-big .unit{font-size:14px;color:var(--ink3);margin-left:2px;font-weight:700}
+  .c-grp-row .achievement .lab-r{font-size:9.5px;color:var(--ink3);font-weight:700;letter-spacing:.3px;text-transform:uppercase;margin-top:4px}
+  /* 그룹 - 월별 3개월 표 */
+  .c-grp-3mo{margin-bottom:14px}
+  .c-grp-3mo-tbl{width:100%;border-collapse:collapse;font-size:11px}
+  .c-grp-3mo-tbl th{background:#F1F5F9;color:var(--ink2);font-size:9.5px;font-weight:800;text-transform:uppercase;letter-spacing:.3px;padding:7px 11px;text-align:left;border-bottom:1px solid var(--line2)}
+  .c-grp-3mo-tbl th.r{text-align:right}
+  .c-grp-3mo-tbl td{padding:8px 11px;border-bottom:1px solid var(--line2);font-variant-numeric:tabular-nums;font-weight:800}
+  .c-grp-3mo-tbl td.r{text-align:right}
+  .c-grp-3mo-tbl tr:last-child td{border-bottom:none}
+  .c-grp-3mo-tbl tr.cur{background:var(--pt-ll)}
+  .c-grp-3mo-tbl tr.cur td{color:var(--pt)}
+  .c-grp-3mo-tbl .net{color:#1D4ED8}
+  .c-grp-3mo-tbl .pct.good{color:#16A34A}
+  .c-grp-3mo-tbl .pct.warn{color:#D97706}
+  /* 이슈 영역 - 가로 2분할 */
+  .c-iss-grid{display:grid;grid-template-columns:1fr 1fr;gap:14px}
+  .c-iss-blk{display:flex;flex-direction:column;gap:8px}
+  .c-iss-blk .hd{display:flex;justify-content:space-between;align-items:center}
+  .c-iss-blk .hd .ttl{font-size:11px;font-weight:800;display:flex;align-items:center;gap:6px;color:var(--ink)}
+  .c-iss-blk .hd .ttl .dot{width:6px;height:6px;border-radius:50%}
+  .c-iss-blk.auto .hd .ttl .dot{background:var(--pt)}
+  .c-iss-blk.manual .hd .ttl .dot{background:#0EA5E9}
+  .c-iss-blk .hd .add{background:#fff;border:1px solid var(--line);font-size:9.5px;font-weight:700;padding:3px 8px;border-radius:4px;cursor:pointer;color:var(--ink2);font-family:inherit}
+  .c-iss-summary{padding:7px 11px;background:#F1F5F9;border:1px solid #CBD5E1;border-radius:5px;font-size:10px;color:var(--ink2);font-weight:600;line-height:1.45}
+  .c-iss-list{display:flex;flex-direction:column;gap:4px}
+  .c-iss-item{background:#fff;border:1px solid var(--line2);border-radius:5px;padding:7px 10px;font-size:10.5px;color:var(--ink);font-weight:600;line-height:1.45;display:flex;align-items:center;gap:7px}
+  .c-iss-item.auto{background:var(--pt-ll);border-color:var(--pt-l)}
+  .c-iss-item.manual{background:#EFF6FF;border-color:#BAE6FD}
+  .c-iss-item .ix{flex:none;font-size:9px;font-weight:800;color:#0EA5E9;background:#fff;border:1px solid #BAE6FD;width:14px;height:14px;border-radius:50%;display:inline-flex;align-items:center;justify-content:center;line-height:1}
+
+</style>
+</head>
+<body>
+
+<div class="demo-nav">
+  <h1>SM본부 상세 보고 - 레이아웃 데모 v2</h1>
+  <div class="tabs">
+    <button class="active" data-tab="a">A. 2단 분할 (좌:KPI / 우:그룹)</button>
+    <button data-tab="b">B. 카드 그리드 (대시보드)</button>
+    <button data-tab="c">C. 컴팩트 한 흐름 (단일 컬럼)</button>
+  </div>
+  <div class="desc">화면 하나에서 3가지 안 비교</div>
+</div>
+
+<!-- ============ 안 A: 2단 분할 ============ -->
+<div class="demo-section active" id="sec-a">
+  <div class="demo-label">
+    <span class="num">A</span>
+    2단 분할 레이아웃 — 좌측 고정 KPI 패널 + 우측 그룹 카드
+    <span class="tip">· 좌측: HQ KPI/월별 매출 sticky · 우측: 1그룹/2그룹 상세 · 동시 비교 ↑ · 스크롤 ↓</span>
+  </div>
+
+  <div class="a-grid">
+    <!-- 좌측 영역 -->
+    <div class="a-left">
+      <!-- HQ KPI Hero (다크) -->
+      <div class="a-hq-hero">
+        <div class="lab">2026 SM본부 누적 달성</div>
+        <h2>연간 누적 현황</h2>
+        <div>
+          <span class="big-pct">68.3<span class="unit">%</span></span>
+          <div class="achievement">25.6억 / 37.5억</div>
+          <div class="pbar"><i style="width:68.3%"></i></div>
+        </div>
+        <div class="stats">
+          <div class="item"><div class="l">순매출</div><div class="v">14.2억<span class="s">/ 17억</span></div></div>
+          <div class="item"><div class="l">이익률</div><div class="v">55.5<span class="s">%</span></div></div>
+          <div class="item"><div class="l">잔여 매출</div><div class="v">11.9억</div></div>
+          <div class="item"><div class="l">월 필요</div><div class="v">1.7억</div></div>
+        </div>
+      </div>
+
+      <!-- 월별 매출 미니 리스트 -->
+      <div class="panel a-mini-mo">
+        <div class="hd">
+          <h3>SM본부 월별 매출</h3>
+          <span class="desc">2026 연간</span>
+        </div>
+        <div class="mo-row"><div class="mo-name">1월 <span class="pill prev">완료</span></div><div class="mo-bar"><i style="width:55%"></i></div><div class="mo-amt">2.8억</div></div>
+        <div class="mo-row"><div class="mo-name">2월 <span class="pill prev">완료</span></div><div class="mo-bar"><i style="width:62%"></i></div><div class="mo-amt">3.1억</div></div>
+        <div class="mo-row"><div class="mo-name">3월 <span class="pill prev">완료</span></div><div class="mo-bar"><i style="width:78%"></i></div><div class="mo-amt">3.9억</div></div>
+        <div class="mo-row"><div class="mo-name">4월 <span class="pill prev">완료</span></div><div class="mo-bar"><i style="width:88%"></i></div><div class="mo-amt">4.4억</div></div>
+        <div class="mo-row cur"><div class="mo-name">5월 <span class="pill cur">진행</span></div><div class="mo-bar"><i style="width:92%"></i></div><div class="mo-amt">4.6억</div></div>
+        <div class="mo-row"><div class="mo-name">6월 <span class="pill next">예정</span></div><div class="mo-bar"><i style="width:0%;background:var(--ink3)"></i></div><div class="mo-amt" style="color:var(--ink3)">-</div></div>
+      </div>
+    </div>
+
+    <!-- 우측 영역: 그룹 카드 -->
+    <div class="a-right">
+      <!-- 1그룹 카드 -->
+      <div class="a-grp-card">
+        <div class="a-grp-head">
+          <div class="name">
+            <div>
+              <div class="label">Group 1</div>
+              <h4>그룹 매출 보고 — G·D·U팀</h4>
+            </div>
+            <div class="grp-pills">
+              <span class="team-pill g">G</span><span class="team-pill d">D</span><span class="team-pill u">U</span>
+            </div>
+          </div>
+          <div class="right">
+            <div>
+              <div class="achievement-big high">72.5<span class="unit">%</span></div>
+              <div class="achievement-lab">목표 달성률</div>
+            </div>
+          </div>
+        </div>
+        <div class="a-grp-quick">
+          <div class="qitem"><div class="l">매출 누적</div><div class="v">14.5억</div></div>
+          <div class="qitem"><div class="l">순매출 누적</div><div class="v net">8.1억</div></div>
+          <div class="qitem"><div class="l">이익률</div><div class="v good">55.9%</div></div>
+          <div class="qitem"><div class="l">잔여 / 월 필요</div><div class="v">5.5억 / 0.8억</div></div>
+        </div>
+        <div class="a-grp-mo">
+          <div class="row"><div class="mo">4월 <span class="pill prev">완료</span></div><div class="amt">3.4억</div><div class="amt net">1.9억</div><div class="pct good">+18%</div><div class="delta">전주 +5%</div></div>
+          <div class="row cur"><div class="mo">5월 <span class="pill cur">진행</span></div><div class="amt">3.6억</div><div class="amt net">2.0억</div><div class="pct good">+22%</div><div class="delta">전주 +12%</div></div>
+          <div class="row"><div class="mo">6월 <span class="pill next">예정</span></div><div class="amt">-</div><div class="amt net">-</div><div class="pct">-</div><div class="delta">-</div></div>
+        </div>
+        <div class="a-iss-section">
+          <div class="a-iss-block auto">
+            <div class="hd"><div class="ttl"><span class="dot"></span>변동사항 자동 감지</div></div>
+            <div class="a-iss-list">
+              <div class="a-iss-item">G팀 불스원 +6.6억 (5월)</div>
+              <div class="a-iss-item">D팀 LG생활건강 −2.1억 (5월)</div>
+            </div>
+          </div>
+          <div class="a-iss-block manual">
+            <div class="hd"><div class="ttl"><span class="dot"></span>이슈사항 (수동)</div><button class="add">＋ 추가</button></div>
+            <div class="a-iss-list">
+              <div class="a-iss-item"><span class="ix">1</span>신규 클라이언트 발굴 지연</div>
+              <div class="a-iss-item"><span class="ix">2</span>2Q 액션 플랜 수립 필요</div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- 2그룹 카드 -->
+      <div class="a-grp-card">
+        <div class="a-grp-head">
+          <div class="name">
+            <div>
+              <div class="label">Group 2</div>
+              <h4>그룹 매출 보고 — E·I·R팀</h4>
+            </div>
+            <div class="grp-pills">
+              <span class="team-pill e">E</span><span class="team-pill i">I</span><span class="team-pill r">R</span>
+            </div>
+          </div>
+          <div class="right">
+            <div>
+              <div class="achievement-big mid">64.1<span class="unit">%</span></div>
+              <div class="achievement-lab">목표 달성률</div>
+            </div>
+          </div>
+        </div>
+        <div class="a-grp-quick">
+          <div class="qitem"><div class="l">매출 누적</div><div class="v">11.1억</div></div>
+          <div class="qitem"><div class="l">순매출 누적</div><div class="v net">6.1억</div></div>
+          <div class="qitem"><div class="l">이익률</div><div class="v">55.0%</div></div>
+          <div class="qitem"><div class="l">잔여 / 월 필요</div><div class="v">6.4억 / 0.9억</div></div>
+        </div>
+        <div class="a-grp-mo">
+          <div class="row"><div class="mo">4월 <span class="pill prev">완료</span></div><div class="amt">2.6억</div><div class="amt net">1.4억</div><div class="pct">−3%</div><div class="delta">전주 -2%</div></div>
+          <div class="row cur"><div class="mo">5월 <span class="pill cur">진행</span></div><div class="amt">2.8억</div><div class="amt net">1.5억</div><div class="pct">+6%</div><div class="delta">전주 +8%</div></div>
+          <div class="row"><div class="mo">6월 <span class="pill next">예정</span></div><div class="amt">-</div><div class="amt net">-</div><div class="pct">-</div><div class="delta">-</div></div>
+        </div>
+        <div class="a-iss-section">
+          <div class="a-iss-block auto">
+            <div class="hd"><div class="ttl"><span class="dot"></span>변동사항 자동 감지</div></div>
+            <div class="a-iss-list">
+              <div class="a-iss-item">E팀 코오롱 +1.2억 (5월)</div>
+            </div>
+          </div>
+          <div class="a-iss-block manual">
+            <div class="hd"><div class="ttl"><span class="dot"></span>이슈사항 (수동)</div><button class="add">＋ 추가</button></div>
+            <div class="a-iss-list">
+              <div class="a-iss-item"><span class="ix">1</span>R팀 운영 인력 부족</div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ============ 안 B: 카드 그리드 (대시보드) ============ -->
+<div class="demo-section" id="sec-b">
+  <div class="demo-label">
+    <span class="num">B</span>
+    카드 그리드 (대시보드형) — 한눈에 6개 KPI + 그룹 비교 표
+    <span class="tip">· 상단: KPI 6칸 그리드 · 중단: 1·2그룹 비교 표 · 하단: 이슈 카드 2분할 · 정보 밀도 ↑↑</span>
+  </div>
+
+  <!-- Hero -->
+  <div class="b-hero">
+    <div class="left">
+      <div class="lab">2026 SM본부 누적 달성</div>
+      <h2>연간 누적 현황 · 기준일 2026-05-28</h2>
+    </div>
+    <div class="center">
+      <span class="pct">68.3%</span>
+      <span class="vs">/ 100% 목표</span>
+    </div>
+    <div class="right">
+      누적 매출 <b>25.6억</b> / 37.5억<br/>
+      잔여 <b>11.9억</b> · 월 필요 <b>1.7억</b>
+    </div>
+  </div>
+
+  <!-- KPI Grid -->
+  <div class="b-kpi-grid">
+    <div class="b-kpi"><div class="l">목표 매출</div><div class="v">37.5<span class="s">억</span></div><div class="sub">2026 연간</div></div>
+    <div class="b-kpi"><div class="l">누적 매출</div><div class="v">25.6<span class="s">억</span></div><div class="sub up">68.3% 달성</div></div>
+    <div class="b-kpi"><div class="l">순매출 누적</div><div class="v" style="color:#1D4ED8">14.2<span class="s">억</span></div><div class="sub">이익률 55.5%</div></div>
+    <div class="b-kpi"><div class="l">잔여 매출</div><div class="v">11.9<span class="s">억</span></div><div class="sub">3개월 남음</div></div>
+    <div class="b-kpi"><div class="l">월 필요</div><div class="v">1.7<span class="s">억</span></div><div class="sub">유지 페이스</div></div>
+    <div class="b-kpi"><div class="l">신규 브랜드</div><div class="v">12<span class="s">건</span></div><div class="sub up">YTD +9</div></div>
+  </div>
+
+  <!-- 그룹 비교 표 -->
+  <div class="b-section-title">그룹별 매출 비교 <span class="desc">· 1·2그룹 달성 현황</span></div>
+  <div class="b-grp-cmp">
+    <table>
+      <thead>
+        <tr>
+          <th style="width:24%">그룹</th>
+          <th class="r" style="width:11%">목표</th>
+          <th class="r" style="width:11%">누적 매출</th>
+          <th class="r" style="width:11%">순매출</th>
+          <th class="r" style="width:9%">이익률</th>
+          <th class="r" style="width:17%">달성률</th>
+          <th class="r" style="width:9%">잔여</th>
+          <th class="r" style="width:8%">월 필요</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr>
+          <td><div class="grp-name"><span class="num">1</span>1그룹 (G·D·U)</div></td>
+          <td class="r">20.0억</td>
+          <td class="r">14.5억</td>
+          <td class="r" style="color:#1D4ED8">8.1억</td>
+          <td class="r" style="color:#16A34A">55.9%</td>
+          <td class="r"><div class="pct-cell good"><span class="pbar"><i style="width:72.5%"></i></span>72.5%</div></td>
+          <td class="r">5.5억</td>
+          <td class="r">0.8억</td>
+        </tr>
+        <tr>
+          <td><div class="grp-name"><span class="num g2">2</span>2그룹 (E·I·R)</div></td>
+          <td class="r">17.5억</td>
+          <td class="r">11.1억</td>
+          <td class="r" style="color:#1D4ED8">6.1억</td>
+          <td class="r">55.0%</td>
+          <td class="r"><div class="pct-cell"><span class="pbar"><i style="width:64.1%;background:#1D4ED8"></i></span>64.1%</div></td>
+          <td class="r">6.4억</td>
+          <td class="r">0.9억</td>
+        </tr>
+        <tr class="total">
+          <td>SM본부 합계</td>
+          <td class="r">37.5억</td>
+          <td class="r">25.6억</td>
+          <td class="r" style="color:#1D4ED8">14.2억</td>
+          <td class="r">55.5%</td>
+          <td class="r"><div class="pct-cell"><span class="pbar"><i style="width:68.3%"></i></span>68.3%</div></td>
+          <td class="r">11.9억</td>
+          <td class="r">1.7억</td>
+        </tr>
+      </tbody>
+    </table>
+  </div>
+
+  <!-- 그룹별 이슈 카드 그리드 -->
+  <div class="b-section-title">그룹별 이슈 현황 <span class="desc">· 변동사항(자동) + 이슈사항(수동)</span></div>
+  <div class="b-grp-iss-grid">
+    <div class="b-grp-iss-card g1">
+      <div class="hd">
+        <div class="name"><span class="dot"></span>1그룹 (G·D·U팀)</div>
+        <div class="achievement good">72.5%</div>
+      </div>
+      <div class="iss-cols">
+        <div class="iss-col">
+          <div class="ttl">변동사항 (자동, 10일내)</div>
+          <div class="list">
+            <div class="item auto">G팀 불스원 +6.6억 (5월)</div>
+            <div class="item auto">D팀 LG생활건강 −2.1억 (5월)</div>
+          </div>
+        </div>
+        <div class="iss-col">
+          <div class="ttl">이슈사항 (수동)</div>
+          <div class="list">
+            <div class="item">1. 신규 클라이언트 발굴 지연</div>
+            <div class="item">2. 2Q 액션 플랜 수립 필요</div>
+          </div>
+        </div>
+      </div>
+    </div>
+    <div class="b-grp-iss-card g2">
+      <div class="hd">
+        <div class="name"><span class="dot"></span>2그룹 (E·I·R팀)</div>
+        <div class="achievement">64.1%</div>
+      </div>
+      <div class="iss-cols">
+        <div class="iss-col">
+          <div class="ttl">변동사항 (자동, 10일내)</div>
+          <div class="list">
+            <div class="item auto">E팀 코오롱 +1.2억 (5월)</div>
+          </div>
+        </div>
+        <div class="iss-col">
+          <div class="ttl">이슈사항 (수동)</div>
+          <div class="list">
+            <div class="item">1. R팀 운영 인력 부족</div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ============ 안 C: 컴팩트 한 흐름 ============ -->
+<div class="demo-section" id="sec-c">
+  <div class="demo-label">
+    <span class="num">C</span>
+    컴팩트 한 흐름 — 한 줄 KPI 스트립 + 가로 막대 월별 + 그룹 카드
+    <span class="tip">· 모든 정보가 단일 컬럼 · 가로 막대로 시각적 가시성 ↑ · 인쇄 친화적</span>
+  </div>
+
+  <div class="c-wrap">
+    <!-- 상단 - 한 줄 KPI 스트립 -->
+    <div class="c-strip">
+      <div class="pri">
+        <div>
+          <div class="lab">2026 SM본부</div>
+          <div class="pct">68.3%</div>
+        </div>
+      </div>
+      <div class="item"><div class="l">누적 매출</div><div class="v">25.6<span class="s">억</span></div></div>
+      <div class="item"><div class="l">순매출</div><div class="v net">14.2<span class="s">억</span></div></div>
+      <div class="item"><div class="l">이익률</div><div class="v">55.5%</div></div>
+      <div class="item"><div class="l">잔여</div><div class="v">11.9<span class="s">억</span></div></div>
+      <div class="item"><div class="l">월 필요</div><div class="v">1.7<span class="s">억</span></div></div>
+      <div class="pbar-wrap">
+        <div class="l">연간 진행률</div>
+        <div class="pbar"><i style="width:68.3%"></i></div>
+      </div>
+    </div>
+
+    <!-- 월별 매출 가로 막대 타임라인 -->
+    <div class="c-timeline">
+      <div class="hd">
+        <h3>SM본부 월별 매출 타임라인</h3>
+        <span class="desc">계획 vs 실적 가로 막대 비교</span>
+      </div>
+      <div class="c-mo-row">
+        <div class="mo">1월 <span class="pill prev">완료</span></div>
+        <div class="bars">
+          <div class="bar plan"><i style="width:80%"></i></div>
+          <div class="bar rev"><i style="width:55%"></i></div>
+        </div>
+        <div class="amt">2.8억</div>
+        <div class="amt net">1.5억</div>
+        <div class="pct">68%</div>
+      </div>
+      <div class="c-mo-row">
+        <div class="mo">2월 <span class="pill prev">완료</span></div>
+        <div class="bars">
+          <div class="bar plan"><i style="width:80%"></i></div>
+          <div class="bar rev"><i style="width:62%"></i></div>
+        </div>
+        <div class="amt">3.1억</div>
+        <div class="amt net">1.7억</div>
+        <div class="pct">77%</div>
+      </div>
+      <div class="c-mo-row">
+        <div class="mo">3월 <span class="pill prev">완료</span></div>
+        <div class="bars">
+          <div class="bar plan"><i style="width:80%"></i></div>
+          <div class="bar rev"><i style="width:78%"></i></div>
+        </div>
+        <div class="amt">3.9억</div>
+        <div class="amt net">2.2억</div>
+        <div class="pct">98%</div>
+      </div>
+      <div class="c-mo-row">
+        <div class="mo">4월 <span class="pill prev">완료</span></div>
+        <div class="bars">
+          <div class="bar plan"><i style="width:80%"></i></div>
+          <div class="bar rev"><i style="width:88%"></i></div>
+        </div>
+        <div class="amt">4.4억</div>
+        <div class="amt net">2.4억</div>
+        <div class="pct good">110%</div>
+      </div>
+      <div class="c-mo-row cur">
+        <div class="mo">5월 <span class="pill cur">진행</span></div>
+        <div class="bars">
+          <div class="bar plan"><i style="width:80%"></i></div>
+          <div class="bar rev"><i style="width:92%"></i></div>
+        </div>
+        <div class="amt">4.6억</div>
+        <div class="amt net">2.5억</div>
+        <div class="pct good">115%</div>
+      </div>
+      <div class="c-mo-row">
+        <div class="mo">6월 <span class="pill next">예정</span></div>
+        <div class="bars">
+          <div class="bar plan"><i style="width:80%"></i></div>
+          <div class="bar rev"><i style="width:0%"></i></div>
+        </div>
+        <div class="amt" style="color:var(--ink3)">-</div>
+        <div class="amt" style="color:var(--ink3)">-</div>
+        <div class="pct" style="color:var(--ink3)">-</div>
+      </div>
+    </div>
+
+    <!-- 그룹 1 카드 -->
+    <div class="c-grp-card">
+      <div class="c-grp-row">
+        <div class="name">
+          <div class="label">Group 1</div>
+          <h4>G·D·U팀</h4>
+          <div class="teams"><span class="team-pill g">G</span><span class="team-pill d">D</span><span class="team-pill u">U</span></div>
+        </div>
+        <div class="pbar-multi">
+          <div class="pbar-line rev"><span class="l">매출</span><span class="b"><i style="width:72.5%"></i></span><span class="pct">72.5%</span></div>
+          <div class="pbar-line net"><span class="l">순매출</span><span class="b"><i style="width:73.6%"></i></span><span class="pct">73.6%</span></div>
+        </div>
+        <div class="achievement">
+          <div class="pct-big good">72.5<span class="unit">%</span></div>
+          <div class="lab-r">목표 달성률</div>
+        </div>
+      </div>
+      <div class="c-grp-3mo">
+        <table class="c-grp-3mo-tbl">
+          <thead><tr><th>월</th><th class="r">매출</th><th class="r">순매출</th><th class="r">이익률</th><th class="r">전주 변동</th></tr></thead>
+          <tbody>
+            <tr><td>4월</td><td class="r">3.4억</td><td class="r net">1.9억</td><td class="r pct good">55.9%</td><td class="r" style="color:#16A34A">+18%</td></tr>
+            <tr class="cur"><td>5월</td><td class="r">3.6억</td><td class="r net">2.0억</td><td class="r pct good">55.6%</td><td class="r" style="color:#16A34A">+22%</td></tr>
+            <tr><td>6월</td><td class="r" style="color:var(--ink3)">-</td><td class="r" style="color:var(--ink3)">-</td><td class="r" style="color:var(--ink3)">-</td><td class="r" style="color:var(--ink3)">-</td></tr>
+          </tbody>
+        </table>
+      </div>
+      <div class="c-iss-grid">
+        <div class="c-iss-blk auto">
+          <div class="hd"><div class="ttl"><span class="dot"></span>변동사항 자동 감지</div></div>
+          <div class="c-iss-summary">최근 10일 2건 매출 변동 · G팀 1건(+6.6억) · D팀 1건(−2.1억)</div>
+          <div class="c-iss-list">
+            <div class="c-iss-item auto"><span class="team-pill g">G팀</span>불스원 매출 급증 (+6.6억) · 5월</div>
+            <div class="c-iss-item auto"><span class="team-pill d">D팀</span>LG생활건강 매출 급감 (−2.1억) · 5월</div>
+          </div>
+        </div>
+        <div class="c-iss-blk manual">
+          <div class="hd"><div class="ttl"><span class="dot"></span>이슈사항 (수동 입력)</div><button class="add">＋ 추가</button></div>
+          <div class="c-iss-list">
+            <div class="c-iss-item manual">
+              <span class="team-pill g">G팀</span>
+              <span style="display:inline-flex;flex-direction:column;gap:2px;flex:1">
+                <span><span class="ix">1</span>&nbsp;신규 클라이언트 발굴 지연</span>
+                <span><span class="ix">2</span>&nbsp;2Q 액션 플랜 수립 필요</span>
+              </span>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- 그룹 2 카드 -->
+    <div class="c-grp-card">
+      <div class="c-grp-row">
+        <div class="name">
+          <div class="label">Group 2</div>
+          <h4>E·I·R팀</h4>
+          <div class="teams"><span class="team-pill e">E</span><span class="team-pill i">I</span><span class="team-pill r">R</span></div>
+        </div>
+        <div class="pbar-multi">
+          <div class="pbar-line rev"><span class="l">매출</span><span class="b"><i style="width:64.1%"></i></span><span class="pct">64.1%</span></div>
+          <div class="pbar-line net"><span class="l">순매출</span><span class="b"><i style="width:62.9%"></i></span><span class="pct">62.9%</span></div>
+        </div>
+        <div class="achievement">
+          <div class="pct-big">64.1<span class="unit">%</span></div>
+          <div class="lab-r">목표 달성률</div>
+        </div>
+      </div>
+      <div class="c-grp-3mo">
+        <table class="c-grp-3mo-tbl">
+          <thead><tr><th>월</th><th class="r">매출</th><th class="r">순매출</th><th class="r">이익률</th><th class="r">전주 변동</th></tr></thead>
+          <tbody>
+            <tr><td>4월</td><td class="r">2.6억</td><td class="r net">1.4억</td><td class="r pct">53.8%</td><td class="r" style="color:#E60021">−3%</td></tr>
+            <tr class="cur"><td>5월</td><td class="r">2.8억</td><td class="r net">1.5억</td><td class="r pct">53.6%</td><td class="r" style="color:#16A34A">+6%</td></tr>
+            <tr><td>6월</td><td class="r" style="color:var(--ink3)">-</td><td class="r" style="color:var(--ink3)">-</td><td class="r" style="color:var(--ink3)">-</td><td class="r" style="color:var(--ink3)">-</td></tr>
+          </tbody>
+        </table>
+      </div>
+      <div class="c-iss-grid">
+        <div class="c-iss-blk auto">
+          <div class="hd"><div class="ttl"><span class="dot"></span>변동사항 자동 감지</div></div>
+          <div class="c-iss-summary">최근 10일 1건 매출 변동 · E팀 1건(+1.2억)</div>
+          <div class="c-iss-list">
+            <div class="c-iss-item auto"><span class="team-pill e">E팀</span>코오롱 매출 급증 (+1.2억) · 5월</div>
+          </div>
+        </div>
+        <div class="c-iss-blk manual">
+          <div class="hd"><div class="ttl"><span class="dot"></span>이슈사항 (수동 입력)</div><button class="add">＋ 추가</button></div>
+          <div class="c-iss-list">
+            <div class="c-iss-item manual"><span class="team-pill r">R팀</span>운영 인력 부족 — 충원 검토 필요</div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<script>
+document.querySelectorAll('.demo-nav .tabs button').forEach(btn=>{
+  btn.addEventListener('click', ()=>{
+    document.querySelectorAll('.demo-nav .tabs button').forEach(b=>b.classList.remove('active'));
+    btn.classList.add('active');
+    const tab = btn.dataset.tab;
+    document.querySelectorAll('.demo-section').forEach(sec=>sec.classList.remove('active'));
+    document.getElementById('sec-'+tab).classList.add('active');
+    window.scrollTo({top:0, behavior:'smooth'});
+  });
+});
+</script>
+
+</body>
+</html>

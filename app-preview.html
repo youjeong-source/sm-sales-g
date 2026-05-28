@@ -3158,21 +3158,12 @@ function renderCharts(){
   const plans = labels.map((_,i)=>STATE.goals.rev/12 * (0.6 + i*0.12));
   let acc=0; const cumRev = revs.map(v=>{acc+=v;return acc;});
 
-  // v75: 월 매출 달성률 기준 컬러 - >=100% 녹, 70-99% 빨강, <70% 회색
-  const revColors = revs.map((v, i) => {
-    const plan = plans[i] || 0;
-    if(!v) return '#E5E5E5';
-    if(!plan) return '#E60021';
-    const r = v/plan;
-    if(r >= 1.0) return '#16A34A';   // 목표 초과 - 녹색
-    if(r >= 0.7) return '#E60021';   // 양호 - 빨강
-    return '#94A3B8';                // 미달 - 회색
-  });
+  // v77: 월 매출 막대 - 모든 팀 동일하게 솔리드 빨강 통일 (v75 분기 제거)
   if(chMonth) chMonth.destroy();
   chMonth = new Chart(document.getElementById('ch-month'),{
     data:{labels,datasets:[
       {type:'bar',label:'월 계획',data:plans,backgroundColor:'#E5E5E5',borderRadius:6,order:3,barPercentage:.8,categoryPercentage:1.0},
-      {type:'bar',label:'월 매출',data:revs,backgroundColor:revColors,borderRadius:6,order:2,barPercentage:.8,categoryPercentage:1.0},
+      {type:'bar',label:'월 매출',data:revs,backgroundColor:'#E60021',borderRadius:6,order:2,barPercentage:.8,categoryPercentage:1.0},
       {type:'bar',label:'월 순매출',data:nets,backgroundColor:'#0F0F10',borderRadius:6,order:1,barPercentage:.8,categoryPercentage:1.0},
       {type:'line',label:'누적 매출',data:cumRev,borderColor:'#E60021',backgroundColor:'rgba(230,0,33,.08)',fill:true,borderWidth:2.5,tension:.3,yAxisID:'y1',order:0,pointRadius:4,pointBackgroundColor:'#E60021'}
     ]},
