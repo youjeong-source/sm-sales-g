@@ -1170,6 +1170,7 @@
     <h5 class="req-head">본부 관리</h5>
     <div class="nav req-head">
       <button data-tab="org"><span class="ico"><svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="4" y="3" width="16" height="18" rx="1.5"/><line x1="9" y1="7" x2="9" y2="7"/><line x1="13" y1="7" x2="13" y2="7"/><line x1="9" y1="11" x2="9" y2="11"/><line x1="13" y1="11" x2="13" y2="11"/><line x1="9" y1="15" x2="9" y2="15"/><line x1="13" y1="15" x2="13" y2="15"/></svg></span>SM본부 통합 현황</button>
+      <button data-tab="hq-detail"><span class="ico"><svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 3v18h18"/><path d="M7 14l4-4 4 4 5-6"/><circle cx="7" cy="14" r="1.5"/><circle cx="11" cy="10" r="1.5"/><circle cx="15" cy="14" r="1.5"/><circle cx="20" cy="8" r="1.5"/></svg></span>월별·그룹 상세 보고</button>
     </div>
 
     <h5 class="hide-on-hq">마감 관리</h5>
@@ -1556,7 +1557,7 @@
     </div>
   </section>
 
-  <!-- =============== SM본부 통합 현황 (Head/Lead) - v64 상세 보고 =============== -->
+  <!-- =============== SM본부 통합 현황 (Head/Lead) - 통합 표/연간 KPI/매출 추이 =============== -->
   <section id="tab-org" class="hide">
     <div class="panel">
       <div class="head-row">
@@ -1564,9 +1565,8 @@
       </div>
       <table class="role-table" id="hq-team-tbl"></table>
     </div>
-    <!-- v64: 상세 보고 영역 -->
+    <!-- 연간 달성 누적 (통합 현황에 유지) -->
     <div class="hq-detail-grid">
-      <!-- 1. 연간 달성 누적 -->
       <div>
         <div class="hq-section-title">
           <h3>📊 SM본부 연간 달성 누적</h3>
@@ -1585,7 +1585,17 @@
           </div>
         </div>
       </div>
-      <!-- 2. 월별 매출 현황 -->
+    </div>
+    <div class="panel" style="margin-top:24px">
+      <h3>본부 통합 매출 추이</h3>
+      <div class="chart-wrap"><canvas id="ch-hq-month"></canvas></div>
+    </div>
+  </section>
+
+  <!-- =============== v65: 월별·그룹 상세 보고 (별도 메뉴) =============== -->
+  <section id="tab-hq-detail" class="hide">
+    <div class="hq-detail-grid">
+      <!-- 월별 매출 현황 -->
       <div>
         <div class="hq-section-title">
           <h3>📅 SM본부 월별 매출 현황</h3>
@@ -1595,14 +1605,10 @@
           <!-- JS로 채움 -->
         </div>
       </div>
-      <!-- 3. 그룹별 매출 보고 -->
+      <!-- 그룹별 매출 보고 -->
       <div class="hq-grp-section" id="hq-grp-section">
         <!-- JS로 그룹 1, 2 카드 채움 -->
       </div>
-    </div>
-    <div class="panel" style="margin-top:24px">
-      <h3>본부 통합 매출 추이</h3>
-      <div class="chart-wrap"><canvas id="ch-hq-month"></canvas></div>
     </div>
   </section>
 
@@ -5058,8 +5064,9 @@ function fmtEokWon(v){
 }
 function fmtMoney(v){ return fmtEokWon(v); }
 
-function renderHQDetail(){
+function renderHQAnnual(){
   if(STATE.team !== 'HQ') return;
+  // 연간 KPI 카드만 렌더 (tab-org)
   // 1) 연간 KPI
   let totRev=0, totExp=0;
   Object.values(ALL_TEAMS_DATA.teams).forEach(t=>{
@@ -5127,6 +5134,14 @@ function renderHQDetail(){
       </div>
     `;
   }
+}
+
+function renderHQDetailPage(){
+  if(STATE.team !== 'HQ') return;
+  // 월별 리스트 + 그룹 카드 (tab-hq-detail)
+  // 페이지 표시를 위해 hq_goals 등을 다시 계산
+  const goalRev = ALL_TEAMS_DATA.hq_goals.rev || 30_000_000_000;
+  const goalMargin = ALL_TEAMS_DATA.hq_goals.margin || 24;
 
   // 2) 월별 매출 리스트 (3개월)
   const monthlyList = document.getElementById('hq-monthly-list');
@@ -5407,7 +5422,7 @@ function openGroupIssueAdd(gid){
       title, desc, author: me, date: dateStr, ts: Date.now()
     });
     try { persistTeamsData(); } catch(e){}
-    renderHQDetail();
+    renderHQDetailPage();
     showToast(`✓ ${GROUP_DEF[gid].label} 이슈가 추가되었습니다`, 'success');
   });
 }
@@ -5417,7 +5432,7 @@ async function deleteGroupIssue(gid, id){
   STATE.groupIssues = STATE.groupIssues || {g1:[], g2:[]};
   STATE.groupIssues[gid] = (STATE.groupIssues[gid]||[]).filter(x=>x.id !== id);
   try { persistTeamsData(); } catch(e){}
-  renderHQDetail();
+  renderHQDetailPage();
   showToast('이슈가 삭제되었습니다', 'info');
 }
 
@@ -5461,8 +5476,8 @@ function renderOrg(){
     });
     return {label:t.name, data, backgroundColor:teamColors[tid]||'#71717A', borderRadius:6};
   });
-  // v64: 상세 보고 영역 렌더
-  try { renderHQDetail(); } catch(e){ console.warn('renderHQDetail 실패', e); }
+  // v65: 연간 KPI만 (월별/그룹은 별도 메뉴에서 렌더)
+  try { renderHQAnnual(); } catch(e){ console.warn('renderHQAnnual 실패', e); }
   if(chHQMonth) try{chHQMonth.destroy();}catch(e){}
   const canvas = document.getElementById('ch-hq-month');
   if(canvas){
@@ -5506,7 +5521,7 @@ function exportCSV(){
 /* ================ Tabs ================ */
 function goTab(t){
   document.querySelectorAll('aside.side .nav button').forEach(b=>b.classList.toggle('active', b.dataset.tab===t));
-  ['dash','brand','ops','alerts','team','goal-set','org','approve','wf','role','hq-sales'].forEach(k=>{
+  ['dash','brand','ops','alerts','team','goal-set','org','approve','wf','role','hq-sales','hq-detail'].forEach(k=>{
     const el = document.getElementById('tab-'+k);
     if(el) el.classList.toggle('hide', k!==t);
   });
@@ -5514,6 +5529,7 @@ function goTab(t){
   if(t==='ops') renderOps();
   if(t==='team') renderTeam();
   if(t==='org') renderOrg();
+  if(t==='hq-detail') renderHQDetailPage();
   if(t==='approve') renderApprove();
   if(t==='hq-sales') renderHQBrandTable();
   if(t==='goal-set') {refreshGoalForm(); setTimeout(renderCharts,50);}
