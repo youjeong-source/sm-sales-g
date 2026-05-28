@@ -1,5 +1,12 @@
 {
   "rewrites": [
+    {"source":"/hq","destination":"/index.html"},
+    {"source":"/g","destination":"/index.html"},
+    {"source":"/d","destination":"/index.html"},
+    {"source":"/u","destination":"/index.html"},
+    {"source":"/e","destination":"/index.html"},
+    {"source":"/i","destination":"/index.html"},
+    {"source":"/r","destination":"/index.html"},
     {"source":"/demo","destination":"/demo.html"},
     {"source":"/demo-hq","destination":"/demo-hq.html"},
     {"source":"/demo-hq-v2","destination":"/demo-hq-v2.html"},
