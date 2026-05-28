@@ -1399,11 +1399,11 @@
 
   /* 워크플로우 5단계 - 가로 진행 카드 */
   .wf-steps{display:grid;grid-template-columns:repeat(5,1fr);gap:10px}
-  .wf-step{background:#fff;border:1px solid var(--line);border-radius:14px;padding:18px 16px;position:relative;transition:all .15s;display:flex;flex-direction:column;gap:10px;min-height:180px}
+  .wf-step{background:#fff;border:1px solid var(--line);border-radius:14px;padding:18px 16px;position:relative;transition:all .15s;display:flex;flex-direction:column;gap:10px;min-height:160px}
   .wf-step:hover{border-color:#FBDCE1;box-shadow:0 4px 12px rgba(230,0,33,.06);transform:translateY(-2px)}
-  .wf-step .step-head{display:flex;align-items:center;gap:8px}
-  .wf-step .n{background:linear-gradient(135deg,#E60021,#B8001A);color:#fff;width:30px;height:30px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-weight:900;font-size:14px;flex:none;box-shadow:0 2px 8px rgba(230,0,33,.25)}
-  .wf-step .step-emoji{font-size:22px}
+  .wf-step .step-head{display:flex;align-items:center;gap:10px}
+  .wf-step .n{background:linear-gradient(135deg,#E60021,#B8001A);color:#fff;width:28px;height:28px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-weight:900;font-size:13px;flex:none;box-shadow:0 2px 6px rgba(230,0,33,.22)}
+  .wf-step .step-head h4{margin:0;font-size:14.5px;font-weight:800;letter-spacing:-.3px;color:var(--ink);line-height:1.3;flex:1;min-width:0}
   .wf-step h4{margin:0;font-size:14.5px;font-weight:800;letter-spacing:-.3px;color:var(--ink);line-height:1.3}
   .wf-step p{margin:0;color:var(--ink2);font-size:12px;line-height:1.6;font-weight:500;flex:1}
   .wf-step .freq{display:inline-flex;align-items:center;gap:4px;font-size:10.5px;padding:5px 10px;border-radius:6px;background:#FFF5F7;color:#B8001A;font-weight:700;letter-spacing:-.1px;align-self:flex-start;margin-top:auto}
@@ -2018,32 +2018,27 @@
     </div>
     <div class="wf-steps">
       <div class="wf-step">
-        <div class="step-head"><div class="n">1</div><span class="step-emoji">🎯</span></div>
-        <h4>연간 목표 설정</h4>
+        <div class="step-head"><div class="n">1</div><h4>연간 목표 설정</h4></div>
         <p>매출, 순매출, 이익률, 신규 브랜드 등 KPI를 분기별로 분할 입력. 팀장이 수정하고 본부장 승인 후 확정됩니다.</p>
         <span class="freq"><span class="ico">📅</span>연 1회 · 1월</span>
       </div>
       <div class="wf-step">
-        <div class="step-head"><div class="n">2</div><span class="step-emoji">📝</span></div>
-        <h4>월별 예상 입력</h4>
+        <div class="step-head"><div class="n">2</div><h4>월별 예상 입력</h4></div>
         <p>브랜드별 × 6개 카테고리(업무)별로 예상 매출/지출을 한 화면에서 일괄 기입합니다.</p>
         <span class="freq"><span class="ico">📅</span>월 1회 · 월초</span>
       </div>
       <div class="wf-step">
-        <div class="step-head"><div class="n">3</div><span class="step-emoji">🔔</span></div>
-        <h4>주간 변동사항 기록</h4>
+        <div class="step-head"><div class="n">3</div><h4>주간 변동사항 기록</h4></div>
         <p>전주 대비 변동사항을 셀별 비고로 기록하면 자동으로 알림 생성. 최근 7일 내 500만원 이상 변동 시 자동 감지.</p>
         <span class="freq"><span class="ico">📅</span>주 1회 · 매주 월</span>
       </div>
       <div class="wf-step">
-        <div class="step-head"><div class="n">4</div><span class="step-emoji">✅</span></div>
-        <h4>월말 마감 · 실적 전환</h4>
+        <div class="step-head"><div class="n">4</div><h4>월말 마감 · 실적 전환</h4></div>
         <p>예상 매출을 실적으로 전환하고, 세금계산서 발행 완료 브랜드가 마감 화면에 자동 노출됩니다.</p>
         <span class="freq"><span class="ico">📅</span>월말</span>
       </div>
       <div class="wf-step">
-        <div class="step-head"><div class="n">5</div><span class="step-emoji">📊</span></div>
-        <h4>대시보드 모니터링</h4>
+        <div class="step-head"><div class="n">5</div><h4>대시보드 모니터링</h4></div>
         <p>KPI 달성률, 매출 TOP 브랜드, 주간 변동 카드 등을 상시 점검합니다.</p>
         <span class="freq"><span class="ico">📅</span>상시</span>
       </div>
