@@ -6567,59 +6567,103 @@ document.addEventListener('click', e=>{
 /* ================ 매월 초 자동 다음달 시트 생성 ================ */
 const AUTO_GEN_KEY = 'sm_last_seen_month_v1';
 function autoGenNextMonth(){
+  // v101: 매월 4주차(day>=22) 트리거 → 2개월 후 시트 자동 생성, 가장 최근 데이터 월에서 매출/지출 복사
   try {
     const today = new Date();
     const yy = today.getFullYear()%100;
     const mm = today.getMonth()+1;
-    const curLabel = `${yy}년 ${mm}월`;
-    const lastSeen = localStorage.getItem(AUTO_GEN_KEY) || '';
-    // 이번 달은 이미 처리됨
-    if(lastSeen === curLabel){
-      return false;
-    }
-    // 다음달 라벨 계산
-    const nextMM = mm === 12 ? 1 : mm+1;
-    const nextYY = mm === 12 ? yy+1 : yy;
-    const nextLabel = `${nextYY}년 ${nextMM}월`;
+    const day = today.getDate();
+
+    // 4주차 진입 전이면 생성 안 함
+    if(day < 22) return false;
+
+    // 2개월 후 라벨 계산 (예: 5월 4주차 → 7월)
+    let targetMM = mm + 2;
+    let targetYY = yy;
+    if(targetMM > 12){ targetMM -= 12; targetYY += 1; }
+    const targetLabel = `${targetYY}년 ${targetMM}월`;
+
+    // 타겟 월 이미 생성됨 체크 (per-target-month flag)
+    const generatedKey = `${AUTO_GEN_KEY}_${targetLabel}`;
+    if(localStorage.getItem(generatedKey)) return false;
 
     let created = false;
-    if(!ALL_TEAMS_DATA.months.includes(nextLabel)){
-      ALL_TEAMS_DATA.months.push(nextLabel);
-      // 각 팀의 브랜드 × 카테고리 구조를 next month로 복사 (rev/exp = 0)
+    if(!ALL_TEAMS_DATA.months.includes(targetLabel)){
+      ALL_TEAMS_DATA.months.push(targetLabel);
+
+      // 각 팀별: 가장 최근의 실제 매출/지출 데이터가 있는 월을 찾아 복사
       Object.keys(ALL_TEAMS_DATA.teams).forEach(tid=>{
         const t = ALL_TEAMS_DATA.teams[tid];
         if(!t.brands || !t.records) return;
-        const cats = new Set();
-        // 현재 월 또는 가장 최근 월의 카테고리 추출
-        t.records.forEach(r=>{ if(r.category) cats.add(r.category); });
+
+        // 1순위: 타겟 직전 월 (전월) - 예: 7월 대상 시 6월
+        let prevMM = targetMM - 1;
+        let prevYY = targetYY;
+        if(prevMM < 1){ prevMM = 12; prevYY -= 1; }
+        const prevLabel = `${prevYY}년 ${prevMM}월`;
+
+        // 소스 월 결정: 전월 우선, 데이터 없으면 가장 최근 데이터 있는 월
+        let sourceMonth = null;
+        if(ALL_TEAMS_DATA.months.includes(prevLabel)){
+          const hasData = t.records.some(r=>r.month===prevLabel && ((r.revenue||0)>0 || (r.expense||0)>0));
+          if(hasData) sourceMonth = prevLabel;
+        }
+        if(!sourceMonth){
+          // 가장 최근 데이터 있는 월 (타겟/전월 제외)
+          for(let i = ALL_TEAMS_DATA.months.length - 1; i >= 0; i--){
+            const candidate = ALL_TEAMS_DATA.months[i];
+            if(candidate === targetLabel) continue;
+            const hasData = t.records.some(r=>r.month===candidate && ((r.revenue||0)>0 || (r.expense||0)>0));
+            if(hasData){ sourceMonth = candidate; break; }
+          }
+        }
+        // 최종 fallback: 마지막 월 (데이터 없어도)
+        if(!sourceMonth){
+          for(let i = ALL_TEAMS_DATA.months.length - 1; i >= 0; i--){
+            const candidate = ALL_TEAMS_DATA.months[i];
+            if(candidate !== targetLabel){ sourceMonth = candidate; break; }
+          }
+        }
+        if(!sourceMonth) return;
+
+        // 소스 월의 레코드를 브랜드별 × 카테고리별로 복사 (매출/지출 값 그대로)
         t.brands.forEach(b=>{
-          // 다음달 시작 시점에 이미 종료된 브랜드는 자동 카피 제외
-          const meta = (typeof BRAND_META !== 'undefined' && BRAND_META[b]) || {};
+          // 종료/계약만료 브랜드는 자동 카피 제외
+          const meta = (t.brandMeta||{})[b] || {};
           if(meta.ended) return;
           if(meta.contractEnd){
-            const m2 = (nextLabel||'').match(/(\d+)년\s*(\d+)월/);
+            const m2 = targetLabel.match(/(\d+)년\s*(\d+)월/);
             if(m2){
               const monthStart = new Date(2000+parseInt(m2[1],10), parseInt(m2[2],10)-1, 1);
               const endDate = new Date(meta.contractEnd);
               if(!isNaN(endDate.getTime()) && monthStart > endDate) return;
             }
           }
-          cats.forEach(c=>{
-            const exists = t.records.some(r=>r.brand===b && r.month===nextLabel && r.category===c);
+          // 해당 브랜드의 소스 월 레코드들을 타겟 월로 복사
+          const sourceRecords = t.records.filter(r=>r.brand===b && r.month===sourceMonth);
+          sourceRecords.forEach(sr=>{
+            const exists = t.records.some(r=>r.brand===b && r.month===targetLabel && r.category===sr.category);
             if(!exists){
-              t.records.push({brand:b, month:nextLabel, category:c, revenue:0, expense:0, note:''});
+              t.records.push({
+                brand: b,
+                month: targetLabel,
+                category: sr.category,
+                revenue: sr.revenue || 0,
+                expense: sr.expense || 0,
+                note: ''  // 비고는 복사하지 않음
+              });
             }
           });
         });
       });
       created = true;
     }
-    localStorage.setItem(AUTO_GEN_KEY, curLabel);
+
+    localStorage.setItem(generatedKey, '1');
     if(created){
       try { persistTeamsData(); } catch(e){}
-      // 토스트는 init() 이후 안전하게
       setTimeout(()=>{
-        try { showToast(`📅 ${nextLabel} 월간 운영 시트가 자동으로 생성되었습니다 (기존 브랜드 구조 복사)`, 'info'); } catch(e){}
+        try { showToast(`📅 ${targetLabel} 월간 운영 시트가 자동으로 생성되었습니다 (전월 데이터 복사)`, 'info'); } catch(e){}
       }, 1200);
     }
     return created;
