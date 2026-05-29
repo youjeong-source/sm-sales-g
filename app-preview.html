@@ -1558,10 +1558,10 @@
       <button data-tab="approve"><span class="ico"><svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M22 11.07V12a10 10 0 11-5.93-9.14"/><polyline points="22 4 12 14.01 9 11.01"/></svg></span>월 마감 확인</button>
     </div>
 
-    <h5>데이터 관리</h5>
-    <div class="nav">
-      <button onclick="event.preventDefault();exportAllData()" title="모든 데이터를 JSON 파일로 다운로드"><span class="ico"><svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg></span>데이터 백업 (다운로드)</button>
-      <button onclick="event.preventDefault();importAllData()" class="req-head" title="백업 파일에서 데이터 복원 (본부장만)"><span class="ico"><svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="17 8 12 3 7 8"/><line x1="12" y1="3" x2="12" y2="15"/></svg></span>데이터 복원 (업로드)</button>
+    <h5 class="req-head">데이터 관리</h5>
+    <div class="nav req-head">
+      <button onclick="event.preventDefault();exportAllData()" title="모든 데이터를 JSON 파일로 다운로드 (본부장만)"><span class="ico"><svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg></span>데이터 백업 (다운로드)</button>
+      <button onclick="event.preventDefault();importAllData()" title="백업 파일에서 데이터 복원 (본부장만)"><span class="ico"><svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="17 8 12 3 7 8"/><line x1="12" y1="3" x2="12" y2="15"/></svg></span>데이터 복원 (업로드)</button>
     </div>
 
     <h5>Documentation</h5>
@@ -1892,7 +1892,7 @@
           </select>
           <input id="ops-search" placeholder="브랜드 검색…" style="width:180px" />
           <button class="btn req-senior" onclick="openBrandAdd()">＋ 브랜드 추가</button>
-          <label class="btn req-senior" style="cursor:pointer">엑셀 업로드<input type="file" accept=".xlsx,.xls,.csv" onchange="uploadOpsExcel(event)" style="display:none" /></label>
+          <button class="btn" onclick="downloadOpsExcel()">엑셀 다운로드</button>
         </div>
       </div>
       <div class="brand-cards" id="brand-cards"></div>
@@ -2073,7 +2073,7 @@
             <div class="fb-bullet"></div>
             <div class="fb-text">
               <div class="fb-name">월간 매출 현황</div>
-              <div class="fb-desc">브랜드 카드별 6개 카테고리 라인 입력 + 엑셀 업로드. 종료 브랜드도 누적 노출</div>
+              <div class="fb-desc">브랜드 카드별 6개 카테고리 라인 입력 + 엑셀 다운로드. 종료 브랜드도 누적 노출</div>
             </div>
           </div>
           <div class="fb-item">
@@ -4886,6 +4886,79 @@ async function deleteBrand(name){
   // v60: 모든 페이지 강제 갱신
   refreshAfterBrandChange();
 }
+/* ===== v102: 월간 운영 엑셀 다운로드 ===== */
+function downloadOpsExcel(){
+  try {
+    if(typeof XLSX === 'undefined'){
+      showToast('엑셀 라이브러리가 로드되지 않았습니다', 'error');
+      return;
+    }
+    const m = document.getElementById('ops-month').value;
+    if(!m){ showToast('월을 선택해주세요', 'warn'); return; }
+    const scope = brandsInScope();
+    if(!scope || scope.length === 0){
+      showToast('다운로드할 브랜드가 없습니다', 'warn');
+      return;
+    }
+    const rows = [];
+    rows.push(['광고주', '브랜드', '카테고리', '매출', '지출', '순매출', '이익률', '비고']);
+    let grandRev=0, grandExp=0;
+    scope.forEach(b => {
+      const adv = (typeof ADV_MAP !== 'undefined' && ADV_MAP[b]) ? ADV_MAP[b] : '-';
+      let bRev=0, bExp=0;
+      let hasAny = false;
+      CATS.forEach(c => {
+        const x = brandCategoryMonth(b, m, c);
+        if((x.rev||0) || (x.exp||0) || (x.note||'')){
+          hasAny = true;
+          bRev += x.rev||0;
+          bExp += x.exp||0;
+          const net = (x.rev||0) - (x.exp||0);
+          const margin = x.rev ? (net/x.rev*100) : 0;
+          rows.push([adv, b, c, x.rev||0, x.exp||0, net, x.rev?Number(margin.toFixed(1))/100:0, x.note||'']);
+        }
+      });
+      if(hasAny){
+        const bNet = bRev - bExp;
+        const bMar = bRev ? Number((bNet/bRev*100).toFixed(1))/100 : 0;
+        rows.push([adv, b, '브랜드 합계', bRev, bExp, bNet, bMar, '']);
+        grandRev += bRev;
+        grandExp += bExp;
+      }
+    });
+    const gNet = grandRev - grandExp;
+    const gMar = grandRev ? Number((gNet/grandRev*100).toFixed(1))/100 : 0;
+    rows.push([]);
+    rows.push(['전체 합계', '', '', grandRev, grandExp, gNet, gMar, '']);
+
+    const ws = XLSX.utils.aoa_to_sheet(rows);
+    // 컬럼 폭
+    ws['!cols'] = [{wch:16},{wch:20},{wch:18},{wch:14},{wch:14},{wch:14},{wch:10},{wch:30}];
+    // 이익률 컬럼(G)을 퍼센트 포맷
+    Object.keys(ws).forEach(addr=>{
+      if(addr[0] === '!') return;
+      if(addr.startsWith('G') && /^G\d+$/.test(addr)){
+        const cell = ws[addr];
+        if(cell && typeof cell.v === 'number'){
+          cell.t = 'n'; cell.z = '0.0%';
+        }
+      }
+    });
+    const wb = XLSX.utils.book_new();
+    const sheetName = m.length > 28 ? m.slice(0,28) : m;
+    XLSX.utils.book_append_sheet(wb, ws, sheetName);
+    const teamLabel = STATE.team || 'team';
+    const safeMo = m.replace(/\s+/g,'_');
+    const filename = `매출현황_${teamLabel}_${safeMo}.xlsx`;
+    XLSX.writeFile(wb, filename);
+    showToast(`✓ ${filename} 다운로드 완료`, 'success');
+  } catch(e){
+    console.warn('downloadOpsExcel 실패', e);
+    showToast('엑셀 다운로드 실패: ' + (e.message||''), 'error');
+  }
+}
+window.downloadOpsExcel = downloadOpsExcel;
+
 /* ===== 월간 운영 엑셀 업로드 ===== */
 function uploadOpsExcel(event){
   const file = event.target.files[0];
