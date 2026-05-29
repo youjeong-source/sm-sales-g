@@ -5731,23 +5731,118 @@ function buildSnapshot(){
   return snapshot;
 }
 
+// v113: 두 스냅샷 머지 - 양쪽 데이터 보존 (Union 전략)
+function mergeSnapshots(local, remote){
+  if(!local) return remote;
+  if(!remote) return local;
+  // remote를 베이스로 시작 → local 데이터를 추가/병합
+  const merged = JSON.parse(JSON.stringify(remote));
+  // months: union
+  const mAll = new Set([...(remote.months||[]), ...(local.months||[])]);
+  merged.months = Array.from(mAll);
+  // teams 병합
+  Object.keys(local.teams||{}).forEach(tid=>{
+    const lt = local.teams[tid];
+    if(!merged.teams[tid]){
+      merged.teams[tid] = JSON.parse(JSON.stringify(lt));
+      return;
+    }
+    const rt = merged.teams[tid];
+    // brands: union (양쪽 모두 보존)
+    const allBrands = new Set([...(rt.brands||[]), ...(lt.brands||[])]);
+    rt.brands = Array.from(allBrands);
+    // records: per (brand, month, category) 머지
+    const recMap = {};
+    (rt.records||[]).forEach(r=>{
+      const k = `${r.brand}|${r.month}|${r.category||''}`;
+      recMap[k] = r;
+    });
+    (lt.records||[]).forEach(r=>{
+      const k = `${r.brand}|${r.month}|${r.category||''}`;
+      const exist = recMap[k];
+      if(!exist){
+        recMap[k] = r;
+      } else {
+        // 둘 다 있을 때: 매출+지출 합이 더 큰 쪽 우선 (실제 데이터 입력된 쪽)
+        const ev = (exist.revenue||0) + (exist.expense||0);
+        const lv = (r.revenue||0) + (r.expense||0);
+        if(lv > ev){ recMap[k] = r; }
+        // 비고가 비어있지 않은 쪽 우선
+        else if(lv === ev && !exist.note && r.note){ recMap[k] = r; }
+      }
+    });
+    rt.records = Object.values(recMap);
+    // notes: union
+    rt.notes = [...(rt.notes||[]), ...(lt.notes||[]).filter(ln=>!(rt.notes||[]).some(rn=>rn.brand===ln.brand&&rn.month===ln.month))];
+    // advertiserMap: local 우선 (사용자가 명시적 변경한 매핑)
+    rt.advertiserMap = Object.assign({}, rt.advertiserMap||{}, lt.advertiserMap||{});
+    // owners: local 우선
+    rt.owners = Object.assign({}, rt.owners||{}, lt.owners||{});
+    // advertiserOrder: union 유지
+    const advAll = new Set([...(rt.advertiserOrder||[]), ...(lt.advertiserOrder||[])]);
+    rt.advertiserOrder = Array.from(advAll);
+    // goals: local 우선 (사용자가 직접 설정한 값)
+    rt.goals = Object.assign({}, rt.goals||{}, lt.goals||{});
+    // roster: 더 긴 쪽 (정보 보존)
+    if((lt.roster||[]).length > (rt.roster||[]).length){ rt.roster = lt.roster; }
+    // brandMeta/taxInvoice/monthlyHidden: local과 remote 병합 (local 우선)
+    rt.brandMeta = Object.assign({}, rt.brandMeta||{}, lt.brandMeta||{});
+    rt.taxInvoice = Object.assign({}, rt.taxInvoice||{}, lt.taxInvoice||{});
+    rt.monthlyHidden = Object.assign({}, rt.monthlyHidden||{}, lt.monthlyHidden||{});
+  });
+  // hq_goals: max값
+  if(local.hq_goals){
+    merged.hq_goals = merged.hq_goals || {};
+    Object.keys(local.hq_goals).forEach(k=>{
+      if(!merged.hq_goals[k] || (local.hq_goals[k] > merged.hq_goals[k])) merged.hq_goals[k] = local.hq_goals[k];
+    });
+  }
+  // groupIssues: 시간 기준 dedupe + union
+  if(local.groupIssues){
+    merged.groupIssues = merged.groupIssues || {g1:[], g2:[]};
+    ['g1','g2'].forEach(gid=>{
+      const all = [...(merged.groupIssues[gid]||[]), ...(local.groupIssues[gid]||[])];
+      const seen = new Set();
+      merged.groupIssues[gid] = all.filter(iss=>{
+        if(!iss || !iss.id) return false;
+        if(seen.has(iss.id)) return false;
+        seen.add(iss.id); return true;
+      });
+    });
+  }
+  // hqInsightOverrides, qualGrowth: merge
+  merged.hqInsightOverrides = Object.assign({}, merged.hqInsightOverrides||{}, local.hqInsightOverrides||{});
+  merged.qualGrowth = Object.assign({}, merged.qualGrowth||{}, local.qualGrowth||{});
+  merged.taxInvoice = Object.assign({}, merged.taxInvoice||{}, local.taxInvoice||{});
+  merged.brandMeta = Object.assign({}, merged.brandMeta||{}, local.brandMeta||{});
+  merged.approvalStatus = Object.assign({}, merged.approvalStatus||{}, local.approvalStatus||{});
+  // renewed: union
+  const renewedAll = new Set([...(merged.renewed||[]), ...(local.renewed||[])]);
+  merged.renewed = Array.from(renewedAll);
+  // updatedAt: max
+  merged.updatedAt = Math.max(merged.updatedAt||0, local.updatedAt||0);
+  return merged;
+}
+
 async function applyRemoteSnapshot(remote, opts){
-  // v111: 항상 클라우드 우선 적용 (편집 중일 때만 스킵)
+  // v113: 머지 전략 - 양쪽 데이터 모두 보존 (Union)
   opts = opts || {};
   if(!remote || !remote.teams) return false;
   // 편집 중이면 덮어쓰기 방지 (사용자 입력 보호)
   if(!opts.force && STATE.edit && STATE.edit.brand){
     return false;
   }
-  // 로컬과 동일한 데이터면 적용 안 함 (불필요한 렌더)
+  // 로컬 스냅샷 로드
   const localStr = localStorage.getItem(DATA_KEY);
-  let localUpdatedAt = 0;
-  try { if(localStr){ const parsed = JSON.parse(localStr); localUpdatedAt = parsed.updatedAt || 0; } } catch(e){}
-  const remoteUpdatedAt = remote.updatedAt || 0;
-  // 클라우드가 로컬과 같거나 같은 시간이면 스킵 (중복 처리 방지)
-  if(remoteUpdatedAt === localUpdatedAt) return false;
-  // 클라우드 데이터를 로컬에 적용 (타임스탬프 비교 없이 - 항상 클라우드 우선)
-  localStorage.setItem(DATA_KEY, JSON.stringify(remote));
+  let local = null;
+  try { if(localStr){ local = JSON.parse(localStr); } } catch(e){}
+  // 머지
+  const merged = mergeSnapshots(local, remote);
+  // 변경 없으면 스킵
+  const mergedStr = JSON.stringify(merged);
+  if(localStr && mergedStr === localStr) return false;
+  // 적용
+  localStorage.setItem(DATA_KEY, mergedStr);
   try {
     restoreTeamsData();
     if(typeof STATE !== 'undefined' && STATE.team){
@@ -5755,6 +5850,8 @@ async function applyRemoteSnapshot(remote, opts){
       if(typeof refreshAll === 'function') refreshAll();
     }
   } catch(e){ console.warn('applyRemoteSnapshot 실패', e); }
+  // 머지된 결과를 클라우드에 푸시 (다른 사용자도 동일 데이터 보게)
+  try { if(typeof cloudPush === 'function') cloudPush(merged); } catch(e){}
   showSyncStatus('synced');
   return true;
 }
