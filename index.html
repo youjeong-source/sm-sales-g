@@ -5710,16 +5710,22 @@ function buildSnapshot(){
   return snapshot;
 }
 
-async function applyRemoteSnapshot(remote){
+async function applyRemoteSnapshot(remote, opts){
+  // v111: 항상 클라우드 우선 적용 (편집 중일 때만 스킵)
+  opts = opts || {};
   if(!remote || !remote.teams) return false;
-  // localStorage 데이터와 비교: 클라우드가 더 최신이면 적용
+  // 편집 중이면 덮어쓰기 방지 (사용자 입력 보호)
+  if(!opts.force && STATE.edit && STATE.edit.brand){
+    return false;
+  }
+  // 로컬과 동일한 데이터면 적용 안 함 (불필요한 렌더)
   const localStr = localStorage.getItem(DATA_KEY);
   let localUpdatedAt = 0;
   try { if(localStr){ const parsed = JSON.parse(localStr); localUpdatedAt = parsed.updatedAt || 0; } } catch(e){}
   const remoteUpdatedAt = remote.updatedAt || 0;
-  if(remoteUpdatedAt <= localUpdatedAt) return false;  // 로컬이 더 최신
-
-  // 클라우드 데이터를 로컬 형태로 저장 → restoreTeamsData 호출
+  // 클라우드가 로컬과 같거나 같은 시간이면 스킵 (중복 처리 방지)
+  if(remoteUpdatedAt === localUpdatedAt) return false;
+  // 클라우드 데이터를 로컬에 적용 (타임스탬프 비교 없이 - 항상 클라우드 우선)
   localStorage.setItem(DATA_KEY, JSON.stringify(remote));
   try {
     restoreTeamsData();
@@ -5762,9 +5768,8 @@ async function initialCloudSync(){
 }
 
 async function periodicCloudPull(){
-  // 편집 중에는 풀 안 함 (사용자 입력 덮어쓰기 방지)
   try {
-    if(STATE.edit && STATE.edit.brand) return;  // 편집 중
+    if(STATE.edit && STATE.edit.brand) return;
     const remote = await cloudFetch();
     if(remote){
       const applied = await applyRemoteSnapshot(remote);
@@ -5818,12 +5823,23 @@ function showSyncStatus(state){
   // 절대 자동 페이드아웃 안 함 (사용자가 항상 상태 보이게)
 }
 
-// 30초마다 클라우드 풀
-setInterval(periodicCloudPull, 30 * 1000);
+// v111: 10초마다 클라우드 풀 (빠른 동기화)
+setInterval(periodicCloudPull, 10 * 1000);
+
+// v111: 탭 포커스/가시성 변경 시 즉시 동기화 (다른 작업 후 돌아왔을 때 최신 데이터 보장)
+document.addEventListener('visibilitychange', ()=>{
+  if(document.visibilityState === 'visible' && typeof periodicCloudPull === 'function'){
+    periodicCloudPull();
+  }
+});
+window.addEventListener('focus', ()=>{
+  if(typeof periodicCloudPull === 'function') periodicCloudPull();
+});
 
 window.cloudFetch = cloudFetch;
 window.cloudPush = cloudPush;
 window.initialCloudSync = initialCloudSync;
+window.periodicCloudPull = periodicCloudPull;
 
 async function logout(){
   const ok = await confirmUI('로그아웃 하시겠습니까?\n현재 세션이 종료되고 로그인 화면으로 이동합니다.', '로그아웃');
