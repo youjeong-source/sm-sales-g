@@ -882,12 +882,12 @@
   .v85-grp-info b{color:var(--ink);font-weight:800}
   /* 월별 펼치기 (collapsible) */
   .v85-mx-tbl{width:100%;border-collapse:collapse;font-size:13px;border:1px solid var(--line);border-radius:6px;overflow:hidden}
-  .v85-mx-tbl thead th{background:#F8FAFC;color:var(--ink3);font-size:11.5px;font-weight:700;letter-spacing:-.2px;padding:11px 12px;text-align:center;border-bottom:1px solid var(--line2);text-transform:none}
+  .v85-mx-tbl thead th{background:#F8FAFC;color:var(--ink);font-size:11.5px;font-weight:600;letter-spacing:-.2px;padding:11px 12px;text-align:center;border-bottom:1px solid var(--line2);text-transform:none}
   .v85-mx-tbl thead th:first-child{text-align:left;padding-left:18px}
   .v85-mx-tbl thead th.r{text-align:right}
-  .v85-mx-tbl tbody td{padding:12px 12px;border-bottom:1px solid var(--line2);font-variant-numeric:tabular-nums;font-weight:700;font-size:13px;color:var(--ink2);background:#fff;text-align:center}
+  .v85-mx-tbl tbody td{padding:12px 12px;border-bottom:1px solid var(--line2);font-variant-numeric:tabular-nums;font-weight:500;font-size:13px;color:var(--ink);background:#fff;text-align:center}
   .v85-mx-tbl tbody td.r{text-align:center;font-weight:700}
-  .v85-mx-tbl tbody td.muted{color:var(--ink3);font-weight:700}
+  .v85-mx-tbl tbody td.muted{color:var(--ink);font-weight:500}
   .v85-mx-tbl tbody td.pct.good{color:#16A34A}
   .v85-mx-tbl tbody td.pct.warn{color:#D97706}
   .v85-mx-tbl tbody tr:last-child td{border-bottom:none}
@@ -895,10 +895,9 @@
   .v85-mx-tbl .mo-row{transition:background .12s;cursor:pointer}
   .v85-mx-tbl .mo-row td{padding:13px 12px;font-weight:800;font-size:13px;background:#F8FAFC;color:var(--ink)}
   .v85-mx-tbl .mo-row:hover td{background:#EEF4F8}
-  .v85-mx-tbl .mo-row.cur td{background:#FFFAFB}
-  .v85-mx-tbl .mo-row.cur td:first-child{color:#E60021;font-weight:900}
-  .v85-mx-tbl .mo-row.cur td.r{font-weight:800}
-  .v85-mx-tbl .team-row.cur td{background:#FFFAFB}
+  /* v104: cur 컬러 제거 - 모두 검정 + 화이트 배경 */
+  .v85-mx-tbl .mo-row.cur td{background:#F8FAFC}
+  .v85-mx-tbl .team-row.cur td{background:#fff}
   .v85-mx-tbl .mo-row.cur:hover td{background:#FFEFF3}
   .v85-mx-tbl .mo-row.next td{color:var(--ink3)}
   .v85-mx-tbl .team-row.next td{color:var(--ink3)}
@@ -913,9 +912,9 @@
   /* 팀별 세부 row - 기본 hidden */
   .v85-mx-tbl .team-row{display:none}
   .v85-mx-tbl .team-row.show{display:table-row}
-  .v85-mx-tbl .team-row td{font-size:12.5px;background:#fff;color:var(--ink2);font-weight:500}
-  .v85-mx-tbl .team-row td.pct{color:var(--ink2) !important;font-weight:500 !important}
-  .v85-mx-tbl .team-row td.tname{padding-left:40px;color:var(--ink2);font-weight:500;text-align:left;font-size:12.5px}
+  .v85-mx-tbl .team-row td{font-size:12.5px;background:#fff;color:var(--ink);font-weight:500}
+  .v85-mx-tbl .team-row td.pct{color:var(--ink) !important;font-weight:500 !important}
+  .v85-mx-tbl .team-row td.tname{padding-left:40px;color:var(--ink);font-weight:500;text-align:left;font-size:12.5px}
   .v85-mx-tbl .team-row.cur td{background:#FFFAFB}
   /* 합계는 펼쳐졌을 때만 보이거나, 항상 보일 수 있음 - 합계는 mo-row 그 자체임 */
 
@@ -6309,12 +6308,12 @@ function renderGroupCard(gid){
     const totPct = totalGoal ? (totalRev/totalGoal*100) : 0;
     const totCls = !totalRev?'':totPct>=100?'good':totPct>=70?'':'warn';
     return `
-      <tr class="mo-row ${type}" data-toggle-month="${mo}"><td><span class="mo-name"><span class="caret">▶</span>${mo} <span class="pill">${pillTxt}</span></span></td><td class="r muted">${totalGoal?fmtFull(totalGoal):'-'}</td><td class="r">${totalRev?fmtFull(totalRev):'-'}</td><td class="r pct ${totCls}">${totalRev?totPct.toFixed(0)+'%':'-'}</td></tr>
+      <tr class="mo-row ${type}" data-toggle-month="${mo}"><td><span class="mo-name"><span class="caret">▶</span>${mo}</span></td><td class="r muted">${totalGoal?fmtFull(totalGoal):'-'}</td><td class="r">${totalRev?fmtFull(totalRev):'-'}</td><td class="r pct ${totCls}">${totalRev?totPct.toFixed(0)+'%':'-'}</td></tr>
       ${teamRows}
     `;
   }).join('');
   const grpMatrixHtml = `<table class="v85-mx-tbl">
-    <thead><tr><th style="width:32%">월 / 팀</th><th class="r">목표 매출</th><th class="r">달성 매출</th><th class="r">달성률</th></tr></thead>
+    <thead><tr><th style="width:28%">월 / 팀</th><th class="r" style="width:24%">목표 매출</th><th class="r" style="width:24%">달성 매출</th><th class="r" style="width:24%">달성률</th></tr></thead>
     <tbody>${mxBlocks}</tbody>
   </table>`;
 
