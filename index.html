@@ -5417,6 +5417,12 @@ function persistTeamsData(silent){
     });
     localStorage.setItem(DATA_KEY, JSON.stringify(snapshot));
     if(!silent) showSaveIndicator('saved');
+    // v108: 클라우드 동기화 (비동기, 에러 무시)
+    try {
+      if(typeof cloudPush === 'function' && CLOUD_AVAILABLE){
+        cloudPush(snapshot).then(ok=>{ if(ok && typeof showSyncStatus==='function') showSyncStatus('synced'); });
+      }
+    } catch(e){}
   } catch(e){
     console.warn('데이터 저장 실패', e);
     // 저장 실패는 무조건 알림 (사일런트라도)
@@ -5626,6 +5632,157 @@ async function importAllData(){
 }
 window.exportAllData = exportAllData;
 window.importAllData = importAllData;
+
+/* ============ v108: Vercel KV 클라우드 동기화 ============ */
+// 다중 사용자 실시간 데이터 동기화 - localStorage + 클라우드 병행
+const CLOUD_API = '/api/data';
+let CLOUD_LAST_SYNC = 0;
+let CLOUD_AVAILABLE = true;  // KV 미설정 시 false → 로컬만 사용
+let CLOUD_SYNC_INFLIGHT = false;
+
+async function cloudFetch(){
+  try {
+    const r = await fetch(CLOUD_API, {method:'GET', cache:'no-store'});
+    if(r.status === 503){
+      CLOUD_AVAILABLE = false;
+      return null;
+    }
+    if(!r.ok) return null;
+    const j = await r.json();
+    return j.data || null;
+  } catch(e){
+    return null;
+  }
+}
+
+async function cloudPush(snapshot){
+  if(!CLOUD_AVAILABLE) return false;
+  if(CLOUD_SYNC_INFLIGHT) return false;
+  CLOUD_SYNC_INFLIGHT = true;
+  try {
+    const r = await fetch(CLOUD_API, {
+      method: 'POST',
+      headers: {'Content-Type': 'application/json'},
+      body: JSON.stringify({data: snapshot})
+    });
+    if(r.status === 503){ CLOUD_AVAILABLE = false; return false; }
+    return r.ok;
+  } catch(e){
+    return false;
+  } finally {
+    CLOUD_SYNC_INFLIGHT = false;
+    CLOUD_LAST_SYNC = Date.now();
+  }
+}
+
+function buildSnapshot(){
+  if(typeof ALL_TEAMS_DATA === 'undefined' || !ALL_TEAMS_DATA.teams) return null;
+  const snapshot = {
+    teams: {},
+    months: ALL_TEAMS_DATA.months,
+    monthlyHidden: (typeof MONTHLY_HIDDEN !== 'undefined') ? MONTHLY_HIDDEN : {},
+    groupIssues: STATE.groupIssues || {g1:[], g2:[]},
+    hq_goals: ALL_TEAMS_DATA.hq_goals,
+    hqInsightOverrides: STATE.hqInsightOverrides || {},
+    qualGrowth: STATE.qualGrowth || {},
+    taxInvoice: (typeof TAX_INVOICE !== 'undefined') ? TAX_INVOICE : {},
+    brandMeta: (typeof BRAND_META !== 'undefined') ? BRAND_META : {},
+    approvalStatus: (typeof APPROVAL_STATUS !== 'undefined') ? APPROVAL_STATUS : {},
+    renewed: Array.from(STATE.renewedSet || []),
+    updatedAt: Date.now()
+  };
+  Object.keys(ALL_TEAMS_DATA.teams).forEach(tid=>{
+    const t = ALL_TEAMS_DATA.teams[tid];
+    snapshot.teams[tid] = {
+      brands: t.brands,
+      records: t.records,
+      notes: t.notes,
+      advertiserMap: t.advertiserMap,
+      owners: t.owners,
+      advertiserOrder: t.advertiserOrder,
+      goals: t.goals,
+      roster: t.roster,
+      brandMeta: t.brandMeta || {},
+      taxInvoice: t.taxInvoice || {},
+      monthlyHidden: t.monthlyHidden || {}
+    };
+  });
+  return snapshot;
+}
+
+async function applyRemoteSnapshot(remote){
+  if(!remote || !remote.teams) return false;
+  // localStorage 데이터와 비교: 클라우드가 더 최신이면 적용
+  const localStr = localStorage.getItem(DATA_KEY);
+  let localUpdatedAt = 0;
+  try { if(localStr){ const parsed = JSON.parse(localStr); localUpdatedAt = parsed.updatedAt || 0; } } catch(e){}
+  const remoteUpdatedAt = remote.updatedAt || 0;
+  if(remoteUpdatedAt <= localUpdatedAt) return false;  // 로컬이 더 최신
+
+  // 클라우드 데이터를 로컬 형태로 저장 → restoreTeamsData 호출
+  localStorage.setItem(DATA_KEY, JSON.stringify(remote));
+  try {
+    restoreTeamsData();
+    if(typeof STATE !== 'undefined' && STATE.team){
+      applyTeamData(STATE.team);
+      if(typeof refreshAll === 'function') refreshAll();
+    }
+  } catch(e){ console.warn('applyRemoteSnapshot 실패', e); }
+  showSyncStatus('synced');
+  return true;
+}
+
+async function initialCloudSync(){
+  try {
+    const remote = await cloudFetch();
+    if(remote){
+      const applied = await applyRemoteSnapshot(remote);
+      if(applied){
+        try { showToast('☁️ 최신 데이터를 클라우드에서 동기화했습니다', 'success'); } catch(e){}
+      }
+    }
+  } catch(e){}
+}
+
+async function periodicCloudPull(){
+  // 편집 중에는 풀 안 함 (사용자 입력 덮어쓰기 방지)
+  try {
+    if(STATE.edit && STATE.edit.brand) return;  // 편집 중
+    const remote = await cloudFetch();
+    if(remote){
+      const applied = await applyRemoteSnapshot(remote);
+      if(applied){
+        try { showToast('☁️ 다른 사용자의 변경사항을 동기화했습니다', 'info'); } catch(e){}
+      }
+    }
+  } catch(e){}
+}
+
+// 동기화 상태 표시 (헤더 우측)
+function showSyncStatus(state){
+  let el = document.getElementById('cloud-sync-status');
+  if(!el){
+    el = document.createElement('div');
+    el.id = 'cloud-sync-status';
+    el.style.cssText = 'position:fixed;bottom:20px;right:20px;background:#fff;border:1px solid var(--line);border-radius:8px;padding:8px 14px;font-size:11.5px;font-weight:600;color:var(--ink2);box-shadow:0 4px 12px rgba(0,0,0,.08);z-index:1000;display:flex;align-items:center;gap:8px;transition:opacity .3s';
+    document.body.appendChild(el);
+  }
+  const icons = {synced:'☁️', syncing:'⟳', error:'⚠️', offline:'💾'};
+  const texts = {synced:'동기화됨', syncing:'동기화 중...', error:'동기화 실패', offline:'로컬 저장 (KV 미설정)'};
+  el.innerHTML = `<span style="font-size:14px">${icons[state]||'☁️'}</span><span>${texts[state]||''}</span>`;
+  if(state === 'synced'){
+    setTimeout(()=>{ if(el) el.style.opacity = '0.5'; }, 2000);
+  } else {
+    el.style.opacity = '1';
+  }
+}
+
+// 30초마다 클라우드 풀
+setInterval(periodicCloudPull, 30 * 1000);
+
+window.cloudFetch = cloudFetch;
+window.cloudPush = cloudPush;
+window.initialCloudSync = initialCloudSync;
 
 async function logout(){
   const ok = await confirmUI('로그아웃 하시겠습니까?\n현재 세션이 종료되고 로그인 화면으로 이동합니다.', '로그아웃');
@@ -6793,6 +6950,8 @@ function autoGenNextMonth(){
 (function init(){
   // 저장된 팀 데이터 복원 (다른 탭의 변경사항 포함)
   restoreTeamsData();
+  // v108: 클라우드에서 최신 데이터 fetch + 더 최신이면 적용
+  setTimeout(()=>{ try { if(typeof initialCloudSync === 'function') initialCloudSync(); } catch(e){} }, 800);
   // v58: brandMeta/taxInvoice 팀별 마이그레이션 (기존 데이터에 없으면 시드에서 복사)
   try { migrateMetaToTeams(); } catch(e){ console.warn('migrateMetaToTeams 실패', e); }
   // 매월 초 자동 다음달 시트 생성
