@@ -4869,7 +4869,6 @@ async function deleteBrand(name){
   DATA.brands = DATA.brands.filter(b=>b!==name);
   DATA.records = DATA.records.filter(r=>r.brand!==name);
   DATA.notes   = DATA.notes.filter(n=>n.brand!==name);
-  // v58: 팀 한정 삭제 - DATA.advertiserMap/owners/brandMeta/taxInvoice 모두 현재 팀 객체 (또는 그 복사본)
   delete DATA.advertiserMap[name];
   delete DATA.owners[name];
   if(DATA.brandMeta) delete DATA.brandMeta[name];
@@ -4884,10 +4883,12 @@ async function deleteBrand(name){
     t.advertiserOrder = (DATA.advertiserOrder||[]).slice();
     t.brandMeta = DATA.brandMeta;
     t.taxInvoice = DATA.taxInvoice;
+    // v114: 삭제 tombstone 추가 - 머지 시 다른 사용자가 부활시키지 못하도록
+    t.deletedBrands = t.deletedBrands || [];
+    if(!t.deletedBrands.includes(name)) t.deletedBrands.push(name);
   }
   persistTeamsData();
   rebuildREC();
-  // v60: 모든 페이지 강제 갱신
   refreshAfterBrandChange();
 }
 /* ===== v102: 월간 운영 엑셀 다운로드 ===== */
@@ -5412,7 +5413,8 @@ function persistTeamsData(silent){
         roster: t.roster,
         brandMeta: t.brandMeta || {},
         taxInvoice: t.taxInvoice || {},
-        monthlyHidden: t.monthlyHidden || {}  // v67: 팀별 분리
+        monthlyHidden: t.monthlyHidden || {},
+        deletedBrands: t.deletedBrands || []  // v114: 삭제 tombstone
       };
     });
     localStorage.setItem(DATA_KEY, JSON.stringify(snapshot));
@@ -5517,6 +5519,8 @@ function restoreTeamsData(){
         if(stored.brandMeta) cur.brandMeta = Object.assign({}, stored.brandMeta);
         if(stored.taxInvoice) cur.taxInvoice = Object.assign({}, stored.taxInvoice);
         if(stored.monthlyHidden) cur.monthlyHidden = Object.assign({}, stored.monthlyHidden);
+        // v114: 삭제 tombstone 복원
+        if(Array.isArray(stored.deletedBrands)){ cur.deletedBrands = stored.deletedBrands.slice(); }
       }
     });
     // 저장된 월 목록 복원 (기존 + 신규 자동 생성 월)
@@ -5725,83 +5729,151 @@ function buildSnapshot(){
       roster: t.roster,
       brandMeta: t.brandMeta || {},
       taxInvoice: t.taxInvoice || {},
-      monthlyHidden: t.monthlyHidden || {}
+      monthlyHidden: t.monthlyHidden || {},
+      deletedBrands: t.deletedBrands || []  // v114
     };
   });
   return snapshot;
 }
 
-// v113: 두 스냅샷 머지 - 양쪽 데이터 보존 (Union 전략)
+// v114: 스냅샷 머지 - 타임스탬프 기반 "최신 우선" + 삭제 보존
+// 핵심: 더 최신 스냅샷이 base. 다른 쪽에만 있는 항목만 보존하여 추가.
+// "0으로 수정"도 정상 반영됨 (최신이 base이므로 그 값이 그대로 유지)
 function mergeSnapshots(local, remote){
-  if(!local) return remote;
-  if(!remote) return local;
-  // remote를 베이스로 시작 → local 데이터를 추가/병합
-  const merged = JSON.parse(JSON.stringify(remote));
-  // months: union
-  const mAll = new Set([...(remote.months||[]), ...(local.months||[])]);
-  merged.months = Array.from(mAll);
+  if(!local) return remote ? JSON.parse(JSON.stringify(remote)) : null;
+  if(!remote) return JSON.parse(JSON.stringify(local));
+  const localTime = local.updatedAt || 0;
+  const remoteTime = remote.updatedAt || 0;
+  // 최신 스냅샷을 base로 사용 (그 안의 값들이 최종 결과)
+  const base = remoteTime >= localTime ? remote : local;
+  const other = remoteTime >= localTime ? local : remote;
+  const merged = JSON.parse(JSON.stringify(base));
+  // months: union (base + other에만 있는 월 추가)
+  const baseMonths = new Set(base.months || []);
+  (other.months || []).forEach(m=>{
+    if(!baseMonths.has(m)) merged.months.push(m);
+  });
   // teams 병합
-  Object.keys(local.teams||{}).forEach(tid=>{
-    const lt = local.teams[tid];
+  Object.keys(other.teams || {}).forEach(tid=>{
+    const ot = other.teams[tid];
     if(!merged.teams[tid]){
-      merged.teams[tid] = JSON.parse(JSON.stringify(lt));
+      // base에 없는 팀이면 통째로 추가
+      merged.teams[tid] = JSON.parse(JSON.stringify(ot));
       return;
     }
-    const rt = merged.teams[tid];
-    // brands: union (양쪽 모두 보존)
-    const allBrands = new Set([...(rt.brands||[]), ...(lt.brands||[])]);
-    rt.brands = Array.from(allBrands);
-    // records: per (brand, month, category) 머지
-    const recMap = {};
-    (rt.records||[]).forEach(r=>{
-      const k = `${r.brand}|${r.month}|${r.category||''}`;
-      recMap[k] = r;
-    });
-    (lt.records||[]).forEach(r=>{
-      const k = `${r.brand}|${r.month}|${r.category||''}`;
-      const exist = recMap[k];
-      if(!exist){
-        recMap[k] = r;
-      } else {
-        // 둘 다 있을 때: 매출+지출 합이 더 큰 쪽 우선 (실제 데이터 입력된 쪽)
-        const ev = (exist.revenue||0) + (exist.expense||0);
-        const lv = (r.revenue||0) + (r.expense||0);
-        if(lv > ev){ recMap[k] = r; }
-        // 비고가 비어있지 않은 쪽 우선
-        else if(lv === ev && !exist.note && r.note){ recMap[k] = r; }
+    const mt = merged.teams[tid];
+    // 삭제 tombstone: 두 쪽 모두 union
+    const otherDeleted = new Set(ot.deletedBrands || []);
+    const baseDeleted = new Set(mt.deletedBrands || []);
+    const allDeleted = new Set([...otherDeleted, ...baseDeleted]);
+    mt.deletedBrands = Array.from(allDeleted);
+    // brands: base 기본 + other에만 있는 브랜드 추가 (단, deleted tombstone에 있으면 제외)
+    const baseBrands = new Set(mt.brands || []);
+    (ot.brands || []).forEach(b=>{
+      if(!baseBrands.has(b) && !allDeleted.has(b)){
+        mt.brands.push(b);
+        baseBrands.add(b);
       }
     });
-    rt.records = Object.values(recMap);
-    // notes: union
-    rt.notes = [...(rt.notes||[]), ...(lt.notes||[]).filter(ln=>!(rt.notes||[]).some(rn=>rn.brand===ln.brand&&rn.month===ln.month))];
-    // advertiserMap: local 우선 (사용자가 명시적 변경한 매핑)
-    rt.advertiserMap = Object.assign({}, rt.advertiserMap||{}, lt.advertiserMap||{});
-    // owners: local 우선
-    rt.owners = Object.assign({}, rt.owners||{}, lt.owners||{});
-    // advertiserOrder: union 유지
-    const advAll = new Set([...(rt.advertiserOrder||[]), ...(lt.advertiserOrder||[])]);
-    rt.advertiserOrder = Array.from(advAll);
-    // goals: local 우선 (사용자가 직접 설정한 값)
-    rt.goals = Object.assign({}, rt.goals||{}, lt.goals||{});
-    // roster: 더 긴 쪽 (정보 보존)
-    if((lt.roster||[]).length > (rt.roster||[]).length){ rt.roster = lt.roster; }
-    // brandMeta/taxInvoice/monthlyHidden: local과 remote 병합 (local 우선)
-    rt.brandMeta = Object.assign({}, rt.brandMeta||{}, lt.brandMeta||{});
-    rt.taxInvoice = Object.assign({}, rt.taxInvoice||{}, lt.taxInvoice||{});
-    rt.monthlyHidden = Object.assign({}, rt.monthlyHidden||{}, lt.monthlyHidden||{});
+    // deleted tombstone에 있는 브랜드는 brands에서도 제거
+    mt.brands = (mt.brands||[]).filter(b=>!allDeleted.has(b));
+    // records: base 기본 + other에만 있는 (brand,month,category) 추가
+    // 단, deleted 브랜드는 제외
+    const baseRecKeys = new Set();
+    mt.records = (mt.records||[]).filter(r=>{
+      if(allDeleted.has(r.brand)) return false;
+      const k = `${r.brand}|${r.month}|${r.category||''}`;
+      baseRecKeys.add(k);
+      return true;
+    });
+    (ot.records||[]).forEach(r=>{
+      if(allDeleted.has(r.brand)) return;
+      const k = `${r.brand}|${r.month}|${r.category||''}`;
+      if(!baseRecKeys.has(k)){
+        mt.records.push(r);
+        baseRecKeys.add(k);
+      }
+    });
+    // notes: union (deleted 제외)
+    const baseNoteKeys = new Set((mt.notes||[]).map(n=>`${n.brand}|${n.month}`));
+    mt.notes = (mt.notes||[]).filter(n=>!allDeleted.has(n.brand));
+    (ot.notes||[]).forEach(n=>{
+      if(allDeleted.has(n.brand)) return;
+      const k = `${n.brand}|${n.month}`;
+      if(!baseNoteKeys.has(k)){
+        mt.notes.push(n);
+        baseNoteKeys.add(k);
+      }
+    });
+    // advertiserMap: base 기본 + other에만 있는 키 추가 (base에 키가 있으면 base 값 유지)
+    Object.keys(ot.advertiserMap||{}).forEach(b=>{
+      if(allDeleted.has(b)) return;
+      if(!(b in (mt.advertiserMap||{}))){
+        mt.advertiserMap = mt.advertiserMap || {};
+        mt.advertiserMap[b] = ot.advertiserMap[b];
+      }
+    });
+    // deleted 브랜드는 advertiserMap에서도 제거
+    Object.keys(mt.advertiserMap||{}).forEach(b=>{ if(allDeleted.has(b)) delete mt.advertiserMap[b]; });
+    // owners: 동일
+    Object.keys(ot.owners||{}).forEach(b=>{
+      if(allDeleted.has(b)) return;
+      if(!(b in (mt.owners||{}))){
+        mt.owners = mt.owners || {};
+        mt.owners[b] = ot.owners[b];
+      }
+    });
+    Object.keys(mt.owners||{}).forEach(b=>{ if(allDeleted.has(b)) delete mt.owners[b]; });
+    // brandMeta: 동일
+    Object.keys(ot.brandMeta||{}).forEach(b=>{
+      if(allDeleted.has(b)) return;
+      if(!(b in (mt.brandMeta||{}))){
+        mt.brandMeta = mt.brandMeta || {};
+        mt.brandMeta[b] = ot.brandMeta[b];
+      }
+    });
+    Object.keys(mt.brandMeta||{}).forEach(b=>{ if(allDeleted.has(b)) delete mt.brandMeta[b]; });
+    // taxInvoice: 동일
+    Object.keys(ot.taxInvoice||{}).forEach(b=>{
+      if(allDeleted.has(b)) return;
+      if(!(b in (mt.taxInvoice||{}))){
+        mt.taxInvoice = mt.taxInvoice || {};
+        mt.taxInvoice[b] = ot.taxInvoice[b];
+      }
+    });
+    Object.keys(mt.taxInvoice||{}).forEach(b=>{ if(allDeleted.has(b)) delete mt.taxInvoice[b]; });
+    // monthlyHidden: union of keys, base 값 우선
+    Object.keys(ot.monthlyHidden||{}).forEach(k=>{
+      if(!(k in (mt.monthlyHidden||{}))){
+        mt.monthlyHidden = mt.monthlyHidden || {};
+        mt.monthlyHidden[k] = ot.monthlyHidden[k];
+      }
+    });
+    // advertiserOrder: base + other에만 있는 항목 추가
+    const baseAdv = new Set(mt.advertiserOrder || []);
+    (ot.advertiserOrder||[]).forEach(a=>{ if(!baseAdv.has(a)){ mt.advertiserOrder = mt.advertiserOrder || []; mt.advertiserOrder.push(a); } });
+    // goals: base 우선 (최신이므로). other에만 있는 키 추가
+    Object.keys(ot.goals||{}).forEach(k=>{
+      if(!(k in (mt.goals||{}))){
+        mt.goals = mt.goals || {};
+        mt.goals[k] = ot.goals[k];
+      }
+    });
+    // roster: 더 긴 쪽 우선 (정보 보존 목적)
+    if((ot.roster||[]).length > (mt.roster||[]).length){ mt.roster = ot.roster; }
   });
-  // hq_goals: max값
-  if(local.hq_goals){
+  // hq_goals: base 우선 (최신). other에만 있는 키 추가
+  if(other.hq_goals){
     merged.hq_goals = merged.hq_goals || {};
-    Object.keys(local.hq_goals).forEach(k=>{
-      if(!merged.hq_goals[k] || (local.hq_goals[k] > merged.hq_goals[k])) merged.hq_goals[k] = local.hq_goals[k];
+    Object.keys(other.hq_goals).forEach(k=>{
+      if(!(k in merged.hq_goals)) merged.hq_goals[k] = other.hq_goals[k];
     });
   }
-  // groupIssues: 시간 기준 dedupe + union
-  if(local.groupIssues){
+  // groupIssues: id 기준 dedupe + union
+  if(other.groupIssues){
     merged.groupIssues = merged.groupIssues || {g1:[], g2:[]};
     ['g1','g2'].forEach(gid=>{
-      const all = [...(merged.groupIssues[gid]||[]), ...(local.groupIssues[gid]||[])];
+      const all = [...(merged.groupIssues[gid]||[]), ...(other.groupIssues[gid]||[])];
       const seen = new Set();
       merged.groupIssues[gid] = all.filter(iss=>{
         if(!iss || !iss.id) return false;
@@ -5810,17 +5882,20 @@ function mergeSnapshots(local, remote){
       });
     });
   }
-  // hqInsightOverrides, qualGrowth: merge
-  merged.hqInsightOverrides = Object.assign({}, merged.hqInsightOverrides||{}, local.hqInsightOverrides||{});
-  merged.qualGrowth = Object.assign({}, merged.qualGrowth||{}, local.qualGrowth||{});
-  merged.taxInvoice = Object.assign({}, merged.taxInvoice||{}, local.taxInvoice||{});
-  merged.brandMeta = Object.assign({}, merged.brandMeta||{}, local.brandMeta||{});
-  merged.approvalStatus = Object.assign({}, merged.approvalStatus||{}, local.approvalStatus||{});
+  // hqInsightOverrides, qualGrowth, approvalStatus: base 우선, other에만 있는 키 추가
+  ['hqInsightOverrides', 'qualGrowth', 'approvalStatus'].forEach(field=>{
+    if(other[field]){
+      merged[field] = merged[field] || {};
+      Object.keys(other[field]).forEach(k=>{
+        if(!(k in merged[field])) merged[field][k] = other[field][k];
+      });
+    }
+  });
   // renewed: union
-  const renewedAll = new Set([...(merged.renewed||[]), ...(local.renewed||[])]);
+  const renewedAll = new Set([...(merged.renewed||[]), ...(other.renewed||[])]);
   merged.renewed = Array.from(renewedAll);
   // updatedAt: max
-  merged.updatedAt = Math.max(merged.updatedAt||0, local.updatedAt||0);
+  merged.updatedAt = Math.max(localTime, remoteTime);
   return merged;
 }
 
