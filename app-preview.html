@@ -884,9 +884,9 @@
   .v85-mx-tbl{width:100%;border-collapse:collapse;font-size:13px;border:1px solid var(--line);border-radius:6px;overflow:hidden}
   .v85-mx-tbl thead th{background:#EFF2F6;color:var(--ink);font-size:11.5px;font-weight:600;letter-spacing:-.2px;padding:11px 12px;text-align:center;border-bottom:1px solid var(--line2);text-transform:none}
   .v85-mx-tbl thead th:first-child{text-align:left;padding-left:18px}
-  .v85-mx-tbl thead th.r{text-align:right;padding-right:24px}
+  .v85-mx-tbl thead th.r{text-align:center}
   .v85-mx-tbl tbody td{padding:12px 12px;border-bottom:1px solid var(--line2);font-variant-numeric:tabular-nums;font-weight:500;font-size:13px;color:var(--ink);background:#fff;text-align:center}
-  .v85-mx-tbl tbody td.r{text-align:right;font-weight:700;padding-right:24px}
+  .v85-mx-tbl tbody td.r{text-align:center;font-weight:700}
   .v85-mx-tbl tbody td.muted{color:var(--ink);font-weight:500}
   .v85-mx-tbl tbody td.pct.good{color:#16A34A}
   .v85-mx-tbl tbody td.pct.warn{color:#D97706}
@@ -914,7 +914,7 @@
   .v85-mx-tbl .team-row{display:none}
   .v85-mx-tbl .team-row.show{display:table-row}
   .v85-mx-tbl .team-row td{font-size:12.5px;background:#fff;color:var(--ink);font-weight:500}
-  .v85-mx-tbl .team-row td.pct{color:var(--ink) !important;font-weight:500 !important}
+  /* v107: team-row td.pct override 제거 - 이익률 컬러 적용 허용 */
   .v85-mx-tbl .team-row td.tname{padding-left:40px;color:var(--ink);font-weight:500;text-align:left;font-size:12.5px}
   .v85-mx-tbl .team-row.cur td{background:#FFFAFB}
   /* 합계는 펼쳐졌을 때만 보이거나, 항상 보일 수 있음 - 합계는 mo-row 그 자체임 */
@@ -6281,40 +6281,45 @@ function renderGroupCard(gid){
   const teamIds = g.teams || [];
   function getTeamMonthly(tid, month){
     const t = ALL_TEAMS_DATA.teams[tid];
-    if(!t) return {rev:0, goal:0};
-    let rev=0;
-    (t.records||[]).forEach(r=>{ if(r.month===month) rev += r.revenue||0; });
+    if(!t) return {rev:0, exp:0, goal:0};
+    let rev=0, exp=0;
+    (t.records||[]).forEach(r=>{ if(r.month===month){ rev += r.revenue||0; exp += r.expense||0; } });
     const annualGoal = (t.goals||{}).rev || 0;
     // v103: U팀은 4월 시작 → 9개월 기준
     const divisor = (tid === 'U') ? 9 : 12;
-    return {rev, goal: annualGoal/divisor};
+    return {rev, exp, goal: annualGoal/divisor};
   }
   const mxMonths = [prevM, curM, nextM];
   const mxTypes = [prevT, curT, nextT];  // v103: 마지막주차 시프트
   const mxBlocks = mxMonths.map((mo, i)=>{
     const type = mxTypes[i];
     const pillTxt = type==='prev'?'완료':type==='cur'?'진행 중':'계획';
-    let totalGoal=0, totalRev=0;
+    let totalGoal=0, totalRev=0, totalExp=0;
     const teamRowsData = teamIds.map(tid=>{
       const d = getTeamMonthly(tid, mo);
       totalGoal += d.goal;
       totalRev += d.rev;
+      totalExp += (d.exp||0);
       return {tid, ...d};
     });
     const teamRows = teamRowsData.map(d=>{
       const pct = d.goal ? (d.rev/d.goal*100) : 0;
       const cls = !d.rev?'':pct>=100?'good':pct>=70?'':'warn';
-      return `<tr class="${type} team-row" data-month="${mo}"><td class="tname">${d.tid}팀</td><td class="r muted">${d.goal?fmtFull(d.goal):'-'}</td><td class="r">${d.rev?fmtFull(d.rev):'-'}</td><td class="r">${d.rev?pct.toFixed(0)+'%':'-'}</td></tr>`;
+      const tMargin = d.rev ? ((d.rev - (d.exp||0))/d.rev*100) : 0;
+      const tMarginCls = !d.rev ? '' : (tMargin>=goalMargin ? 'good' : tMargin>=0 ? 'warn' : 'bad');
+      return `<tr class="${type} team-row" data-month="${mo}"><td class="tname">${d.tid}팀</td><td class="r muted">${d.goal?fmtFull(d.goal):'-'}</td><td class="r">${d.rev?fmtFull(d.rev):'-'}</td><td class="r">${d.rev?pct.toFixed(0)+'%':'-'}</td><td class="r pct ${tMarginCls}">${d.rev?tMargin.toFixed(1)+'%':'-'}</td></tr>`;
     }).join('');
     const totPct = totalGoal ? (totalRev/totalGoal*100) : 0;
     const totCls = !totalRev?'':totPct>=100?'good':totPct>=70?'':'warn';
+    const totMargin = totalRev ? ((totalRev - totalExp)/totalRev*100) : 0;
+    const totMarginCls = !totalRev?'':totMargin>=goalMargin?'good':totMargin>=0?'warn':'bad';
     return `
-      <tr class="mo-row ${type}" data-toggle-month="${mo}"><td><span class="mo-name"><span class="caret">▶</span>${mo}</span></td><td class="r muted">${totalGoal?fmtFull(totalGoal):'-'}</td><td class="r">${totalRev?fmtFull(totalRev):'-'}</td><td class="r pct ${totCls}">${totalRev?totPct.toFixed(0)+'%':'-'}</td></tr>
+      <tr class="mo-row ${type}" data-toggle-month="${mo}"><td><span class="mo-name"><span class="caret">▶</span>${mo}</span></td><td class="r muted">${totalGoal?fmtFull(totalGoal):'-'}</td><td class="r">${totalRev?fmtFull(totalRev):'-'}</td><td class="r pct ${totCls}">${totalRev?totPct.toFixed(0)+'%':'-'}</td><td class="r pct ${totMarginCls}">${totalRev?totMargin.toFixed(1)+'%':'-'}</td></tr>
       ${teamRows}
     `;
   }).join('');
   const grpMatrixHtml = `<table class="v85-mx-tbl">
-    <thead><tr><th style="width:28%">월 / 팀</th><th class="r" style="width:24%">목표 매출</th><th class="r" style="width:24%">달성 매출</th><th class="r" style="width:24%">달성률</th></tr></thead>
+    <thead><tr><th style="width:22%">월 / 팀</th><th class="r" style="width:20%">목표 매출</th><th class="r" style="width:20%">달성 매출</th><th class="r" style="width:18%">달성률</th><th class="r" style="width:20%">이익률</th></tr></thead>
     <tbody>${mxBlocks}</tbody>
   </table>`;
 
