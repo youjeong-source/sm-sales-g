@@ -5777,6 +5777,13 @@ async function periodicCloudPull(){
 
 // 동기화 상태 표시 (헤더 우측)
 function showSyncStatus(state){
+  // v110: 본부장(head)만 인디케이터 표시. 동기화 로직은 모든 사용자 작동.
+  const isHead = (typeof STATE !== 'undefined') && (STATE.role === 'head' || (STATE.level||0) >= 3);
+  if(!isHead){
+    const existing = document.getElementById('cloud-sync-status');
+    if(existing) existing.style.display = 'none';
+    return;
+  }
   let el = document.getElementById('cloud-sync-status');
   if(!el){
     el = document.createElement('div');
