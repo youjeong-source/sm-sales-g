@@ -5417,10 +5417,13 @@ function persistTeamsData(silent){
     });
     localStorage.setItem(DATA_KEY, JSON.stringify(snapshot));
     if(!silent) showSaveIndicator('saved');
-    // v108: 클라우드 동기화 (비동기, 에러 무시)
+    // v108/v112: 클라우드 동기화 (비동기, 큐잉)
     try {
       if(typeof cloudPush === 'function' && CLOUD_AVAILABLE){
-        cloudPush(snapshot).then(ok=>{ if(ok && typeof showSyncStatus==='function') showSyncStatus('synced'); });
+        cloudPush(snapshot).then(ok=>{
+          if(ok && typeof showSyncStatus === 'function') showSyncStatus('synced');
+          if(!ok) console.warn('[클라우드] 푸시 실패 - 다시 시도됨');
+        });
       }
     } catch(e){}
   } catch(e){
@@ -5439,6 +5442,16 @@ setInterval(()=>{
 
 // 페이지 닫기/새로고침 전 마지막 저장
 window.addEventListener('beforeunload', function(){
+  // v112: 페이지 닫기 전 sendBeacon으로 클라우드 푸시 (마지막 변경 사항 보장)
+  try {
+    if(typeof CLOUD_AVAILABLE !== 'undefined' && CLOUD_AVAILABLE && typeof buildSnapshot === 'function'){
+      const snap = buildSnapshot();
+      if(snap){
+        const blob = new Blob([JSON.stringify({data: snap})], {type:'application/json'});
+        navigator.sendBeacon('/api/data', blob);
+      }
+    }
+  } catch(e){}
   try {
     if(typeof ALL_TEAMS_DATA !== 'undefined' && ALL_TEAMS_DATA.teams){
       const snapshot = {
@@ -5655,24 +5668,32 @@ async function cloudFetch(){
   }
 }
 
+let CLOUD_PENDING_SNAPSHOT = null;
 async function cloudPush(snapshot){
+  // v112: 큐잉 - 항상 최신 스냅샷이 푸시되도록 보장
   if(!CLOUD_AVAILABLE) return false;
-  if(CLOUD_SYNC_INFLIGHT) return false;
+  CLOUD_PENDING_SNAPSHOT = snapshot;  // 항상 최신으로 교체
+  if(CLOUD_SYNC_INFLIGHT) return true;  // 워커가 처리할 것
   CLOUD_SYNC_INFLIGHT = true;
-  try {
-    const r = await fetch(CLOUD_API, {
-      method: 'POST',
-      headers: {'Content-Type': 'application/json'},
-      body: JSON.stringify({data: snapshot})
-    });
-    if(r.status === 503){ CLOUD_AVAILABLE = false; return false; }
-    return r.ok;
-  } catch(e){
-    return false;
-  } finally {
-    CLOUD_SYNC_INFLIGHT = false;
-    CLOUD_LAST_SYNC = Date.now();
+  let success = false;
+  while(CLOUD_PENDING_SNAPSHOT){
+    const snap = CLOUD_PENDING_SNAPSHOT;
+    CLOUD_PENDING_SNAPSHOT = null;
+    try {
+      const r = await fetch(CLOUD_API, {
+        method: 'POST',
+        headers: {'Content-Type': 'application/json'},
+        body: JSON.stringify({data: snap})
+      });
+      if(r.status === 503){ CLOUD_AVAILABLE = false; break; }
+      success = r.ok;
+    } catch(e){
+      console.warn('cloudPush 실패', e);
+    }
   }
+  CLOUD_SYNC_INFLIGHT = false;
+  CLOUD_LAST_SYNC = Date.now();
+  return success;
 }
 
 function buildSnapshot(){
@@ -5823,8 +5844,8 @@ function showSyncStatus(state){
   // 절대 자동 페이드아웃 안 함 (사용자가 항상 상태 보이게)
 }
 
-// v111: 10초마다 클라우드 풀 (빠른 동기화)
-setInterval(periodicCloudPull, 10 * 1000);
+// v112: 3초마다 클라우드 풀 (거의 실시간)
+setInterval(periodicCloudPull, 3 * 1000);
 
 // v111: 탭 포커스/가시성 변경 시 즉시 동기화 (다른 작업 후 돌아왔을 때 최신 데이터 보장)
 document.addEventListener('visibilitychange', ()=>{
